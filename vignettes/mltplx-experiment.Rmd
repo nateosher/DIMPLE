@@ -1,0 +1,112 @@
+---
+title: "mltplx-experiment"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{mltplx-experiment}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(DistDist)
+```
+
+# Summary
+
+This vignette explains how to construct and use `MltplxExperiment` objects. We'll start by simulating some simple data with three cell types: "tumor", "immune," and "other." We'll generate 10 slides worth of data.
+
+```{r}
+cell_x_values = runif(3000, 0, 600)
+cell_y_values = runif(3000, 0, 600)
+cell_marks = sample(c("Tumor", "Immune", "Other"), 3000, replace = TRUE)
+slide_ids = rep(paste("Slide", 1:10), each = 300)
+
+experiment = new_MltplxExperiment(x = cell_x_values, 
+                                  y = cell_y_values,
+                                  marks = factor(cell_marks),
+                                  slide_id = slide_ids)
+
+print(experiment)
+```
+
+Suppose we now want to generate intensities of each cell type for each slide. This can be accomplished as follows:
+
+```{r}
+experiment = update_intensity(experiment, 10, 30)
+experiment
+```
+
+We can generate distance matrices for each intensity using the `update_dist` function. We'll use `cor` as the distance metric, though this isn't necessarily recommended in practice; the point is that we can use any function that takes in two vectors and outputs a scalar.
+
+```{r}
+experiment = update_dist(experiment, cor)
+experiment
+```
+
+The final thing we can do is attach "metadata," i.e. data related to either the slide or the patient the slide came from. We'll simulate some simple data, and attach it.
+
+```{r}
+sim_metadata = tibble::tibble(
+  age = sample(50:70, 10, replace = TRUE),
+  sex = sample(c("M", "F"), 10, replace = TRUE),
+  patient_id = paste("Patient", 1:10),
+  slide_id = paste("Slide", 1:10)
+)
+
+experiment = update_metadata(experiment, metadata = sim_metadata)
+experiment
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

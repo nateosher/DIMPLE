@@ -1,0 +1,160 @@
+#' Creates new `MltplxObject` object.
+#' @param x Vector of x coordinates of cells
+#' @param y Vector of y coordinates of cells
+#' @param marks Vector of cell types
+#' @param slide_id Vector of slide ids, i.e. how should cells be grouped
+#' @param ps Optional; if you'd like to generate intensity estimates when
+#' you first create these objects, this will determine the "pixel size," i.e.
+#' the side-length of the squares the domain will be broken up into in order
+#' for the estimation to occur. Required if `bw` is passed (and vice versa).
+#' Intensities can also be generated after this object is created.
+#' @param bw Optional; if you'd like to generate intensity estimates when
+#' you first create these objects, this will determine the "bandwidth" of the
+#' smoothing. Larger values of `bw` result in more smoothing; this is not
+#' necessarily a good thing. Required if `ps` is passed (and vice versa).
+#' Intensities can also be generated after this object is created.
+#' @param dist_metric Optional; if you'd like to generate distance matrices
+#' between different cell type intensities, this will be the distance metric
+#' used to do so. Distance matrices can also be generated after this object
+#' is created.
+#' @param .dist_metric_name Optional; not required, even when a distance
+#' matrix is passed. However, if you'd like to name the distance function
+#' you use something specific, you can pass this name as a string using
+#' this parameter. Otherwise, it defaults to the name of the function
+#' @return `MltplxObject` object
+#' @export
+new_MltplxObject = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
+                            dist_metric = NULL, .dist_metric_name = NULL){
+
+  dist_metric_name <- get_dist_metric_name(dist_metric,.dist_metric_name)
+
+  # Make image
+  mltplx_image = new_MltplxImage(x, y, marks)
+
+
+  # Make intensities, if applicable
+  if(!is.null(ps) && !is.null(bw)){
+    mltplx_intensity = new_MltplxIntensity(mltplx_image, ps, bw)
+  }else{
+    mltplx_intensity = NULL
+  }
+
+  # Make distance matrices, if applicable
+  if(!is.null(dist_metric)){
+    mltplx_dist = new_MltplxDist(mltplx_intensity, dist_metric,
+                                 dist_metric_name)
+  }else{
+    mltplx_dist = NULL
+  }
+
+  structure(
+    list(
+      slide_id = slide_id[1],
+      mltplx_image = mltplx_image,
+      mltplx_intensity = mltplx_intensity,
+      mltplx_dist = mltplx_dist
+    ),
+    class = "MltplxObject"
+  )
+}
+
+#' @export
+print.MltplxObject = function(mltplx_object, ...){
+  cat("MltplxObject \n")
+  cat("Slide id:", mltplx_object$slide_id, "\n")
+  cat("Image with", mltplx_object$mltplx_image$ppp$n, "cells across",
+      length(mltplx_object$mltplx_image$cell_types), "cell types\n")
+  cell_type_str = paste0(mltplx_object$mltplx_image$cell_types, collapse = ", ")
+  cat("Cell types:", cell_type_str, "\n")
+
+  if(!is.null(mltplx_object$mltplx_intensity)){
+    cat("Intensity generated with pixel size",
+        mltplx_object$mltplx_intensity$ps,
+        "and bandwidth", mltplx_object$mltplx_intensity$bw, "\n")
+  }else{
+    cat("No intensity generated (yet)\n")
+  }
+  if(!is.null(mltplx_object$mltplx_dist)){
+    cat("Distance matrix generated using", mltplx_object$mltplx_dist$metric,
+        "\n")
+  }else{
+    cat("No distance matrix generated (yet)\n")
+  }
+  cat(length(mltplx_object$quantile_dist),"quantile distance arrays generated.",
+      "\n")
+}
+
+#' @export
+update_object_intensity = function(mltplx_object, ps, bw){
+  mltplx_object$mltplx_intensity = new_MltplxIntensity(
+    mltplx_object$mltplx_image, ps, bw
+  )
+  return(mltplx_object)
+}
+
+update_object_dist = function(mltplx_object, dist_metric,
+                              .dist_metric_name = NULL){
+  if(is.null(mltplx_object$mltplx_intensity))
+    stop(paste("you have to generate intensities before",
+                "distance matrices- see `update_intensity` function",
+                "for details on how to do this"))
+
+  if(is.null(.dist_metric_name)){
+    .dist_metric_name = substitute(dist_metric) %>% as.character()
+  }
+
+  mltplx_object$mltplx_dist = new_MltplxDist(
+    mltplx_object$mltplx_intensity, dist_metric,
+    .dist_metric_name
+  )
+  return(mltplx_object)
+}
+
+#' @export
+dist_to_df.MltplxObject <- function(mltplx_object) {
+  if(!is.null(mltplx_object$mltplx_dist)) {
+    mat <- mltplx_object$mltplx_dist$dist
+
+    mat %>%
+      as.data.frame.table() %>%
+      rename(type1=Var1,
+             type2=Var2,
+             dist=Freq) %>%
+    mutate(slide_id=mltplx_object$slide_id)
+  } else {
+    cat(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a distance matrix."))
+  }
+}
+
+#' @export
+get_dist_metric_name <- function(dist_metric,.dist_metric_name=NULL) {
+  if(!is.null(.dist_metric_name)){
+    dist_metric_name = .dist_metric_name
+  }else{
+    dist_metric_name = substitute(dist_metric) %>% as.character()
+  }
+  dist_metric_name
+}
+
+#' @export
+add_QuantileDist.MltplxObject <- function(mltplx_object,
+                                          dist_metric,
+                                          mask_type,
+                                          q_probs,
+                                          .dist_metric_name = NULL,
+                                          verbose = FALSE) {
+  if(verbose) print(mltplx_object$slide_id)
+
+  dist_metric_name = get_dist_metric_name(dist_metric,.dist_metric_name)
+  q_dist <- mltplx_object$quantile_dist <- new_QuantileDist(mltplx_object$mltplx_intensity,
+                                                       dist_metric=dist_metric,
+                                                       mask_type=mask_type,
+                                                       q_probs=q_probs,
+                                                       dist_metric_name=dist_metric_name)
+  if(length(mltplx_object$quantile_dist) == 0) {
+    mltplx_object$quantile_dist <- list(q_dist)
+  } else {
+    mltplx_object$quantile_dist <- append(mltplx_object$quantile_dist,q_dist)
+  }
+  mltplx_object
+}
