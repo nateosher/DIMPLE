@@ -7,6 +7,7 @@
 #' @return dataframe in which rows are pixels and columns are cell types
 #' @export
 #'
+#' @importFrom magrittr `%>%`
 #' @examples
 pat.density = function(pat,eps,sigma,...) {
   split.pat = spatstat.geom::split.ppp(pat)

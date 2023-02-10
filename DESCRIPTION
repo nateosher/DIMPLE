@@ -15,7 +15,8 @@ Imports:
   fuzzyjoin,
   pals,
   spatstat.geom,
-  spatstat.core
+  spatstat.core,
+  tidyr
 Suggests: 
     knitr,
     rmarkdown,

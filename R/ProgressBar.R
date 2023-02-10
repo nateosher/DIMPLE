@@ -1,3 +1,7 @@
+#' Prints text progress bar with spinny thing
+#' @param cur current index
+#' @param total total number of things to be done
+#' @return NULL
 ProgressBar = function(cur, total,...){
   n_equals = min(floor((cur/total) * (options("width")$width - 20)),
                  options("width")$width - 20)

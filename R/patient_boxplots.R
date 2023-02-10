@@ -5,6 +5,7 @@
 #' @param t2 Second cell type
 #' @param grouping_var Optional; string to indicate variable to use to further
 #' group boxplots.
+#' @param label_spots Whether or not boxplots should be labeled with slide ids
 #' @return ggplot2 plot
 #' @importFrom magrittr `%>%`
 #' @export
