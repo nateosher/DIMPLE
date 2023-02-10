@@ -25,7 +25,7 @@ new_QuantileDist <- function(mltplx_intensity,
       x
     }) %>%
     mutate(q_fac = factor(1:nrow(.)))
-
+  q$q2[length(q$q2)]<-(q$q2[length(q$q2)]+.Machine$double.eps)
 
   intensities %>%
     fuzzyjoin::fuzzy_join(q,
