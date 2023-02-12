@@ -35,7 +35,9 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
     y = y,
     marks = marks,
     slide_id = slide_id,
-    slide_id_num = slide_id %>% factor() %>% as.numeric(),
+    slide_id_num = slide_id %>%
+      factor(levels = unique(slide_id)) %>%
+      as.numeric(),
     total_slides = max(slide_id_num)
   )
 
@@ -45,9 +47,11 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
     dist_metric_name = NULL
 
   mltplx_objects = full_tib %>%
-    group_by(slide_id, slide_id_num, total_slides) %>%
+    group_by(slide_id_num, slide_id) %>%
     group_map(~{
-      ProgressBar(.y$slide_id_num, .y$total_slides)
+      # I changed this; leads to weird ordering bug if we group by
+      # total # of slides as well
+      ProgressBar(.y$slide_id_num, .x$total_slides[1])
       new_MltplxObject(.x$x, .x$y, .x$marks, .y$slide_id, ps, bw,
                                     dist_metric,
                                     dist_metric_name)
@@ -95,6 +99,11 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
   }else{
     cat("No attached metadata")
   }
+}
+
+#' @export
+length.MltplxExperiment = function(mltplx_experiment){
+  return(length(mltplx_experiment$mltplx_objects))
 }
 
 #' @export
