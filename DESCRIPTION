@@ -17,7 +17,8 @@ Imports:
     spatstat.geom,
     spatstat.core,
     tidyr,
-    qgraph
+    qgraph,
+    broom
 Suggests: 
     knitr,
     rmarkdown,

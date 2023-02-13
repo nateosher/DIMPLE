@@ -30,6 +30,7 @@ plot_intensities <- function(mltplx_experiment,types,slide_ids) {
       ggplot(aes(X,Y,fill=intensity)) +
       geom_tile() +
       facet_wrap(~type) +
+      scale_fill_gradientn(colours = terrain.colors(15)) +
       ggtitle(paste0("Intensity plot for slide id ", id)) -> p
     print(p)
   }

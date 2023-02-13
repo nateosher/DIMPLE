@@ -115,12 +115,22 @@ dist_to_df.MltplxObject <- function(mltplx_object) {
   if(!is.null(mltplx_object$mltplx_dist)) {
     mat <- mltplx_object$mltplx_dist$dist
 
-    mat %>%
+   df <- mat %>%
       as.data.frame.table() %>%
       rename(type1=Var1,
              type2=Var2,
              dist=Freq) %>%
     mutate(slide_id=mltplx_object$slide_id)
+    
+    df %>%
+      select(type1,type2,slide_id) %>%
+      apply(.,1,sort) %>%
+      t(.) %>%
+      duplicated(.) -> dup_ix
+    
+    df[dup_ix, ] -> df
+    
+    return(df)
   } else {
     cat(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a distance matrix."))
   }

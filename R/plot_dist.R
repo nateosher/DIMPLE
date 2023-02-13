@@ -2,8 +2,7 @@
 #' @param mltplx_experiment `MltplxExperiment` objects
 #' @param slide_ids Vector of ids of slides whose distance matrices you'd like
 #' to print
-#' @param mode String indicating plot type; currently only "heatmap" is
-#' supported
+#' @param mode String indicating plot type, either "heatmap" or "network"
 #' @return NULL
 #' @importFrom magrittr `%>%`
 #' @import ggplot2

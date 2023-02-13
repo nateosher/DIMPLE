@@ -122,7 +122,6 @@ dist_to_df.MltplxExperiment <- function(mltplx_experiment) {
     warning("you have not attached any metadata")
   map_df(mltplx_experiment$mltplx_objects,dist_to_df) %>%
     {
-      if(!is.null(mltplx_experiment$metadata)) left_join(.,mltplx_experiment$metadata)
       if(!is.null(mltplx_experiment$metadata))
         left_join(.,mltplx_experiment$metadata)
       else
