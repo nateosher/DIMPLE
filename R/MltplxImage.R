@@ -6,9 +6,9 @@
 #' @importFrom spatstat.geom ppp owin
 #' @export
 new_MltplxImage = function(x, y, marks){
-  ppp = ppp(x = x, y = y, marks = marks,
-            window = owin(c(0, max(x)),
-                          c(0, max(y))))
+  ppp = ppp(x = x, y = y, marks = factor(marks),
+            window = owin(c(min(x), max(x)),
+                          c(min(y), max(y))))
 
   structure(
     list(

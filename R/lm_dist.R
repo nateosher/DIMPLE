@@ -22,8 +22,7 @@ lm_dist <- function(mltplx_experiment,
   
   df <- df %>%
     filter(slide_id %in% slide_ids,
-           type1 %in% types,
-           type2 %in% types)
+           type1 %in% types | type2 %in% types) # from reduce_symmetric
   
   fm <- as.formula(paste0("dist ~ ", group_factor))
 

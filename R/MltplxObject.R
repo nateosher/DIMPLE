@@ -145,16 +145,6 @@ dist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
 }
 
 #' @export
-get_dist_metric_name <- function(dist_metric,.dist_metric_name=NULL) {
-  if(!is.null(.dist_metric_name)){
-    dist_metric_name = .dist_metric_name
-  }else{
-    dist_metric_name = substitute(dist_metric) %>% as.character()
-  }
-  dist_metric_name
-}
-
-#' @export
 add_QuantileDist.MltplxObject <- function(mltplx_object,
                                           dist_metric,
                                           mask_type,
