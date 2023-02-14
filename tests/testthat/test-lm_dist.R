@@ -1,10 +1,9 @@
 exp <- build_mltplx_exp(200,seed=2025)
 exp <- add_mltplx_metadata(exp,n_patients=2)
+exp <- update_intensity(exp,ps=2,bw=3)
+exp <- update_dist(exp,cor)
 
 test_that("Correct linear model outputs", {
-  exp <- update_intensity(exp,ps=2,bw=3)
-  exp <- update_dist(exp,cor)
-  
   y <- unlist(lapply(exp$mltplx_objects, \(obj) obj$mltplx_dist$dist[1,2]))
   
   tb <- tibble(y=y,slide_id=exp$slide_ids) %>%
