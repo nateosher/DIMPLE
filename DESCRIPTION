@@ -18,9 +18,7 @@ Imports:
     spatstat.core,
     tidyr,
     qgraph,
-    broom,
-    lme4,
-    broom.mixed
+    broom
 Suggests: 
     covr,
     knitr,
