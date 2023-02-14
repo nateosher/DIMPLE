@@ -110,8 +110,15 @@ update_object_dist = function(mltplx_object, dist_metric,
   return(mltplx_object)
 }
 
+
+#' Title
+#'
+#' @param mltplx_object 
+#' @param reduce_symmetric logical, whether to remove equivalent rows
+#'
+#' @return tibble with dist information
 #' @export
-dist_to_df.MltplxObject <- function(mltplx_object) {
+dist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
   if(!is.null(mltplx_object$mltplx_dist)) {
     mat <- mltplx_object$mltplx_dist$dist
 
@@ -122,14 +129,15 @@ dist_to_df.MltplxObject <- function(mltplx_object) {
              dist=Freq) %>%
     mutate(slide_id=mltplx_object$slide_id)
     
-    df %>%
-      select(type1,type2,slide_id) %>%
-      apply(.,1,sort) %>%
-      t(.) %>%
-      duplicated(.) -> dup_ix
-    
-    df[dup_ix, ] -> df
-    
+   if(reduce_symmetric) {
+     df %>%
+       select(type1,type2,slide_id) %>%
+       apply(.,1,sort) %>%
+       t(.) %>%
+       duplicated(.) -> dup_ix
+     
+     df <- df[dup_ix, ]
+   }
     return(df)
   } else {
     cat(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a distance matrix."))

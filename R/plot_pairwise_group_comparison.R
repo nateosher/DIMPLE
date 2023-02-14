@@ -4,7 +4,7 @@
 #'
 #' @return ggplot heatmap
 #' @export
-plot_typewise_comparison <- function(df) {
+plot_pairwise_group_heatmap <- function(df) {
   df %>% {
     ggplot(.,aes(type1,type2,fill=estimate)) +
     geom_tile() +
@@ -18,4 +18,23 @@ plot_typewise_comparison <- function(df) {
                             limits = c(-max(abs(round(.$estimate,2))),max(abs(round(.$estimate,2))))
     )
   }
+}
+
+#' Plot boxplots of dist between two groups for a combination of cell types
+#'
+#' @param mltplx_experiment 
+#' @param t1 cell type 1
+#' @param t2 cell type 2
+#' @param group_factor string, name of metadata column
+#'
+#' @return ggplot boxplots
+#' @export
+typewise_boxplots <- function(mltplx_experiment,t1,t2,group_factor) {
+  mltplx_experiment %>%
+    dist_to_df() %>%
+    filter(type1 == t1,
+           type2 == t2) %>%
+    ggplot(aes(!!sym(group_factor),dist)) +
+    geom_boxplot() +
+    geom_jitter(color="orange")
 }

@@ -16,7 +16,7 @@ lm_dist <- function(mltplx_experiment,
   stopifnot("Group factor must be in patient metadata"=group_factor %in% colnames(mltplx_experiment$metadata))
   
   df <- mltplx_experiment %>%
-    dist_to_df()
+    dist_to_df(reduce_symmetric = TRUE)
   if(is.null(slide_ids)) slide_ids <- unique(df$slide_id)
   if(is.null(types)) types <- unique(df$type1)
   
