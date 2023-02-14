@@ -20,6 +20,7 @@ Imports:
     qgraph,
     broom
 Suggests: 
+    covr,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)

@@ -15,8 +15,6 @@ test_that("`MltplxExperiment` constructor (no intensities/dists) works", {
   expect_true(is.null(experiment_only$dist_metric_name))
   expect_true(is.null(experiment_only$metadata))
 
-  expect_equal(length(experiment_only), 10)
-
   expect_equal(class(experiment_only[[1]]), "MltplxObject")
 
   expect_equal(experiment_only[[1]]$slide_id, "Slide 1")

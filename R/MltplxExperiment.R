@@ -102,11 +102,6 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
 }
 
 #' @export
-length.MltplxExperiment = function(mltplx_experiment){
-  return(length(mltplx_experiment$mltplx_objects))
-}
-
-#' @export
 `[[.MltplxExperiment` = function(mltplx_experiment, i){
   return(mltplx_experiment$mltplx_objects[[i]])
 }

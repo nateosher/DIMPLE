@@ -9,6 +9,8 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/DistDist)](https://CRAN.R-project.org/package=DistDist)
+[![Codecov test
+coverage](https://codecov.io/gh/nateosher/DistDist/branch/master/graph/badge.svg)](https://app.codecov.io/gh/nateosher/DistDist?branch=master)
 <!-- badges: end -->
 
 The goal of DistDist is to …
