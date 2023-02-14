@@ -41,7 +41,6 @@ lm_dist <- function(mltplx_experiment,
       tryCatch({
         lm(fm,data=.x)
       },error=\(e) {
-        print(e)
         NULL
       }
       ) %>%
