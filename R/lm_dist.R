@@ -25,7 +25,8 @@ lm_dist <- function(mltplx_experiment,
   if(is.null(slide_ids)) slide_ids <- unique(df$slide_id)
   if(is.null(types)) types <- unique(df$type1)
   
-  fm_string <- paste0("dist ~ ", group_factor,paste0(covariates,collapse = " + "))
+  fm_string <- paste0("dist ~ ", group_factor)
+  if(!is.null(covariates)) fm_string <- paste0(fm_string, " + ",paste0(covariates,collapse = " + "))
   fm <- as.formula(fm_string)
   
   result <- df %>%
@@ -40,13 +41,14 @@ lm_dist <- function(mltplx_experiment,
       tryCatch({
         lm(fm,data=.x)
       },error=\(e) {
+        print(e)
         NULL
       }
       ) %>%
         broom::tidy()
     }) %>%
     ungroup() %>%
-    filter(!stringr::str_detect(term,"Intercept")) %>%
+    filter(!stringr::str_detect(term,paste0(c("Intercept",covariates),collapse = "|"))) %>%
     mutate(p.adj = p.adjust(p.value,method="fdr"))
   
   return(result)
