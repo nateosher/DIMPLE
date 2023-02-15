@@ -28,11 +28,10 @@ lm_dist <- function(mltplx_experiment,
   fm_string <- paste0("dist ~ ", group_factor)
   if(!is.null(covariates)) fm_string <- paste0(fm_string, " + ",paste0(covariates,collapse = " + "))
   fm <- as.formula(fm_string)
-  
+
   result <- df %>%
     filter(slide_id %in% slide_ids,
-           type1 %in% types,
-           type2 %in% types) %>%
+           type1 %in% types | type2 %in% types) %>% # from reduce_symmetric
     group_by(patient_id,type1,type2) %>%
     mutate(.,dist = agg_fun(dist,na.rm = T)) %>%
     distinct(type1,type2,dist,patient_id,.keep_all = T) %>%
