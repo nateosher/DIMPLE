@@ -101,14 +101,15 @@ function(input, output, session) {
     
     df<-data.frame()%>%filter(image_id==input$image_to_plot)
     req(input$image_to_plot%in%df$image_id)
-    obj<-new_MltplxObject(
+    obj<-new_MltplxExperiment(
       x = df$x,
       y = df$y,
       marks = df$cell_type,
       slide_id = df$image_id)
     
     
-    plot(obj$mltplx_image)
+    #plot(obj$mltplx_image)
+    plot_ppp(obj,input$image_to_plot)
     # req(data.frame())
     # 
     # df<-data.frame()
@@ -127,14 +128,14 @@ function(input, output, session) {
   output$intens_plot <- renderPlot({
     df<-data.frame()%>%filter(image_id==input$intens_to_plot)
     req(input$intens_to_plot%in%df$image_id)
-    intens_data<-new_MltplxObject(
+    intens_data<-new_MltplxExperiment(
       x = df$x,
       y = df$y,
       marks = df$cell_type,
       slide_id = df$image_id,ps=input$eps,bw=input$bw )
-    as.data.frame(intens_data$mltplx_intensity$intensities)%>%pivot_longer(-c("X","Y"))%>%
-      ggplot(aes(X,Y))+geom_raster(aes(fill=value))+facet_wrap(name~.)
-    
+   # as.data.frame(intens_data$mltplx_intensity$intensities)%>%pivot_longer(-c("X","Y"))%>%
+   #   ggplot(aes(X,Y))+geom_raster(aes(fill=value))+facet_wrap(name~.)
+    plot_intensities(intens_data,types=unique(df$cell_type),input$intens_to_plot)
     
   })
   
