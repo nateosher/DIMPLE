@@ -14,7 +14,7 @@ Imports:
   ggplot2,
   fuzzyjoin,
   pals,
-  spatstat,
+  spatstat.explore,
   spatstat.geom,
   tidyr
 Suggests: 

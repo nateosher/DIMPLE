@@ -13,10 +13,10 @@ pat.density = function(pat,eps,sigma,...) {
   split.pat = spatstat.geom::split.ppp(pat)
   dens.split = lapply(split.pat,function(pp) {
     tryCatch({
-      spatstat.core::density.ppp(pp,sigma=sigma,diggle=T,eps=eps,...)
+      spatstat.explore::density.ppp(pp,sigma=sigma,diggle=T,eps=eps,...)
     },
     error=function(e) {
-      spatstat.core::density.ppp(pp,diggle=T,eps=eps,...)
+      spatstat.explore::density.ppp(pp,diggle=T,eps=eps,...)
     })
   })
   sp = dens.split[[2]]
