@@ -148,6 +148,47 @@ dist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
   }
 }
 
+#' Quantile dist to df
+#'
+#' @param mltplx_object 
+#' @param reduce_symmetric logical, whether to remove equivalent rows
+#'
+#' @return tibble with dist information
+#' @export
+qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
+  if(!is.null(mltplx_object$quantile_dist)) {
+    arr <- mltplx_object$quantile_dist$quantile_dist_array
+    
+    nms3 <- mltplx_object$quantile_dist$quantiles %>%
+      unite("p1_p2",p1,p2,sep="-") %>%
+      pull(p1_p2)
+    
+    dimnames(arr)[[3]] <- nms3
+    
+    df <- arr %>%
+      as.data.frame.table() %>%
+      rename(type1=Var1,
+             type2=Var2,
+             interval=Var3,
+             dist=Freq) %>%
+      mutate(slide_id=mltplx_object$slide_id) %>%
+      as_tibble()
+    
+    if(reduce_symmetric) {
+      df %>%
+        select(type1,type2,slide_id,interval) %>%
+        apply(.,1,sort) %>%
+        t(.) %>%
+        duplicated(.) -> dup_ix
+      
+      df <- df[dup_ix, ]
+    }
+    df
+  } else {
+    cat(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a quantile distance array."))
+  }
+}
+
 #' @export
 add_QuantileDist.MltplxObject <- function(mltplx_object,
                                           dist_metric,
