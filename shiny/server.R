@@ -8,8 +8,8 @@
 #
 
 library(shiny);library(ggplot2);library(dplyr);library(here);library(spatstat);library(tidyr);library(purrr);library(fuzzyjoin)
-
-library(DistDist)
+library(devtools)
+devtools::load_all()
 source("helpers.R")
 
 
@@ -91,6 +91,7 @@ function(input, output, session) {
     
     df<-metadata()%>%mutate(slide_id=as.factor(.data[[input$md_image_id]]),patient_id=as.factor(.data[[input$patient_id]]),surv_time=as.numeric(.data[[input$surv_time]]),surv_event=as.factor(.data[[input$surv_event]]))
     updateSelectInput(session, inputId = 'grouping_var', label = 'Select grouping variable',choices = names(df),selected="Patient")
+    updateSelectInput(session, inputId = 'heatmap_grouping_var', label = 'Select grouping variable',choices = names(df),selected="Group")
     return(df)
   })
   
@@ -291,6 +292,18 @@ function(input, output, session) {
     
   }))
   
+  output$typewise_boxplot<-renderPlot(({
+    req(out())
+    typewise_boxplots(out(),input$t1,input$t2,group_factor=input$grouping_var)
+  }))
+  
+  output$heatmap<-renderPlot(({
+    req(out())
+    df<-lm_dist(out(),group_factor = input$heatmap_grouping_var,agg_fun = median)
+    plot_pairwise_group_heatmap(df)
+  }))
+  
 }
+
 
 

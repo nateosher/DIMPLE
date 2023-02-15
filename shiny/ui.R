@@ -146,7 +146,7 @@ fluidPage(shinyjs::useShinyjs(),
                      )
                      
             ),
-            tabPanel("Plot Distance Matrices",
+            tabPanel("Plot Boxplots",
                      pageWithSidebar(
                        headerPanel(''),
                        sidebarPanel(  
@@ -157,20 +157,21 @@ fluidPage(shinyjs::useShinyjs(),
                        ),
                        mainPanel(
                          #pre(id = "console"),
-                         plotOutput('patient_boxplot')
+                         plotOutput('patient_boxplot'),
+                         plotOutput('typewise_boxplot')
                        )
                      )
                      
             ),
-            tabPanel("Another plot",
+            tabPanel("Plot grouped heatmap",
                      pageWithSidebar(
                        headerPanel(''),
                        sidebarPanel(  
-                         selectInput('grouping_factor', 'Select grouping factor', "", selected = "Group")
+                         selectInput('heatmap_grouping_var', 'Select grouping variable', "", selected = "Group")
                        ),
                        mainPanel(
                          #pre(id = "console"),
-                         plotOutput('plot_pairwise_group_heatmap')
+                         plotOutput('heatmap')
                        )
                      )
                      
