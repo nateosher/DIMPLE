@@ -112,10 +112,10 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
 }
 
 #' @export
-dist_to_df.MltplxExperiment <- function(mltplx_experiment) {
+dist_to_df.MltplxExperiment <- function(mltplx_experiment,reduce_symmetric = FALSE) {
   if(is.null(mltplx_experiment$metadata))
     warning("you have not attached any metadata")
-  map_df(mltplx_experiment$mltplx_objects,dist_to_df) %>%
+  map_df(mltplx_experiment$mltplx_objects, dist_to_df, reduce_symmetric) %>%
     {
       if(!is.null(mltplx_experiment$metadata))
         left_join(.,mltplx_experiment$metadata)
