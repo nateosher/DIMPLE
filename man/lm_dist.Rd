@@ -4,12 +4,23 @@
 \alias{lm_dist}
 \title{Linear model of between-group differences in dist}
 \usage{
-lm_dist(mltplx_experiment, group_factor, slide_ids = NULL, types = NULL)
+lm_dist(
+  mltplx_experiment,
+  group_factor,
+  agg_fun = median,
+  covariates = NULL,
+  slide_ids = NULL,
+  types = NULL
+)
 }
 \arguments{
 \item{mltplx_experiment}{MltplxExperiment object}
 
 \item{group_factor}{currently only supports binary group_factor. Must be a string for a column name in metadata.}
+
+\item{agg_fun}{function to aggregate slide-level measurements to patient level. Must have option to remove NA rows via \code{na.rm = T}.}
+
+\item{covariates}{vector of metadata columns to adjust for in linear model}
 
 \item{slide_ids}{vector of slide_ids}
 

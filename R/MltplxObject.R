@@ -26,7 +26,11 @@
 new_MltplxObject = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
                             dist_metric = NULL, .dist_metric_name = NULL){
 
-  dist_metric_name <- get_dist_metric_name(dist_metric,.dist_metric_name)
+  if(!is.null(.dist_metric_name)){
+    dist_metric_name = .dist_metric_name
+  }else{
+    dist_metric_name = substitute(dist_metric) %>% as.character()
+  }
 
   # Make image
   mltplx_image = new_MltplxImage(x, y, marks)
@@ -153,7 +157,12 @@ add_QuantileDist.MltplxObject <- function(mltplx_object,
                                           verbose = FALSE) {
   if(verbose) print(mltplx_object$slide_id)
 
-  dist_metric_name = get_dist_metric_name(dist_metric,.dist_metric_name)
+  if(!is.null(.dist_metric_name)){
+    dist_metric_name = .dist_metric_name
+  }else{
+    dist_metric_name = substitute(dist_metric) %>% as.character()
+  }
+  
   q_dist <- mltplx_object$quantile_dist <- new_QuantileDist(mltplx_object$mltplx_intensity,
                                                        dist_metric=dist_metric,
                                                        mask_type=mask_type,

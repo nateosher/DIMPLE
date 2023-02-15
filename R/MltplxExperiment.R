@@ -41,7 +41,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
     total_slides = max(slide_id_num)
   )
   
-  dist_metric_name <- get_dist_metric_name(dist_metric,.dist_metric_name)
+  dist_metric_name = substitute(dist_metric) %>% as.character()
 
   mltplx_objects = full_tib %>%
     group_by(slide_id_num, slide_id) %>%
@@ -72,15 +72,6 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
     ),
     class = "MltplxExperiment"
   )
-}
-
-get_dist_metric_name <- function(dist_metric,.dist_metric_name=NULL) {
-  if(!is.null(.dist_metric_name)){
-    dist_metric_name = .dist_metric_name
-  }else{
-    dist_metric_name = substitute(dist_metric) %>% as.character()
-  }
-  dist_metric_name
 }
 
 #' @export
@@ -123,7 +114,8 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
 dist_to_df.MltplxExperiment <- function(mltplx_experiment,reduce_symmetric = FALSE) {
   if(is.null(mltplx_experiment$metadata))
     warning("you have not attached any metadata")
-  map_df(mltplx_experiment$mltplx_objects,dist_to_df,reduce_symmetric) %>%
+
+  map_df(mltplx_experiment$mltplx_objects, dist_to_df, reduce_symmetric) %>%
     {
       if(!is.null(mltplx_experiment$metadata))
         left_join(.,mltplx_experiment$metadata)

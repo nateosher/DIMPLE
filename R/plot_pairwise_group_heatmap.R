@@ -26,14 +26,25 @@ plot_pairwise_group_heatmap <- function(df) {
 #' @param t1 cell type 1
 #' @param t2 cell type 2
 #' @param group_factor string, name of metadata column
+#' @param agg_fun function to aggregate slide-level measurements to patient level.
 #'
 #' @return ggplot boxplots
 #' @export
-typewise_boxplots <- function(mltplx_experiment,t1,t2,group_factor) {
+typewise_boxplots <- function(mltplx_experiment,
+                              t1,
+                              t2,
+                              group_factor,
+                              agg_fun = NULL) {
   mltplx_experiment %>%
     dist_to_df() %>%
     filter(type1 == t1,
            type2 == t2) %>%
+    {
+      if(!is.null(agg_fun)) {
+        group_by(.,patient_id,type1,type2,!!sym(group_factor)) %>%
+        summarise(dist = agg_fun(dist,na.rm=T))
+      } else .
+    } %>%
     ggplot(aes(!!sym(group_factor),dist)) +
     geom_boxplot() +
     geom_jitter(color="orange")
