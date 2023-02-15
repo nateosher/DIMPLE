@@ -40,11 +40,8 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
       as.numeric(),
     total_slides = max(slide_id_num)
   )
-
-  if(!is.null(dist_metric))
-    dist_metric_name = substitute(dist_metric) %>% as.character()
-  else
-    dist_metric_name = NULL
+  
+  dist_metric_name = substitute(dist_metric) %>% as.character()
 
   mltplx_objects = full_tib %>%
     group_by(slide_id_num, slide_id) %>%
@@ -62,14 +59,16 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
   if(!is.null(metadata)) {
     check_metadata(mltplx_objects,metadata)
   }
-
+  
+  slide_ids <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
   structure(
     list(
       mltplx_objects = mltplx_objects,
       ps = ps,
       bw = bw,
       dist_metric_name = dist_metric_name,
-      metadata = metadata
+      metadata = metadata,
+      slide_ids = slide_ids
     ),
     class = "MltplxExperiment"
   )
@@ -115,6 +114,7 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
 dist_to_df.MltplxExperiment <- function(mltplx_experiment,reduce_symmetric = FALSE) {
   if(is.null(mltplx_experiment$metadata))
     warning("you have not attached any metadata")
+
   map_df(mltplx_experiment$mltplx_objects, dist_to_df, reduce_symmetric) %>%
     {
       if(!is.null(mltplx_experiment$metadata))
