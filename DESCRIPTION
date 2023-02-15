@@ -16,7 +16,6 @@ Imports:
   pals,
   spatstat,
   spatstat.geom,
-  spatstat.core,
   tidyr
 Suggests: 
     covr,
