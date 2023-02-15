@@ -2,30 +2,32 @@
 #' @param mltplx_experiment `MltplxExperiment` objects
 #' @param slide_ids Vector of ids of slides whose distance matrices you'd like
 #' to print
-#' @param mode String indicating plot type; currently only "heatmap" is
-#' supported
+#' @param mode String indicating plot type, either "heatmap" or "network"
 #' @return NULL
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
 plot_dist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
   if(mode == "heatmap") {
-    mltplx_experiment %>%
+    df <- mltplx_experiment %>%
       dist_to_df() %>%
-      tidyr::drop_na(dist) -> df
+      tidyr::drop_na(dist)
 
     for(id in slide_ids) {
-      df %>%
+      p <- df %>%
         dplyr::filter(slide_id == id) %>%
         ggplot(aes(type1,type2,fill=dist)) +
         geom_tile() +
         anglex() +
         scale_fill_gradient2() +
-        ggtitle(paste0("Distance matrix for slide id ", id)) -> p
+        ggtitle(paste0("Distance matrix for slide id ", id))
       print(p)
     }
   } else if(mode == "network") {
-    stop("Mode network currently unsupported")
+    filtered_exp <- filter_mltplx_objects(mltplx_experiment,slide_ids)
+    for(mltplx_object in filtered_exp) {
+      qgraph::qgraph(mltplx_object$mltplx_dist$dist,layout = "circle",threshold=0.1)
+    }
   } else {
     stop("Mode must be either heatmap or network")
   }

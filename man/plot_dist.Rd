@@ -12,8 +12,7 @@ plot_dist(mltplx_experiment, slide_ids, mode = "heatmap")
 \item{slide_ids}{Vector of ids of slides whose distance matrices you'd like
 to print}
 
-\item{mode}{String indicating plot type; currently only "heatmap" is
-supported}
+\item{mode}{String indicating plot type, either "heatmap" or "network"}
 }
 \description{
 Plots distance matrices for selected slides in a \code{MltplxExperiment} object

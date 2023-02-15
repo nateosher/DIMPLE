@@ -26,7 +26,11 @@
 new_MltplxObject = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
                             dist_metric = NULL, .dist_metric_name = NULL){
 
-  dist_metric_name <- get_dist_metric_name(dist_metric,.dist_metric_name)
+  if(!is.null(.dist_metric_name)){
+    dist_metric_name = .dist_metric_name
+  }else{
+    dist_metric_name = substitute(dist_metric) %>% as.character()
+  }
 
   # Make image
   mltplx_image = new_MltplxImage(x, y, marks)
@@ -110,30 +114,79 @@ update_object_dist = function(mltplx_object, dist_metric,
   return(mltplx_object)
 }
 
+
+#' Title
+#'
+#' @param mltplx_object 
+#' @param reduce_symmetric logical, whether to remove equivalent rows
+#'
+#' @return tibble with dist information
 #' @export
-dist_to_df.MltplxObject <- function(mltplx_object) {
+dist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
   if(!is.null(mltplx_object$mltplx_dist)) {
     mat <- mltplx_object$mltplx_dist$dist
 
-    mat %>%
+   df <- mat %>%
       as.data.frame.table() %>%
       rename(type1=Var1,
              type2=Var2,
              dist=Freq) %>%
     mutate(slide_id=mltplx_object$slide_id)
+    
+   if(reduce_symmetric) {
+     df %>%
+       select(type1,type2,slide_id) %>%
+       apply(.,1,sort) %>%
+       t(.) %>%
+       duplicated(.) -> dup_ix
+     
+     df <- df[dup_ix, ]
+   }
+    return(df)
   } else {
     cat(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a distance matrix."))
   }
 }
 
+#' Quantile dist to df
+#'
+#' @param mltplx_object 
+#' @param reduce_symmetric logical, whether to remove equivalent rows
+#'
+#' @return tibble with dist information
 #' @export
-get_dist_metric_name <- function(dist_metric,.dist_metric_name=NULL) {
-  if(!is.null(.dist_metric_name)){
-    dist_metric_name = .dist_metric_name
-  }else{
-    dist_metric_name = substitute(dist_metric) %>% as.character()
+qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
+  if(!is.null(mltplx_object$quantile_dist)) {
+    arr <- mltplx_object$quantile_dist$quantile_dist_array
+    
+    nms3 <- mltplx_object$quantile_dist$quantiles %>%
+      unite("p1_p2",p1,p2,sep="-") %>%
+      pull(p1_p2)
+    
+    dimnames(arr)[[3]] <- nms3
+    
+    df <- arr %>%
+      as.data.frame.table() %>%
+      rename(type1=Var1,
+             type2=Var2,
+             interval=Var3,
+             dist=Freq) %>%
+      mutate(slide_id=mltplx_object$slide_id) %>%
+      as_tibble()
+    
+    if(reduce_symmetric) {
+      df %>%
+        select(type1,type2,slide_id,interval) %>%
+        apply(.,1,sort) %>%
+        t(.) %>%
+        duplicated(.) -> dup_ix
+      
+      df <- df[dup_ix, ]
+    }
+    df
+  } else {
+    cat(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a quantile distance array."))
   }
-  dist_metric_name
 }
 
 #' @export
@@ -145,7 +198,12 @@ add_QuantileDist.MltplxObject <- function(mltplx_object,
                                           verbose = FALSE) {
   if(verbose) print(mltplx_object$slide_id)
 
-  dist_metric_name = get_dist_metric_name(dist_metric,.dist_metric_name)
+  if(!is.null(.dist_metric_name)){
+    dist_metric_name = .dist_metric_name
+  }else{
+    dist_metric_name = substitute(dist_metric) %>% as.character()
+  }
+  
   q_dist <- mltplx_object$quantile_dist <- new_QuantileDist(mltplx_object$mltplx_intensity,
                                                        dist_metric=dist_metric,
                                                        mask_type=mask_type,
