@@ -69,9 +69,9 @@ fluidPage(shinyjs::useShinyjs(),
                                         'Single Quote'="'"),
                                       '"'),
                          selectInput('md_image_id', 'Image ID', ""),
-                         selectInput('patient_id', 'Patient ID', "", selected = ""),
-                         selectInput('surv_time', 'Survival Time', "", selected = ""),
-                         selectInput('surv_event', 'Survival Event', "", selected = "")
+                         selectInput('patient_id', 'Patient ID', "", selected = "")
+                         #selectInput('surv_time', 'Survival Time', "", selected = ""),
+                         #selectInput('surv_event', 'Survival Event', "", selected = "")
                        ),
                        mainPanel(
                          tableOutput('contents_md')
