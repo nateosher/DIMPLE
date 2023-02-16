@@ -144,15 +144,18 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
                                               dist_metric,
                                               mask_type,
                                               q_probs,
-                                              .dist_metric_name = NULL,
-                                              verbose = FALSE) {
+                                              .dist_metric_name = NULL) {
+  slide_ids <- mltplx_experiment$slide_ids
+  n_slides <- length(slide_ids)
   mltplx_experiment$mltplx_objects <- map(mltplx_experiment$mltplx_objects,
-                                          add_QuantileDist,
+                                          \(obj,...) {
+                                            ProgressBar(which(obj$slide_id == slide_ids), n_slides)
+                                            add_QuantileDist(obj,...)
+                                            },
                                           dist_metric,
                                           mask_type,
                                           q_probs,
-                                          .dist_metric_name,
-                                          verbose)
+                                          .dist_metric_name)
 
   mltplx_experiment
 }

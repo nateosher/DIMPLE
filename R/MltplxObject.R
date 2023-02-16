@@ -190,10 +190,7 @@ add_QuantileDist.MltplxObject <- function(mltplx_object,
                                           dist_metric,
                                           mask_type,
                                           q_probs,
-                                          .dist_metric_name = NULL,
-                                          verbose = FALSE) {
-  if(verbose) print(mltplx_object$slide_id)
-
+                                          .dist_metric_name = NULL) {
   if(!is.null(.dist_metric_name)){
     dist_metric_name = .dist_metric_name
   }else{
