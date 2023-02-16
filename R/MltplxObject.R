@@ -125,23 +125,20 @@ update_object_dist = function(mltplx_object, dist_metric,
 dist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
   if(!is.null(mltplx_object$mltplx_dist)) {
     mat <- mltplx_object$mltplx_dist$dist
+    
+    if(reduce_symmetric) {
+      mat[lower.tri(mat)] <- NA
+    }
 
    df <- mat %>%
       as.data.frame.table() %>%
       rename(type1=Var1,
              type2=Var2,
              dist=Freq) %>%
+     drop_na(dist) %>%
     mutate(slide_id=mltplx_object$slide_id)
     
-   if(reduce_symmetric) {
-     df %>%
-       select(type1,type2,slide_id) %>%
-       apply(.,1,sort) %>%
-       t(.) %>%
-       duplicated(.) -> dup_ix
-     
-     df <- df[dup_ix, ]
-   }
+
     return(df)
   } else {
     cat(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a distance matrix."))
