@@ -51,5 +51,3 @@ lm_dist <- function(mltplx_experiment,
   
   return(result)
 }
-
-## Here's another insignificant change
