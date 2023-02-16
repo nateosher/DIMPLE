@@ -1,0 +1,118 @@
+---
+title: "Quantile Dists"
+author: "Joel Eliason"
+date: "2023-02-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(DistDist)
+library(tidyverse)
+CRC_master <- read_csv("../scratch/CRC_master.csv") %>%
+  mutate(type = factor(type)) %>%
+  filter(!(type %in% c("dirt","undefined"))) %>%
+  mutate(type = fct_collapse(type,
+                             stroma = c("stroma","nerves","lymphatics"),
+                             "CD163+ macros" = c("CD68+CD163+ macrophages","CD163+ macrophages"),
+                             "CD68+ macros" = c("CD11b+ monocytes","CD11b+CD68+ macrophages","CD68+ macrophages",
+                                                "CD68+ macrophages GzmB+","CD11c+ DCs"),
+                             "generic immune" = c("tumor cells / immune cells","immune cells","immune cells / vasculature"),
+                             "memory CD4+ T"="CD4+ T cells CD45RO+",
+                             "CD4+ T cells" = c("CD4+ T cells","CD4+ T cells GATA3+","CD3+ T cells"))) %>%
+  droplevels()
+
+data <- CRC_master %>%
+  select(patients,spots,type,X,Y)
+
+# mltplx_experiment<-new_MltplxExperiment(x=data$X,y=data$Y,marks=as.factor(data$type),slide_id=data$spots,ps=20,bw=30,dist_metric = cor)
+# 
+# metadata <- read_csv("../data/CRC_pt_metadata.csv") %>%
+#   rename(slide_id = Spot,
+#          patient_id = Patient)
+# 
+# mltplx_experiment <- update_metadata(mltplx_experiment,metadata)
+# 
+# q_probs <- tibble(from=seq(0,90,10),to=seq(10,100,10))
+# mltplx_experiment <- add_QuantileDist(mltplx_experiment,\(x,y) suppressWarnings(cor(x,y)),"tumor cells",q_probs,verbose=TRUE)
+# 
+# saveRDS(mltplx_experiment,"cor_qdist_exp.rds")
+
+mltplx_experiment <- readRDS("../scratch/cor_qdist_exp.rds")
+```
+
+```{r}
+mltplx_experiment %>%
+  patient_boxplots(t1="adipocytes",
+                 t2="vasculature")
+```
+
+```{r}
+mltplx_experiment %>%
+  plot_dist(slide_ids = c("19_A","20_A"),mode="network")
+```
+
+```{r}
+mltplx_experiment %>%
+  plot_intensities(types = c("tumor cells","stroma"),
+                   slide_ids = c("19_A","20_A"))
+
+```
+
+```{r}
+mltplx_experiment %>%
+  plot_ppp(slide_ids = c("19_A","20_A"))
+```
+
+
+```{r}
+mltplx_experiment %>%
+  lm_dist("Group",
+          covariates = c("p_TNM","Sex","Age")) %>%
+  plot_pairwise_group_heatmap(group_names = c("CLR","DII"))
+```
+
+```{r}
+mltplx_experiment %>%
+  typewise_boxplots(t1 = "Tregs",
+                    t2 = "CD163+ macros",
+                    group_factor = "Group",
+                    agg_fun = median)
+```
+
+```{r}
+df <- mltplx_experiment %>%
+  qdist_to_df(reduce_symmetric = F)
+df
+df %>%
+  filter(type1 == "CD68+ macros",
+         type2 == "tumor cells") %>%
+  ggplot(aes(Group,dist,fill=interval)) +
+  geom_boxplot()
+```
+
+```{r}
+df %>%
+  filter(type1 == "CD68+ macros",
+         type2 == "tumor cells") %>%
+  group_by(patient_id,interval) %>%
+  mutate(dist = median(dist,na.rm=T)) %>%
+  distinct(patient_id,interval,dist,Group) %>%
+  ggplot(aes(Group,dist,fill=interval)) +
+  geom_boxplot()
+```
+
+```{r}
+df %>%
+  filter(type1 == "CD68+ macros",
+         type2 == "Tregs") %>%
+  group_by(patient_id,interval) %>%
+  mutate(dist = median(dist,na.rm=T)) %>%
+  distinct(patient_id,interval,dist,Group) %>%
+  ggplot(aes(interval,dist,fill=Group)) +
+  geom_boxplot()
+```
+
