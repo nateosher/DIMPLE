@@ -7,8 +7,6 @@
 \method{qdist_to_df}{MltplxObject}(mltplx_object, reduce_symmetric = FALSE)
 }
 \arguments{
-\item{mltplx_object}{}
-
 \item{reduce_symmetric}{logical, whether to remove equivalent rows}
 }
 \value{

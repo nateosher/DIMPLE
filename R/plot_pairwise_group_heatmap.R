@@ -5,13 +5,16 @@
 #' @return ggplot heatmap
 #' @export
 plot_pairwise_group_heatmap <- function(df) {
+  group_name <- unique(df$term)
   df %>% {
     ggplot(.,aes(type1,type2,fill=estimate)) +
     geom_tile() +
     anglex() +
     sig_stars() +
     scico::scale_fill_scico(palette = "vik",
-                            label = function(z) replace(z, c(1, length(z)), c("Greater in group 2 \u2193", "Greater in group 1 \u2191")),
+                            label = function(z) replace(z, c(1, length(z)), 
+                                                        c(paste0("Lesser in group ",group_name, " \u2193"),
+                                                          paste0("Greater in group ", group_name, " \u2191"))),
                             breaks = round(seq(from=-max(abs(round(.$estimate,2))),
                                                to=max(abs(round(.$estimate,2))),
                                                length.out=5),2),
