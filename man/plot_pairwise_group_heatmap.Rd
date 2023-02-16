@@ -4,7 +4,7 @@
 \alias{plot_pairwise_group_heatmap}
 \title{Pairwise comparison between types across groups}
 \usage{
-plot_pairwise_group_heatmap(df)
+plot_pairwise_group_heatmap(df, group_names = c(1, 2))
 }
 \arguments{
 \item{df}{tibble. a result of a multiplex analysis, eg, lm_dist}
