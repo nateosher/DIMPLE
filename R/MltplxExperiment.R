@@ -40,8 +40,10 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
       as.numeric(),
     total_slides = max(slide_id_num)
   )
-  
+
   dist_metric_name = substitute(dist_metric) %>% as.character()
+  if(length(dist_metric_name) == 0)
+    dist_metric_name = NULL
 
   mltplx_objects = full_tib %>%
     group_by(slide_id_num, slide_id) %>%
@@ -59,7 +61,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
   if(!is.null(metadata)) {
     check_metadata(mltplx_objects,metadata)
   }
-  
+
   slide_ids <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
   structure(
     list(

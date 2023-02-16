@@ -7,18 +7,17 @@ Authors@R:
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Imports:
-    dplyr,
-    magrittr,
-    purrr,
-    tibble,
-    ggplot2,
-    fuzzyjoin,
-    pals,
-    spatstat.geom,
-    spatstat.core,
-    tidyr,
-    qgraph,
-    broom
+  dplyr,
+  magrittr,
+  purrr,
+  tibble,
+  ggplot2,
+  fuzzyjoin,
+  pals,
+  broom,
+  spatstat.explore,
+  spatstat.geom,
+  tidyr
 Suggests: 
     covr,
     knitr,
