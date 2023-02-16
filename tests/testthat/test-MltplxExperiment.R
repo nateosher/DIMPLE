@@ -28,3 +28,31 @@ test_that("`MltplxExperiment` constructor (no intensities/dists) works", {
   expect_equal(experiment_only[[9]]$slide_id, "Slide 9")
   expect_equal(experiment_only[[10]]$slide_id, "Slide 10")
 })
+
+test_that("`add_QuantileDist` handles missing types", {
+  # From Maria's example
+  x <- runif(100,-50,50)
+  y <- runif(100,-50,50)
+  sid<-c(rep("A",50),rep("B",50))
+  typesA<-sample(rep_len(sample(paste0("X",1:2)),50))
+  typesB<-sample(rep_len(sample(paste0("X",1:3)),50))
+  types<-c(typesA,typesB)
+  exp <- new_MltplxExperiment(x,y,types,sid)
+  exp <- update_intensity(exp,ps=2,bw=3)
+  from<-c(0,50)
+  to<-c(50,100)
+  q_probs<-cbind.data.frame(from,to)
+  #want quantile dist with X3 as mask type but X3 is not in image A
+  expect_warning({
+    exp_with_qd = add_QuantileDist(exp,cor,mask_type = "X3",q_probs)
+  })
+
+  # First quantile dist should be NA
+  expect_true(is.na(exp_with_qd[[1]]$quantile_dist))
+
+  # Not a thorough check, but just making sure it isn't also NA
+  expect_true(all(
+    dim(exp_with_qd[[2]]$quantile_dist$quantile_dist_array) ==
+      c(3,3,2)
+  ))
+})

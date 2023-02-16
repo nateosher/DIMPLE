@@ -100,6 +100,7 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
   }else{
     cat("No attached metadata")
   }
+  cat("\n\n")
 }
 
 #' @export
