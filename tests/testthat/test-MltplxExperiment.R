@@ -108,6 +108,12 @@ test_that("`MltplxExperiment` constructor catches malformed objects", {
 
   # length(slide_ids) != length(x), length(y), marks
   expect_error(new_MltplxExperiment(x, y, marks, slide_ids[1:10]))
+
+  # ps but no bw
+  expect_error(new_MltplxExperiment(x, y, marks, slide_ids, ps = 30))
+
+  # bw but no ps
+  expect_error(new_MltplxExperiment(x, y, marks, slide_ids, bw = 30))
 })
 
 
