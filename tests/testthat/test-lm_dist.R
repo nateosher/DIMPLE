@@ -17,3 +17,4 @@ test_that("Correct aggregation", {
   
   expect_false(s$coefficients[2,1] == m2$estimate[1]) # check to see that aggregation was done
 })
+
