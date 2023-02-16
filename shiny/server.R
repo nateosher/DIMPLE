@@ -59,10 +59,10 @@ function(input, output, session) {
                       choices = names(df), selected = "spots")
     updateSelectInput(session, inputId = 'patient_id', label = 'Patient ID',
                       choices = names(df), selected = "Patient")
-    updateSelectInput(session, inputId = 'surv_time', label = 'Survival Time',
-                      choices = names(df), selected = "OS")
-    updateSelectInput(session, inputId = 'surv_event', label = 'Survival Event',
-                      choices = names(df), selected = "OS_Censor")
+    #updateSelectInput(session, inputId = 'surv_time', label = 'Survival Time',
+        #              choices = names(df), selected = "OS")
+    #updateSelectInput(session, inputId = 'surv_event', label = 'Survival Event',
+              #        choices = names(df), selected = "OS_Censor")
     
     return(df)
   })
@@ -89,7 +89,7 @@ function(input, output, session) {
   
   md.data.frame<-reactive({
     
-    df<-metadata()%>%mutate(slide_id=as.factor(.data[[input$md_image_id]]),patient_id=as.factor(.data[[input$patient_id]]),surv_time=as.numeric(.data[[input$surv_time]]),surv_event=as.factor(.data[[input$surv_event]]))
+    df<-metadata()%>%mutate(slide_id=as.factor(.data[[input$md_image_id]]),patient_id=as.factor(.data[[input$patient_id]]))
     updateSelectInput(session, inputId = 'grouping_var', label = 'Select grouping variable',choices = names(df),selected="Patient")
     updateSelectInput(session, inputId = 'heatmap_grouping_var', label = 'Select grouping variable',choices = names(df),selected="Group")
     return(df)
@@ -132,20 +132,8 @@ function(input, output, session) {
       
     }
 
-    
-   
-    #plot(obj$mltplx_image)
     plot_ppp(obj,input$image_to_plot)
-    # req(data.frame())
-    # 
-    # df<-data.frame()
-    # req(input$image_to_plot%in%df$image_id)
-    # obj<-new_MltplxExperiment(
-    #   x = df$x,
-    #   y = df$y,
-    #   marks = df$cell_type,
-    #   slide_id = df$image_id)
-    # plot_ppp(obj,input$image_to_plot)
+  
     
     
   })
@@ -166,8 +154,7 @@ function(input, output, session) {
     
     intens_data <- update_intensity(exp,ps=input$eps,bw=input$bw)
     }
-   # as.data.frame(intens_data$mltplx_intensity$intensities)%>%pivot_longer(-c("X","Y"))%>%
-   #   ggplot(aes(X,Y))+geom_raster(aes(fill=value))+facet_wrap(name~.)
+   
     plot_intensities(intens_data,types=unique(intens_data$mltplx_objects[[1]]$mltplx_image$cell_types),input$intens_to_plot)
     
   })
@@ -355,6 +342,9 @@ function(input, output, session) {
         exp<-fake_experiment()
         intens_data <- update_intensity(exp,ps=input$eps,bw=input$bw)
         distance_data<- update_dist(intens_data,dist_metric=func_list[[input$dist_metric]])
+        from <- as.numeric(unlist(strsplit(input$quantiles_from,",")))
+        to <- as.numeric(unlist(strsplit(input$quantiles_to,",")))
+        q_probs<-cbind.data.frame(from,to)
         obj<-add_QuantileDist(distance_data, dist_metric=func_list[[input$dist_metric]],mask_type=input$quant_cell_type,q_probs)
       }
     }
@@ -379,50 +369,22 @@ function(input, output, session) {
   
   
   output$dm_plot <- renderPlot({
-    # if(!is.null(data.frame())){
-    #   req( input$dm_to_plot%in%data.frame()$image_id)
-    #   plot_dist(out(), input$dm_to_plot, mode = "heatmap")
-    # }else{
-    #   plot_dist(fake_experiment(), input$dm_to_plot, mode = "heatmap")
-    # }
     req(out())
     plot_dist(out(), input$dm_to_plot, mode = "heatmap")
   })
   
   output$patient_boxplot<-renderPlot(({
-    # if(!is.null(input$file1)){
-    # req(out())
-    # 
-    # patient_boxplots(out(),input$t1,input$t2,grouping_var=input$grouping_var,label_spots=TRUE)
-    # }else{
-    #   patient_boxplots(fake_experiment(),input$t1,input$t2,grouping_var=input$grouping_var,label_spots=TRUE)
-    # }
     req(out())
-    patient_boxplots(out(),input$t1,input$t2,grouping_var=input$grouping_var,label_spots=TRUE)
+    patient_boxplots(out(),input$t1,input$t2,grouping_var=input$grouping_var,label_spots=FALSE)
     
   }))
   
   output$typewise_boxplot<-renderPlot(({
-    # if(!is.null(input$file1)){
-    # req(out())
-    # typewise_boxplots(out(),input$t1,input$t2,group_factor=input$grouping_var)
-    # }else{
-    #   typewise_boxplots(fake_experiment(),input$t1,input$t2,group_factor=input$grouping_var)
-    # }
-    
      req(out())
      typewise_boxplots(out(),input$t1,input$t2,group_factor=input$grouping_var)
   }))
   
   output$heatmap<-renderPlot(({
-    # if(!is.null(input$file1)){
-    # req(out())
-    # df<-lm_dist(out(),group_factor = input$heatmap_grouping_var,agg_fun = median)
-    # 
-    # }else{
-    #   df<-lm_dist(fake_experiment(),group_factor = input$heatmap_grouping_var,agg_fun = median)
-    # 
-    # }
     req(out())
     df<-lm_dist(out(),group_factor = input$heatmap_grouping_var,agg_fun = median)
     plot_pairwise_group_heatmap(df)
