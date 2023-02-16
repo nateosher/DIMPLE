@@ -117,7 +117,7 @@ update_object_dist = function(mltplx_object, dist_metric,
 
 #' Title
 #'
-#' @param mltplx_object 
+#' @param mltplx_object
 #' @param reduce_symmetric logical, whether to remove equivalent rows
 #'
 #' @return tibble with dist information
@@ -146,21 +146,25 @@ dist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
 
 #' Quantile dist to df
 #'
-#' @param mltplx_object 
+#' @param mltplx_object
 #' @param reduce_symmetric logical, whether to remove equivalent rows
 #'
 #' @return tibble with dist information
 #' @export
 qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
-  if(!is.null(mltplx_object$quantile_dist)) {
+
+  has_quantile_dist = !is.null(mltplx_object$quantile_dist) &&
+                        (length(mltplx_object$quantile_dist) > 1 ||
+                         !is.na(mltplx_object$quantile_dist))
+  if(has_quantile_dist) {
     arr <- mltplx_object$quantile_dist$quantile_dist_array
-    
+
     nms3 <- mltplx_object$quantile_dist$quantiles %>%
-      unite("p1_p2",p1,p2,sep="-") %>%
+      tidyr::unite("p1_p2",p1,p2,sep="-") %>%
       pull(p1_p2)
-    
+
     dimnames(arr)[[3]] <- nms3
-    
+
     df <- arr %>%
       as.data.frame.table() %>%
       rename(type1=Var1,
@@ -169,19 +173,20 @@ qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
              dist=Freq) %>%
       mutate(slide_id=mltplx_object$slide_id) %>%
       as_tibble()
-    
+
     if(reduce_symmetric) {
       df %>%
         select(type1,type2,slide_id,interval) %>%
         apply(.,1,sort) %>%
         t(.) %>%
         duplicated(.) -> dup_ix
-      
+
       df <- df[dup_ix, ]
     }
     df
   } else {
-    cat(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a quantile distance array."))
+    warning(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a quantile distance array."))
+    tibble::tibble()
   }
 }
 
@@ -191,12 +196,20 @@ add_QuantileDist.MltplxObject <- function(mltplx_object,
                                           mask_type,
                                           q_probs,
                                           .dist_metric_name = NULL) {
+
+  if(!(mask_type %in% colnames(mltplx_object$mltplx_intensity$intensities))){
+    warning(paste0("cell type ", mask_type, " not present in slide with id ",
+                  mltplx_object$slide_id, "; returning NA"))
+    mltplx_object$quantile_dist = NA
+    return(mltplx_object)
+  }
+
   if(!is.null(.dist_metric_name)){
     dist_metric_name = .dist_metric_name
   }else{
     dist_metric_name = substitute(dist_metric) %>% as.character()
   }
-  
+
   q_dist <- mltplx_object$quantile_dist <- new_QuantileDist(mltplx_object$mltplx_intensity,
                                                        dist_metric=dist_metric,
                                                        mask_type=mask_type,

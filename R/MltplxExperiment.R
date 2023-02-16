@@ -30,6 +30,10 @@
 #' @import purrr
 new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
                                 dist_metric = NULL, metadata = NULL){
+
+  mltplx_experiment_check_inputs(x, y, marks, slide_id, ps, bw,
+                                 dist_metric, metadata)
+
   full_tib = tibble(
     x = x,
     y = y,
@@ -76,6 +80,27 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
   )
 }
 
+mltplx_experiment_check_inputs = function(x, y, marks, slide_id, ps, bw,
+                                          dist_metric, metadata){
+
+  if(length(x) != length(y))
+    stop("`x` must be the same length as `y`")
+
+  if(length(marks) != length(x))
+    stop("`marks` must be the same length as `x` and `y`")
+
+  if(length(slide_id) != length(x))
+    stop("`slide_id` must be the same length as `x` and `y`")
+
+  # TODO: typechecks
+  # TODO: refactor into sub-functions that can be called when other
+  #       components are added
+
+  if((is.null(ps) && !is.null(bw)) || (!is.null(ps) && is.null(bw)))
+    stop("`ps` and `bw` must both be provided to compute intensities")
+
+}
+
 #' @export
 print.MltplxExperiment = function(mltplx_experiment, ...){
   cat("MltplxExperiment with", length(mltplx_experiment$mltplx_objects),
@@ -100,6 +125,7 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
   }else{
     cat("No attached metadata")
   }
+  cat("\n\n")
 }
 
 #' @export
