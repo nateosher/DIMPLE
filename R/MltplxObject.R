@@ -131,13 +131,12 @@ dist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
     }
 
    df <- mat %>%
-      as.data.frame.table() %>%
-      rename(type1=Var1,
-             type2=Var2,
-             dist=Freq) %>%
-     drop_na(dist) %>%
+    as.data.frame.table() %>%
+    rename(type1=Var1,
+           type2=Var2,
+           dist=Freq) %>%
+    drop_na(dist) %>%
     mutate(slide_id=mltplx_object$slide_id)
-    
 
     return(df)
   } else {
