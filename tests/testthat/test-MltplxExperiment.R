@@ -55,4 +55,15 @@ test_that("`add_QuantileDist` handles missing types", {
     dim(exp_with_qd[[2]]$quantile_dist$quantile_dist_array) ==
       c(3,3,2)
   ))
+
+  # This should throw two warnings: one for no metadata, and one
+  # for slide A not containing a quantile distance array
+  expect_warning({
+    qd_df = qdist_to_df(exp_with_qd)
+  }) %>%
+  expect_warning()
+
+  expect_true(all(
+    dim(qd_df) == c(18, 5)
+  ))
 })

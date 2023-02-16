@@ -156,11 +156,15 @@ dist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
 #' @return tibble with dist information
 #' @export
 qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
-  if(!is.null(mltplx_object$quantile_dist)) {
+
+  has_quantile_dist = !is.null(mltplx_object$quantile_dist) &&
+                        (length(mltplx_object$quantile_dist) > 1 ||
+                         !is.na(mltplx_object$quantile_dist))
+  if(has_quantile_dist) {
     arr <- mltplx_object$quantile_dist$quantile_dist_array
 
     nms3 <- mltplx_object$quantile_dist$quantiles %>%
-      unite("p1_p2",p1,p2,sep="-") %>%
+      tidyr::unite("p1_p2",p1,p2,sep="-") %>%
       pull(p1_p2)
 
     dimnames(arr)[[3]] <- nms3
@@ -185,7 +189,8 @@ qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
     }
     df
   } else {
-    cat(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a quantile distance array."))
+    warning(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a quantile distance array."))
+    tibble::tibble()
   }
 }
 
