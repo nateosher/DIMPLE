@@ -51,7 +51,8 @@ new_QuantileDist <- function(mltplx_intensity,
       metric = dist_metric_name,
       cell_types = cell_types,
       mask_type = mask_type,
-      quantiles = q
+      quantiles = q,
+      xy_qfac = joined_q %>% select(X,Y,q_fac)
     ),
     class = "QuantileDist"
   )
