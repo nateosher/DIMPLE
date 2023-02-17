@@ -175,7 +175,7 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
   n_slides <- length(slide_ids)
   mltplx_experiment$mltplx_objects <- map(mltplx_experiment$mltplx_objects,
                                           \(obj,...) {
-                                            ProgressBar(which(obj$slide_id == slide_ids), n_slides)
+                                            ProgressBar(which(obj$slide_id == slide_ids)+1, n_slides)
                                             add_QuantileDist(obj,...)
                                             },
                                           dist_metric,
