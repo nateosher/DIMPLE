@@ -15,10 +15,10 @@ plot_pairwise_group_heatmap <- function(df) {
                             label = function(z) replace(z, c(1, length(z)), 
                                                         c(paste0("Lesser in group ",group_name, " \u2193"),
                                                           paste0("Greater in group ", group_name, " \u2191"))),
-                            breaks = round(seq(from=-max(abs(round(.$estimate,2))),
-                                               to=max(abs(round(.$estimate,2))),
+                            breaks = round(seq(from=-max(abs(round(.$estimate,2)),na.rm=T),
+                                               to=max(abs(round(.$estimate,2)),na.rm=T),
                                                length.out=5),2),
-                            limits = c(-max(abs(round(.$estimate,2))),max(abs(round(.$estimate,2))))
+                            limits = c(-max(abs(round(.$estimate,2)),na.rm=T),max(abs(round(.$estimate,2)),na.rm=T))
     )
   }
 }
