@@ -41,7 +41,8 @@ typewise_boxplots <- function(mltplx_experiment,
   mltplx_experiment %>%
     dist_to_df() %>%
     filter(type1 == t1,
-           type2 == t2) %>%
+           type2 == t2) %>% 
+    mutate(across(!!sym(group_factor),factor))%>%
     {
       if(!is.null(agg_fun)) {
         group_by(.,patient_id,type1,type2,!!sym(group_factor)) %>%
