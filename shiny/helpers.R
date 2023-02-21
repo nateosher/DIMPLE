@@ -59,14 +59,8 @@ plot_dist <- function(mltplx_experiment, slide_ids, mode = "heatmap",plot_by_qua
     } 
   }else{
     if(mode == "heatmap") {
-      mat <- mltplx_experiment$quantile_dist$quantile_dist_array
-      quantiles<-mltplx_experiment$quantile_dist$quantiles
-      df <- mat %>%
-        as.data.frame.table() %>%
-        rename(type1=Var1,
-               type2=Var2,quantile=Var3,
-               dist=Freq) %>% 
-        mutate(slide_id=mltplx_experiment$slide_id,quantile=factor(quantile,labels=paste0(quantiles$p1,"-",quantiles$p2))) %>%
+
+      df <- qdist_to_df(mltplx_experiment) %>%
         tidyr::drop_na(dist)
       
       for(id in slide_ids) {
@@ -75,7 +69,7 @@ plot_dist <- function(mltplx_experiment, slide_ids, mode = "heatmap",plot_by_qua
           ggplot(aes(type1,type2,fill=dist)) +
           geom_tile() +
           anglex() +
-          scale_fill_gradient2() + facet_wrap(quantile~.)
+          scale_fill_gradient2() + facet_wrap(interval~.)+
         ggtitle(paste0("Distance matrix for slide id ", id))
         print(p)
       }
@@ -88,7 +82,159 @@ plot_dist <- function(mltplx_experiment, slide_ids, mode = "heatmap",plot_by_qua
   
 }
 
+plot_qdist<-function(mltplx_experiment, slide_ids, mode = "heatmap"){
+  if(mode == "heatmap") {
+    
+    df <- qdist_to_df(mltplx_experiment) %>%
+      tidyr::drop_na(dist)
+    
+    for(id in slide_ids) {
+      p <- df %>%
+        dplyr::filter(slide_id == id) %>%
+        ggplot(aes(type1,type2,fill=dist)) +
+        geom_tile() +
+        anglex() +
+        scale_fill_gradient2() + facet_wrap(interval~.)+
+        ggtitle(paste0("Distance matrix for slide id ", id))
+      print(p)
+    }
+  } else if(mode == "network") {
+    filtered_exp <- filter_mltplx_objects(mltplx_experiment,slide_ids)
+    for(mltplx_object in filtered_exp) {
+      for(i in 1:length(mltplx_object$quantile_dist$quantiles$q_fac))
+      arr<-mltplx_object$quantile_dist$quantile_dist_array
+      block.diag<-do.call("adiag", lapply(seq(dim(arr)[3]), function(x) arr[ , , x]))
+      intervals<-qdist_to_df(mltplx_object)%>%distinct(type1,interval)
+      qgraph::qgraph(block.diag,threshold=0.1,layout="groups",groups=as.factor(intervals$interval),title=paste0("Network for slide id ", mltplx_object$slide_id))
 
+    }
+  } else {
+    stop("Mode must be either heatmap or network")
+  } 
+}
+
+library(magic)
+plot_qintensities <- function(mltplx_experiment,mask_type,q_probs,slide_ids) {
+  objs <- filter_mltplx_objects(mltplx_experiment,slide_ids)
+  
+  df <- purrr::map_df(1:length(objs),\(i) {
+    obj <- objs[[i]]
+    intensities<-obj$mltplx_intensity$intensities%>%
+      as.data.frame()
+    mask_intensities <- intensities %>% pull(!!sym(mask_type))
+    q <- q_probs %>%
+      pmap_dfr(\(from,to) {
+        as.vector(quantile(mask_intensities,probs=c(from,to)/100)) -> x
+        x <- c(x,from,to)
+        names(x) <- c("q1","q2","p1","p2")
+        x
+      }) %>%
+      mutate(q_fac = factor(1:nrow(.)))
+    q$q2[length(q$q2)]<-(q$q2[length(q$q2)]+.Machine$double.eps)
+    
+    intensities %>%
+      fuzzyjoin::fuzzy_join(q,
+                            by = setNames(c("q1","q2"),c(mask_type,mask_type)),
+                            match_fun = list(`>=`, `<`)) -> joined_q
+    joined_q$slide_id<-obj$slide_id
+    joined_q
+  })
+  
+  
+  for(id in slide_ids) {
+    ppp<-objs[[which(sapply(objs, "[[", 1)==id)]]$mltplx_image$ppp
+    d<-df %>%dplyr::filter(slide_id == id)
+      ggplot(d,aes(X,Y)) +
+      geom_tile(aes(fill=q_fac)) +
+      scale_fill_brewer(palette="YlGnBu",name=paste0("Quantile of ",mask_type)) +
+      geom_point(aes(X,Y,color=type,shape=type),data=cbind.data.frame(X=ppp$x,Y=ppp$y,type=ppp$marks))+
+        scale_shape_manual(name = "type",
+                           label = levels(ppp$marks),
+                           values=1:nlevels(ppp$marks),drop=FALSE) +
+        scale_color_manual(name = "type",
+                           label = levels(ppp$marks),
+                           values=as.vector(pals::polychrome()),drop=FALSE) +
+      ggtitle(paste0("Quantile intensity plot for slide id ", id)) -> p
+    print(p)
+  }
+}
+library(survival)
+surv_dist <- function(mltplx_experiment,
+                    surv_time, surv_event,
+                    agg_fun = median,
+                    covariates = NULL,
+                    slide_ids = NULL,
+                    types = NULL
+) {
+  stopifnot("Patient metadata must exist"=!is.null(mltplx_experiment$metadata))
+  stopifnot("Survival time must be in patient metadata"=surv_time %in% colnames(mltplx_experiment$metadata))
+  stopifnot("Survival event must be in patient metadata"=surv_event %in% colnames(mltplx_experiment$metadata))
+  df <- mltplx_experiment %>%
+    dist_to_df(reduce_symmetric = TRUE)
+  
+  if(is.null(slide_ids)) slide_ids <- unique(df$slide_id)
+  if(is.null(types)) types <- unique(df$type1)
+  fm_string <- paste0("Surv(",surv_time,",",surv_event,") ~ dist")
+  #fm_string <- paste0("dist ~ ", group_factor)
+  if(!is.null(covariates)) fm_string <- paste0(fm_string, " + ",paste0(covariates,collapse = " + "))
+  fm <- as.formula(fm_string)
+  
+  result <- df %>%
+    filter(slide_id %in% slide_ids,
+           type1 %in% types | type2 %in% types) %>% # from reduce_symmetric
+    group_by(patient_id,type1,type2) %>%
+    mutate(.,dist = agg_fun(dist,na.rm = T)) %>%
+    distinct(type1,type2,dist,patient_id,.keep_all = T) %>%
+    group_by(type1,type2) %>%
+    group_modify(~{
+      tryCatch({
+        coxph(fm,data=.x)
+      },error=\(e) {
+        NULL
+      }
+      ) %>%
+        broom::tidy()
+    }) %>%
+    ungroup() %>%
+    mutate(p.adj = p.adjust(p.value,method="fdr"))
+  
+  return(result)
+}
+
+# 
+# plot_qintensities(exp,"X1",q_probs,"A")
+# df<-data.frame()%>%filter(image_id==input$quantile_to_plot)
+# req(input$quantile_to_plot%in%df$image_id)
+# intens_data<-new_MltplxObject(
+#   x = df$x,
+#   y = df$y,
+#   marks = df$cell_type,
+#   slide_id = df$image_id,ps=input$eps,bw=input$bw)
+# from <- as.numeric(unlist(strsplit(input$quantiles_from,",")))
+# to <- as.numeric(unlist(strsplit(input$quantiles_to,",")))
+# q_probs<-cbind.data.frame(from,to)
+# 
+# intensities <- intens_data$mltplx_intensity$intensities %>%
+#   as.data.frame()
+# 
+# mask_intensities <- intensities %>% pull(!!sym(input$quant_cell_type))
+# q <- q_probs %>%
+#   pmap_dfr(\(from,to) {
+#     as.vector(quantile(mask_intensities,probs=c(from,to)/100)) -> x
+#     x <- c(x,from,to)
+#     names(x) <- c("q1","q2","p1","p2")
+#     x
+#   }) %>%
+#   mutate(q_fac = factor(1:nrow(.)))
+# q$q2[length(q$q2)]<-(q$q2[length(q$q2)]+.Machine$double.eps)
+# 
+# intensities %>%
+#   fuzzyjoin::fuzzy_join(q,
+#                         by = setNames(c("q1","q2"),c(input$quant_cell_type,input$quant_cell_type)),
+#                         match_fun = list(`>=`, `<`)) -> joined_q
+# 
+# ggplot(joined_q,aes(X,Y))+geom_raster(aes(fill=q_fac))+geom_point(aes(X,Y,color=type),data=cbind.data.frame(X=intens_data$mltplx_image$ppp$x,Y=intens_data$mltplx_image$ppp$y,type=intens_data$mltplx_image$ppp$marks))+
+#   scale_fill_brewer(palette="YlGnBu")
 
 
 #' group_boxplots <- function(mltpx_experiment,t1,t2,grouping_var="Group") {

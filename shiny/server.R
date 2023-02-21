@@ -59,10 +59,6 @@ function(input, output, session) {
                       choices = names(df), selected = "spots")
     updateSelectInput(session, inputId = 'patient_id', label = 'Patient ID',
                       choices = names(df), selected = "Patient")
-    #updateSelectInput(session, inputId = 'surv_time', label = 'Survival Time',
-        #              choices = names(df), selected = "OS")
-    #updateSelectInput(session, inputId = 'surv_event', label = 'Survival Event',
-              #        choices = names(df), selected = "OS_Censor")
     
     return(df)
   })
@@ -77,27 +73,31 @@ function(input, output, session) {
     df<-data()%>%select(.data[[input$xcol]],.data[[input$ycol]],.data[[input$type_id]],.data[[input$image_id]]) %>% group_by(.data[[input$image_id]])%>%
       mutate(x=as.numeric(.data[[input$xcol]]),y=as.numeric(.data[[input$ycol]]),cell_type=as.factor(.data[[input$type_id]]),image_id=as.factor(.data[[input$image_id]]))
     
-    updateSelectInput(session, inputId = 'image_to_plot', label = 'Select image to plot',choices = unique(df$image_id), selected = "1_A")
-    updateSelectInput(session, inputId = 'intens_to_plot', label = 'Select image to plot intensities',choices = unique(df$image_id), selected = "1_A")
+    updateSelectInput(session, inputId = 'image_to_plot', label = 'Select image to plot',choices = unique(df$image_id))
+    updateSelectInput(session, inputId = 'intens_to_plot', label = 'Select image to plot intensities',choices = unique(df$image_id))
     updateSelectInput(session, inputId = 'dm_to_plot', label = 'Select image id to plot distance matrix',choices = unique(df$image_id))
-    updateSelectInput(session, inputId = 't1', label = 'Select cell type 1',choices = unique(df$cell_type),selected="tumor cells")
-    updateSelectInput(session, inputId = 't2', label = 'Select cell type 2',choices = unique(df$cell_type),selected="CD4+ T cells")
-    updateSelectInput(session, inputId = 'quant_cell_type', label = 'Select cell type for mask',choices = unique(df$cell_type),selected="tumor cells")
-    updateSelectInput(session, inputId = 'quantile_to_plot', label = 'Select image to plot quantiles of intensities',choices =  unique(df$image_id), selected = "1_A")
+    updateSelectInput(session, inputId = 't1', label = 'Select cell type 1',choices = unique(df$cell_type))
+    updateSelectInput(session, inputId = 't2', label = 'Select cell type 2',choices = unique(df$cell_type))
+    updateSelectInput(session, inputId = 'quant_cell_type', label = 'Select cell type for mask',choices = unique(df$cell_type))
+    updateSelectInput(session, inputId = 'quantile_to_plot', label = 'Select image to plot quantiles of intensities',choices =  unique(df$image_id))
     return(df)
   })
   
   md.data.frame<-reactive({
     
     df<-metadata()%>%mutate(slide_id=as.factor(.data[[input$md_image_id]]),patient_id=as.factor(.data[[input$patient_id]]))
-    updateSelectInput(session, inputId = 'grouping_var', label = 'Select grouping variable',choices = names(df),selected="Patient")
-    updateSelectInput(session, inputId = 'heatmap_grouping_var', label = 'Select grouping variable',choices = names(df),selected="Group")
+    updateSelectInput(session, inputId = 'grouping_var', label = 'Select grouping variable',choices = names(df))
+    updateSelectInput(session, inputId = 'heatmap_grouping_var', label = 'Select grouping variable',choices = names(df))
+    updateSelectInput(session, inputId = 'surv_time', label = 'Select survival time variable',choices = names(df))
+    updateSelectInput(session, inputId = 'surv_event', label = 'Select survival event variable',choices = names(df))
     return(df)
   })
   
   fake_experiment<-reactive({
     exp <- build_mltplx_exp(2000,seed=1,n_slides=20)
     exp <- add_mltplx_metadata(exp,n_patients=10)
+    exp$metadata$survival_time<-rexp(dim(exp$metadata)[1],1)
+    exp$metadata$survival_event<-sample(c(0,1),dim(exp$metadata)[1],replace=T)
     #exp <- update_intensity(exp,ps=2,bw=3)
     #exp <- update_dist(exp,cor)
     
@@ -111,7 +111,8 @@ function(input, output, session) {
     
     updateSelectInput(session, inputId = 'grouping_var', label = 'Select grouping variable',choices = names(exp$metadata),selected="patient_id")
     updateSelectInput(session, inputId = 'heatmap_grouping_var', label = 'Select grouping variable',choices = names(exp$metadata),selected="group")
-    
+    updateSelectInput(session, inputId = 'surv_time', label = 'Select survival time variable',choices = names(exp$metadata))
+    updateSelectInput(session, inputId = 'surv_event', label = 'Select survival event variable',choices = names(exp$metadata))
     return(exp)
   })
   
@@ -159,8 +160,8 @@ function(input, output, session) {
     
   })
   
-  func_list<-list(jsd_unnormalized,jensen_shannon_dist,KL_div)
-  names(func_list)<-c("JSDu","JSD","KLD")
+  func_list<-list(cor,jensen_shannon_dist,KL_div)
+  names(func_list)<-c("Correlation","JSD","KLD")
   
   output$one_dm_plot<- renderPlot({
     if(input$quantiles_or_none=="N"){
@@ -168,7 +169,7 @@ function(input, output, session) {
         df<-data.frame()%>%filter(image_id==input$dm_to_plot)
         df$cell_type<-factor(df$cell_type,levels=unique(df$cell_type))
         req(input$dm_to_plot%in%df$image_id)
-        distance_data<-new_MltplxObject(
+        distance_data<-new_MltplxExperiment(
           x = df$x,
           y = df$y,
           marks = df$cell_type,
@@ -180,13 +181,14 @@ function(input, output, session) {
         intens_data <- update_intensity(exp,ps=input$eps,bw=input$bw)
         distance_data<- update_dist(intens_data,dist_metric=func_list[[input$dist_metric]])
       }
-      plot_dist(distance_data,input$dm_to_plot, mode = "heatmap")
+      plot_dist(distance_data,input$dm_to_plot, mode = input$dm_plot_type)
+      
     }else{
       if(!is.null(input$file1)){
       df<-data.frame()%>%filter(image_id==input$dm_to_plot)
       df$cell_type<-factor(df$cell_type,levels=unique(df$cell_type))
       req(input$dm_to_plot%in%df$image_id)
-      distance_data<-new_MltplxObject(
+      distance_data<-new_MltplxExperiment(
         x = df$x,
         y = df$y,
         marks = df$cell_type,
@@ -208,72 +210,74 @@ function(input, output, session) {
         distance_data<-add_QuantileDist(distance_data, dist_metric=func_list[[input$dist_metric]],mask_type=input$quant_cell_type,q_probs)
         
       }
-      plot_dist(distance_data,input$dm_to_plot, mode = "heatmap",plot_by_quantile=T)
+      #plot_dist(distance_data,input$dm_to_plot, mode = "heatmap",plot_by_quantile=T)
+      plot_qdist(distance_data,input$dm_to_plot, mode = input$dm_plot_type)
     }
-    
-    
     
   })
   
   output$quantile_intens_plot<-renderPlot({
     if(!is.null(input$file1)){
-      df<-data.frame()%>%filter(image_id==input$quantile_to_plot)
-      req(input$quantile_to_plot%in%df$image_id)
-      intens_data<-new_MltplxObject(
-        x = df$x,
-        y = df$y,
-        marks = df$cell_type,
-        slide_id = df$image_id,ps=input$eps,bw=input$bw)
-      from <- as.numeric(unlist(strsplit(input$quantiles_from,",")))
-      to <- as.numeric(unlist(strsplit(input$quantiles_to,",")))
-      q_probs<-cbind.data.frame(from,to)
+       df<-data.frame()%>%filter(image_id==input$quantile_to_plot)
+       req(input$quantile_to_plot%in%df$image_id)
+       intens_data<-new_MltplxExperiment(
+         x = df$x,
+         y = df$y,
+         marks = df$cell_type,
+         slide_id = df$image_id,ps=input$eps,bw=input$bw)
+       from <- as.numeric(unlist(strsplit(input$quantiles_from,",")))
+       to <- as.numeric(unlist(strsplit(input$quantiles_to,",")))
+       q_probs<-cbind.data.frame(from,to)
+      # 
+      # intensities <- intens_data$mltplx_intensity$intensities %>%
+      #   as.data.frame()
+      # 
+      # mask_intensities <- intensities %>% pull(!!sym(input$quant_cell_type))
+      # q <- q_probs %>%
+      #   pmap_dfr(\(from,to) {
+      #     as.vector(quantile(mask_intensities,probs=c(from,to)/100)) -> x
+      #     x <- c(x,from,to)
+      #     names(x) <- c("q1","q2","p1","p2")
+      #     x
+      #   }) %>%
+      #   mutate(q_fac = factor(1:nrow(.)))
+      # q$q2[length(q$q2)]<-(q$q2[length(q$q2)]+.Machine$double.eps)
+      # 
+      # intensities %>%
+      #   fuzzyjoin::fuzzy_join(q,
+      #                         by = setNames(c("q1","q2"),c(input$quant_cell_type,input$quant_cell_type)),
+      #                         match_fun = list(`>=`, `<`)) -> joined_q
       
-      intensities <- intens_data$mltplx_intensity$intensities %>%
-        as.data.frame()
-      
-      mask_intensities <- intensities %>% pull(!!sym(input$quant_cell_type))
-      q <- q_probs %>%
-        pmap_dfr(\(from,to) {
-          as.vector(quantile(mask_intensities,probs=c(from,to)/100)) -> x
-          x <- c(x,from,to)
-          names(x) <- c("q1","q2","p1","p2")
-          x
-        }) %>%
-        mutate(q_fac = factor(1:nrow(.)))
-      q$q2[length(q$q2)]<-(q$q2[length(q$q2)]+.Machine$double.eps)
-      
-      intensities %>%
-        fuzzyjoin::fuzzy_join(q,
-                              by = setNames(c("q1","q2"),c(input$quant_cell_type,input$quant_cell_type)),
-                              match_fun = list(`>=`, `<`)) -> joined_q
+      plot_quantile_mask(intens_data,input$quant_cell_type,q_probs,input$quantile_to_plot)
     }else{
       exp<-fake_experiment()
       intens_data <- update_intensity(exp,ps=input$eps,bw=input$bw)
-      intens_data<-filter_mltplx_objects(intens_data,input$quantile_to_plot)[[1]]
-      #distance_data<- update_dist(exp,dist_metric=func_list[[input$dist_metric]])
+      # intens_data<-filter_mltplx_objects(intens_data,input$quantile_to_plot)[[1]]
+      # #distance_data<- update_dist(exp,dist_metric=func_list[[input$dist_metric]])
       from <- as.numeric(unlist(strsplit(input$quantiles_from,",")))
       to <- as.numeric(unlist(strsplit(input$quantiles_to,",")))
       q_probs<-cbind.data.frame(from,to)
-      
-      intensities <- intens_data$mltplx_intensity$intensities %>%
-        as.data.frame()
-      
-      mask_intensities <- intensities %>% pull(!!sym(input$quant_cell_type))
-      q <- q_probs %>%
-        pmap_dfr(\(from,to) {
-          as.vector(quantile(mask_intensities,probs=c(from,to)/100)) -> x
-          x <- c(x,from,to)
-          names(x) <- c("q1","q2","p1","p2")
-          x
-        }) %>%
-        mutate(q_fac = factor(1:nrow(.)))
-      
-      q$q2[length(q$q2)]<-(q$q2[length(q$q2)]+.Machine$double.eps)
-      
-      intensities %>%
-        fuzzyjoin::fuzzy_join(q,
-                              by = setNames(c("q1","q2"),c(input$quant_cell_type,input$quant_cell_type)),
-                              match_fun = list(`>=`, `<`)) -> joined_q
+      # 
+      # intensities <- intens_data$mltplx_intensity$intensities %>%
+      #   as.data.frame()
+      # 
+      # mask_intensities <- intensities %>% pull(!!sym(input$quant_cell_type))
+      # q <- q_probs %>%
+      #   pmap_dfr(\(from,to) {
+      #     as.vector(quantile(mask_intensities,probs=c(from,to)/100)) -> x
+      #     x <- c(x,from,to)
+      #     names(x) <- c("q1","q2","p1","p2")
+      #     x
+      #   }) %>%
+      #   mutate(q_fac = factor(1:nrow(.)))
+      # 
+      # q$q2[length(q$q2)]<-(q$q2[length(q$q2)]+.Machine$double.eps)
+      # 
+      # intensities %>%
+      #   fuzzyjoin::fuzzy_join(q,
+      #                         by = setNames(c("q1","q2"),c(input$quant_cell_type,input$quant_cell_type)),
+      #                         match_fun = list(`>=`, `<`)) -> joined_q
+      plot_quantile_mask(intens_data,input$quant_cell_type,q_probs,input$quantile_to_plot)
     }
     
     
@@ -365,6 +369,7 @@ function(input, output, session) {
     message = function(m) {
       shinyjs::html(id = "text", html = paste0(m$message), add = FALSE)
     })
+    shinyjs::enable("submit")
   })
   
   
@@ -384,9 +389,18 @@ function(input, output, session) {
      typewise_boxplots(out(),input$t1,input$t2,group_factor=input$grouping_var)
   }))
   
+  agg_func_list<-list(median,mean,max,min)
+  names(agg_func_list)<-c("median","mean","max","min")
+  
   output$heatmap<-renderPlot(({
     req(out())
-    df<-lm_dist(out(),group_factor = input$heatmap_grouping_var,agg_fun = median)
+    df<-lm_dist(out(),group_factor = input$heatmap_grouping_var,agg_fun = agg_func_list[[input$agg_function]])
+    plot_pairwise_group_heatmap(df)
+  }))
+  
+  output$surv_heatmap<-renderPlot(({
+    req(out())
+    df<-surv_dist(out(),surv_time = input$surv_time, surv_event=input$surv_event ,agg_fun = agg_func_list[[input$agg_function1]])
     plot_pairwise_group_heatmap(df)
   }))
   
