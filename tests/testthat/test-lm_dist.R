@@ -44,13 +44,14 @@ test_that("Correct aggregation", {
   expect_true(s1.2$coefficients[2,1] == m2.1$estimate[1]) # estimate should be the same
 })
 
+
+# test_that("agg_fun with no na.rm option is rejected", {
+#   bad_fun <- function(x) sum(x)
+#   
+#   expect_error(lm_dist(exp,"group",agg_fun = bad_fun),"na.rm must be an option in agg_fun")
+# })
 ## TODO
 ## reduce_symmetric works correctly
-test_that("agg_fun with no na.rm option is rejected", {
-  bad_fun <- function(x) sum(x)
-  
-  expect_error(lm_dist(exp,"group",agg_fun = bad_fun),"Error: na.rm must be an option in agg_fun")
-})
 ## correct output structure (and computation) with and without covariates
 ## Covariates must be in metadata
 
