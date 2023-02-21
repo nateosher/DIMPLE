@@ -228,62 +228,18 @@ function(input, output, session) {
        from <- as.numeric(unlist(strsplit(input$quantiles_from,",")))
        to <- as.numeric(unlist(strsplit(input$quantiles_to,",")))
        q_probs<-cbind.data.frame(from,to)
-      # 
-      # intensities <- intens_data$mltplx_intensity$intensities %>%
-      #   as.data.frame()
-      # 
-      # mask_intensities <- intensities %>% pull(!!sym(input$quant_cell_type))
-      # q <- q_probs %>%
-      #   pmap_dfr(\(from,to) {
-      #     as.vector(quantile(mask_intensities,probs=c(from,to)/100)) -> x
-      #     x <- c(x,from,to)
-      #     names(x) <- c("q1","q2","p1","p2")
-      #     x
-      #   }) %>%
-      #   mutate(q_fac = factor(1:nrow(.)))
-      # q$q2[length(q$q2)]<-(q$q2[length(q$q2)]+.Machine$double.eps)
-      # 
-      # intensities %>%
-      #   fuzzyjoin::fuzzy_join(q,
-      #                         by = setNames(c("q1","q2"),c(input$quant_cell_type,input$quant_cell_type)),
-      #                         match_fun = list(`>=`, `<`)) -> joined_q
       
       plot_quantile_mask(intens_data,input$quant_cell_type,q_probs,input$quantile_to_plot)
     }else{
       exp<-fake_experiment()
       intens_data <- update_intensity(exp,ps=input$eps,bw=input$bw)
-      # intens_data<-filter_mltplx_objects(intens_data,input$quantile_to_plot)[[1]]
-      # #distance_data<- update_dist(exp,dist_metric=func_list[[input$dist_metric]])
       from <- as.numeric(unlist(strsplit(input$quantiles_from,",")))
       to <- as.numeric(unlist(strsplit(input$quantiles_to,",")))
       q_probs<-cbind.data.frame(from,to)
-      # 
-      # intensities <- intens_data$mltplx_intensity$intensities %>%
-      #   as.data.frame()
-      # 
-      # mask_intensities <- intensities %>% pull(!!sym(input$quant_cell_type))
-      # q <- q_probs %>%
-      #   pmap_dfr(\(from,to) {
-      #     as.vector(quantile(mask_intensities,probs=c(from,to)/100)) -> x
-      #     x <- c(x,from,to)
-      #     names(x) <- c("q1","q2","p1","p2")
-      #     x
-      #   }) %>%
-      #   mutate(q_fac = factor(1:nrow(.)))
-      # 
-      # q$q2[length(q$q2)]<-(q$q2[length(q$q2)]+.Machine$double.eps)
-      # 
-      # intensities %>%
-      #   fuzzyjoin::fuzzy_join(q,
-      #                         by = setNames(c("q1","q2"),c(input$quant_cell_type,input$quant_cell_type)),
-      #                         match_fun = list(`>=`, `<`)) -> joined_q
+
       plot_quantile_mask(intens_data,input$quant_cell_type,q_probs,input$quantile_to_plot)
     }
-    
-    
-    #ggplot(joined_q,aes(X,Y))+geom_raster(aes(fill=.data[[input$quant_cell_type]]))+facet_wrap(q_fac~.,nrow=2,ncol=2)+geom_point(aes(X,Y),color="white",data=cbind.data.frame(X=intens_data$mltplx_image$ppp$x,Y=intens_data$mltplx_image$ppp$y)[intens_data$mltplx_image$ppp$marks==input$quant_cell_type,])+scale_fill_viridis_c()
-    ggplot(joined_q,aes(X,Y))+geom_raster(aes(fill=q_fac))+geom_point(aes(X,Y,color=type),data=cbind.data.frame(X=intens_data$mltplx_image$ppp$x,Y=intens_data$mltplx_image$ppp$y,type=intens_data$mltplx_image$ppp$marks))+
-      scale_fill_brewer(palette="YlGnBu")
+
   })
   
   out <- reactive({
