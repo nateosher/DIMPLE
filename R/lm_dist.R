@@ -18,6 +18,10 @@ lm_dist <- function(mltplx_experiment,
 ) {
   stopifnot("Patient metadata must exist"=!is.null(mltplx_experiment$metadata))
   stopifnot("Group factor must be in patient metadata"=group_factor %in% colnames(mltplx_experiment$metadata))
+  # stopifnot("na.rm must be an option in agg_fun"="na.rm" %in% formalArgs(agg_fun))
+  if(!is.null(covariates)) {
+    stopifnot("Covariates must be in patient metadata"=all(covariates %in% colnames(mltplx_experiment$metadata)))
+  }
   
   df <- mltplx_experiment %>%
     dist_to_df(reduce_symmetric = TRUE)
