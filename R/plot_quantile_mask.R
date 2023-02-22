@@ -13,8 +13,9 @@
 #' @export
 
 plot_quantile_mask <- function(mltplx_experiment,mask_type,q_probs,slide_ids) {
-
-    df <- purrr::map_df(1:length(objs),\(i) {
+  objs <- filter_mltplx_objects(mltplx_experiment,slide_ids)
+  
+  df <- purrr::map_df(1:length(objs),\(i) {
     obj <- objs[[i]]
     if(!is.null(obj$quantile_dist) &&
        obj$quantile_dist$mask_type == mask_type &&
