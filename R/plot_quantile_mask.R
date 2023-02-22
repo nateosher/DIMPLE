@@ -13,16 +13,25 @@
 #' @export
 
 plot_quantile_mask <- function(mltplx_experiment,mask_type,q_probs,slide_ids) {
-  objs <- filter_mltplx_objects(mltplx_experiment,slide_ids)
+
+  if(!is.null(mltplx_experiment$mltplx_objects[[1]]$quantile_dist))
   
+  objs <- filter_mltplx_objects(mltplx_experiment,slide_ids)
   
   df <- purrr::map_df(1:length(objs),\(i) {
     obj <- objs[[i]]
-    intensities<-obj$mltplx_intensity$intensities%>%
-      as.data.frame()
-    joined_q<- calc_qfac(q_probs,intensities,mask_type)$joined_q
-    joined_q$slide_id<-obj$slide_id
-    joined_q
+    if(!is.null(obj$quantile_dist)){
+      joined_q<- obj$quantile_dist$xy_qfac
+      joined_q$slide_id<-obj$slide_id
+      joined_q
+    }else{
+      intensities<-obj$mltplx_intensity$intensities%>%
+        as.data.frame()
+      joined_q<- calc_qfac(q_probs,intensities,mask_type)$joined_q
+      joined_q$slide_id<-obj$slide_id
+      joined_q
+    }
+
   })
   
   

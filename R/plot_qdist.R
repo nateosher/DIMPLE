@@ -13,12 +13,12 @@ plot_qdist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
   if(mode == "heatmap") {
     
     df <- qdist_to_df(mltplx_experiment) %>%
-      tidyr::drop_na(dist)
+      tidyr::drop_na(qdist)
     
     for(id in slide_ids) {
       p <- df %>%
         dplyr::filter(slide_id == id) %>%
-        ggplot(aes(type1,type2,fill=dist)) +
+        ggplot(aes(type1,type2,fill=qdist)) +
         geom_tile() +
         anglex() +
         scale_fill_gradient2() + facet_wrap(interval~.)+
