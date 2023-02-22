@@ -354,11 +354,7 @@ function(input, output, session) {
     plot_pairwise_group_heatmap(df)
   }))
   
-  output$surv_heatmap<-renderPlot(({
-    req(out())
-    df<-surv_dist(out(),surv_time = input$surv_time, surv_event=input$surv_event ,agg_fun = agg_func_list[[input$agg_function1]])
-    plot_pairwise_group_heatmap(df)
-  }))
+  
   
 }
 

@@ -178,21 +178,6 @@ fluidPage(shinyjs::useShinyjs(),
                        )
                      )
                      
-            ),
-            tabPanel("Plot survival heatmap",
-                     pageWithSidebar(
-                       headerPanel(''),
-                       sidebarPanel(  tags$head(tags$style("#surv_heatmap{height:70vh !important;}")),
-                         selectInput('surv_time', 'Select survival time variable', "", selected = "Group"),
-                         selectInput('surv_event', 'Select survival event variable', "", selected = "Group"),
-                         selectInput('agg_function1', 'Select function to aggregate distances over patients', c("median","mean","max","min"))
-                       ),
-                       mainPanel(
-                         #pre(id = "console"),
-                         plotOutput('surv_heatmap')
-                       )
-                     )
-                     
             )
           )
 )
