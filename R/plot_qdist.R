@@ -6,7 +6,7 @@
 #' @return NULL
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
-#' @importFrom magic adist
+#' @importFrom magic adiag
 #' @export
 plot_qdist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
   stopifnot("Quantile distances must exist"=!is.null(mltplx_experiment$mltplx_objects[[1]]$quantile_dist))
@@ -29,9 +29,11 @@ plot_qdist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
     filtered_exp <- filter_mltplx_objects(mltplx_experiment,slide_ids)
     for(mltplx_object in filtered_exp) {
       for(i in 1:length(mltplx_object$quantile_dist$quantiles$q_fac))
-        arr<-mltplx_object$quantile_dist$quantile_dist_array
-      block.diag<-do.call("adiag", lapply(seq(dim(arr)[3]), function(x) arr[ , , x]))
-      intervals<-qdist_to_df(mltplx_object)%>%distinct(type1,interval)
+        arr <- mltplx_object$quantile_dist$quantile_dist_array
+      block.diag <- do.call("adiag", lapply(seq(dim(arr)[3]), function(x) arr[ , , x]))
+      intervals <- qdist_to_df(mltplx_object) %>%
+        distinct(type1,interval)
+      nms <- colnames(mltplx_object$mltplx_dist$dist)
       qgraph::qgraph(block.diag,threshold=0.1,layout="groups",groups=as.factor(intervals$interval),title=paste0("Network for slide id ", mltplx_object$slide_id))
       
     }
