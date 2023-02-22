@@ -8,6 +8,7 @@
 #' @param slide_ids Vector of slide ids for which you would like to plot
 #' @return NULL
 #' @importFrom magrittr `%>%`
+#' @import RColorBrewer
 #' @importFrom fuzzyjoin fuzzy_join
 #' @import ggplot2
 #' @export
@@ -35,11 +36,14 @@ plot_quantile_mask <- function(mltplx_experiment,mask_type,q_probs,slide_ids) {
   })
   
   for(id in slide_ids) {
+    
     ppp<-objs[[which(sapply(objs, "[[", 1)==id)]]$mltplx_image$ppp
     d<-df %>%dplyr::filter(slide_id == id)
+    nb.cols <- length(unique(d$q_fac))
+    mycolors <- colorRampPalette(brewer.pal(9, "YlGnBu"))(nb.cols)
     ggplot(d,aes(X,Y)) +
       geom_tile(aes(fill=q_fac),alpha=.7) +
-      scale_fill_brewer(palette="YlGnBu",name=paste0("Quantile of ",mask_type)) +
+      scale_fill_manual(values = mycolors)+
       geom_point(aes(X,Y,color=type,shape=type),data=cbind.data.frame(X=ppp$x,Y=ppp$y,type=ppp$marks))+
       scale_shape_manual(name = "type",
                          label = levels(ppp$marks),
