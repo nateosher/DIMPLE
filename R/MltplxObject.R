@@ -170,7 +170,7 @@ qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
       rename(type1=Var1,
              type2=Var2,
              interval=Var3,
-             dist=Freq) %>%
+             qdist=Freq) %>%
       mutate(slide_id=mltplx_object$slide_id) %>%
       as_tibble()
 

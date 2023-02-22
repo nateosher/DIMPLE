@@ -4,13 +4,13 @@
 #'
 #' @return ggplot heatmap
 #' @export
-plot_pairwise_group_heatmap <- function(df) {
+plot_pairwise_group_heatmap <- function(df,p_val_col = "p.adj") {
   group_name <- unique(df$term)
   df %>% {
     ggplot(.,aes(type1,type2,fill=estimate)) +
     geom_tile() +
     anglex() +
-    sig_stars() +
+    sig_stars(p_values = p_val_col) +
     scico::scale_fill_scico(palette = "vik",
                             label = function(z) replace(z, c(1, length(z)), 
                                                         c(paste0("Lesser in group ",group_name, " \u2193"),

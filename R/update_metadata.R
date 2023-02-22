@@ -16,16 +16,17 @@ update_metadata = function(mltplx_experiment, metadata){
   return(mltplx_experiment)
 }
 
+same_elements <- function(a, b) return(identical(sort(a), sort(b)))
+
 check_metadata <- function(mltplx_objects,metadata) {
   stopifnot("Metadata needs column named slide_id"="slide_id" %in%
               colnames(metadata))
   stopifnot("Metadata needs column named patient_id"="patient_id" %in%
               colnames(metadata))
 
-  SameElements <- function(a, b) return(identical(sort(a), sort(b)))
 
   stopifnot("Metadata slide_id does not contain all slide_ids found in mltplx_objects" =
-              SameElements(metadata$slide_id,
+              same_elements(metadata$slide_id,
                              unlist(
                                lapply(mltplx_objects,\(obj) obj$slide_id)
                              )
