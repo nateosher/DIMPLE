@@ -49,4 +49,5 @@ SimulateGrid = function(intensity_list, square_side_length = 1){
                         window = owin(c(0, square_side_length * grid_ncol),
                                       c(0, square_side_length * grid_nrow)))
 
+  return(final_pointproc)
 }
