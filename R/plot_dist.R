@@ -26,7 +26,8 @@ plot_dist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
   } else if(mode == "network") {
     filtered_exp <- filter_mltplx_objects(mltplx_experiment,slide_ids)
     for(mltplx_object in filtered_exp) {
-      qgraph::qgraph(mltplx_object$mltplx_dist$dist,layout = "circle",threshold=0.1)
+      nms <- colnames(mltplx_object$mltplx_dist$dist)
+      qgraph::qgraph(mltplx_object$mltplx_dist$dist,layout = "circle",threshold=0.1,labels=nms,label.cex=2.5,label.scale.equal=T)
     }
   } else {
     stop("Mode must be either heatmap or network")
