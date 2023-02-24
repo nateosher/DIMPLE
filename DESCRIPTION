@@ -18,7 +18,8 @@ Imports:
     spatstat.explore,
     spatstat.geom,
     tidyr,
-    magic
+    magic,
+    RColorBrewer
 Suggests: 
     covr,
     knitr,
