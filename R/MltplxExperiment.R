@@ -182,6 +182,7 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
                                           mask_type,
                                           q_probs,
                                           .dist_metric_name)
+  ProgressBar(n_slides + 1, n_slides)
 
   mltplx_experiment
 }

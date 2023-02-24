@@ -17,7 +17,7 @@ group_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group") {
   mltplx_experiment %>%
     dist_to_df %>%
     filter(type1 == t1,
-           type2 == t2) %>%
+           type2 == t2) %>% 
     ggplot(aes(!!sym(grouping_var),dist)) +
     geom_boxplot() +
     geom_jitter(color="orange") +
