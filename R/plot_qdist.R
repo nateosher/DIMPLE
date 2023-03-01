@@ -21,7 +21,7 @@ plot_qdist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
         ggplot(aes(type1,type2,fill=qdist)) +
         geom_tile() +
         anglex() +
-        scale_fill_gradient2() + facet_wrap(interval~.)+
+        viridis::scale_fill_viridis() + facet_wrap(interval~.)+
         ggtitle(paste0("Distance matrix for slide id ", id))
       print(p)
     }
@@ -34,7 +34,7 @@ plot_qdist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
       intervals <- qdist_to_df(mltplx_object) %>%
         distinct(type1,interval)
       nms <- colnames(mltplx_object$mltplx_dist$dist)
-      qgraph::qgraph(block.diag,threshold=0.1,layout="groups",groups=as.factor(intervals$interval),title=paste0("Network for slide id ", mltplx_object$slide_id))
+      qgraph::qgraph(block.diag,threshold=0.1,layout="groups",groups=as.factor(intervals$interval),title=paste0("Network for slide id ", mltplx_object$slide_id),palette="gray")
       
     }
   } else {

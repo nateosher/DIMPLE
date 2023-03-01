@@ -19,9 +19,9 @@ plot_quantile_mask <- function(mltplx_experiment,mask_type,q_probs,slide_ids) {
   df <- purrr::map_df(1:length(objs),\(i) {
     obj <- objs[[i]]
     if(!is.null(obj$quantile_dist) &&
-       obj$quantile_dist$mask_type == mask_type &&
-       obj$quantile_dist$quantiles$p1 == q_probs$from &&
-       obj$quantile_dist$quantiles$p2 == q_probs$to
+      obj$quantile_dist$mask_type == mask_type &&
+      all(obj$quantile_dist$quantiles$p1 == q_probs$from) &&
+      all(obj$quantile_dist$quantiles$p2 == q_probs$to)
        ){
       joined_q<- obj$quantile_dist$xy_qfac
       joined_q$slide_id<-obj$slide_id
@@ -39,18 +39,16 @@ plot_quantile_mask <- function(mltplx_experiment,mask_type,q_probs,slide_ids) {
     
     ppp<-objs[[which(sapply(objs, "[[", 1)==id)]]$mltplx_image$ppp
     d<-df %>%dplyr::filter(slide_id == id)
-    nb.cols <- length(unique(d$q_fac))
-    mycolors <- colorRampPalette(brewer.pal(9, "YlGnBu"))(nb.cols)
     ggplot(d,aes(X,Y)) +
-      geom_tile(aes(fill=q_fac),alpha=.7) +
-      scale_fill_manual(values = mycolors)+
-      geom_point(aes(X,Y,color=type,shape=type),data=cbind.data.frame(X=ppp$x,Y=ppp$y,type=ppp$marks))+
+      geom_tile(aes(fill=q_fac)) +
+      scale_fill_grey(start=0,end=1,name=paste0("Quantile of ", mask_type))+
+      geom_point(aes(X,Y,color=type,shape=type),data=cbind.data.frame(X=ppp$x,Y=ppp$y,type=ppp$marks),size=2)+
       scale_shape_manual(name = "type",
                          label = levels(ppp$marks),
                          values=1:nlevels(ppp$marks),drop=FALSE) +
       scale_color_manual(name = "type",
                          label = levels(ppp$marks),
-                         values=as.vector(pals::polychrome()),drop=FALSE) +
+                         values=rep_len(cbfp, length(unique(ppp$marks))+1),drop=FALSE) +
       ggtitle(paste0("Quantile intensity plot for slide id ", id)) -> p
     print(p)
   }

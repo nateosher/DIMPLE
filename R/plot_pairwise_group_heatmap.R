@@ -6,20 +6,26 @@
 #' @export
 plot_pairwise_group_heatmap <- function(df,p_val_col = "p.adj") {
   group_name <- unique(df$term)
-  df %>% {
+  df %>%     
+    na.omit(estimate) %>% 
+    mutate(estimate=signif(estimate,2)) %>%
+    arrange(type1, type2) %>%
+    {
     ggplot(.,aes(type1,type2,fill=estimate)) +
     geom_tile() +
     anglex() +
     sig_stars(p_values = p_val_col) +
-    scico::scale_fill_scico(palette = "vik",
-                            label = function(z) replace(z, c(1, length(z)), 
-                                                        c(paste0("Lesser in group ",group_name, " \u2193"),
-                                                          paste0("Greater in group ", group_name, " \u2191"))),
-                            breaks = round(seq(from=-max(abs(round(.$estimate,2)),na.rm=T),
-                                               to=max(abs(round(.$estimate,2)),na.rm=T),
-                                               length.out=5),2),
-                            limits = c(-max(abs(round(.$estimate,2)),na.rm=T),max(abs(round(.$estimate,2)),na.rm=T))
-    )
+    scale_x_discrete(drop = FALSE) +
+    scale_y_discrete(drop = FALSE) +
+    viridis::scale_fill_viridis(
+                            label = function(z) replace(z, c(1, length(z)),
+                                                        c(paste0("Lesser in ",group_name, " \u2193"),
+                                                          paste0("Greater in ", group_name, " \u2191"))),
+                            breaks = (seq(from=min(.$estimate,na.rm=T),
+                                             to=max(.$estimate,na.rm=T),
+                                              length.out=5)),
+                            limits = c(min(.$estimate,na.rm=T),max(.$estimate,na.rm=T))
+    ) 
   }
 }
 
@@ -51,5 +57,5 @@ typewise_boxplots <- function(mltplx_experiment,
     } %>%
     ggplot(aes(!!sym(group_factor),dist)) +
     geom_boxplot() +
-    geom_jitter(color="orange")
+    geom_jitter(color=cbfp[1])
 }
