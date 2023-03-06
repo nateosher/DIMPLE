@@ -109,6 +109,28 @@ test_that("`SimulateGrid` works", {
   expect_true(all(
     sim1$marks %>% levels() == c(1, 2)
   ))
+
+  # Handle edge case where no points are generated
+  expect_no_error({
+    sim2 = SimulateGrid(
+      list(
+        GridRect(100, 100, 1,  1,  20, 20, 0),
+        GridRect(100, 100, 80, 80, 20, 20, 0)
+      )
+    )
+  })
+
+  expect_equal(sim2$n, 0)
+
+  expect_equal(sim2$marks %>% levels() %>% length(), 2)
+
+  expect_true(all(
+    sim2$window$xrange == c(0, 100)
+  ))
+
+  expect_true(all(
+    sim2$window$yrange == c(0, 100)
+  ))
 })
 
 
