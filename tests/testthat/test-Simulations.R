@@ -107,7 +107,7 @@ test_that("`SimulateGrid` works", {
 
   # And there should be two marks: 1 and 2
   expect_true(all(
-    sim1$marks %>% levels() == c(1, 2)
+    sim1$marks %>% levels() == c("1", "2")
   ))
 
   # Handle edge case where no points are generated
