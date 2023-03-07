@@ -33,17 +33,11 @@ plot_matrix_heatmap = function (m, t = "", min.v = NA, max.v = NA,
     max.v = max(plot.tib$val, na.rm = T)
   }
 
-  # cols = colorRampPalette(rev(c("#0a0722", "#3d0965", "#721a6e",
-  #                                        "#a52c60", "#d44842", "#f37819",
-  #                                        "#fcb216")))(7)
-  cols = terrain.colors(15)
-
   ggplot(plot.tib) + geom_tile(mapping = aes(x = c, y = reorder(r, -r),
                                              fill = val)) +
     labs(fill = "") +
     ggtitle(t) +
-    scale_fill_gradientn(colors = cols,
-                         limits = c(min.v, max.v), na.value = "white") +
+    viridis::scale_fill_viridis(limits = c(min.v, max.v)) +
     theme(axis.title.y = element_blank(),
           axis.text.y = element_blank(),
           axis.ticks.y = element_blank(),
