@@ -5,7 +5,7 @@
 \title{Generates a simulation of an arbitrary number of cell types with the specified
 intensity pattern}
 \usage{
-SimulateGrid(intensity_list, square_side_length = 1)
+SimulateGrid(intensity_list, marks = NULL, square_side_length = 1)
 }
 \arguments{
 \item{intensity_list}{a list of matrices, each of which represents the
