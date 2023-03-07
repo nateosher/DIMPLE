@@ -10,6 +10,7 @@
 #' @import ggplot2
 #' @importFrom grDevices colorRampPalette
 #' @importFrom stats reorder
+#' @export
 plot_matrix_heatmap = function (m, t = "", min.v = NA, max.v = NA,
                           show_legend = TRUE, reflect = FALSE){
   plot.tib = tibble(r = numeric(0), c = numeric(0), val = numeric(0))
