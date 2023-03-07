@@ -17,6 +17,7 @@ patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",
     dist_to_df %>%
     filter(type1 == t1,
            type2 == t2) %>%
+    mutate(across(!!sym(grouping_var),factor) ) %>%
     {
       if(!is.null(grouping_var)) ggplot2::ggplot(.,aes(x=patient_id,y=dist,
                                               fill=!!sym(grouping_var)))
