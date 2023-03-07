@@ -14,7 +14,10 @@
 GridRect = function(m, n, bot_left_corner_x, bot_left_corner_y, width,
                     height, intensity){
   intensity_mat = matrix(0, nrow = m, ncol = n)
-  rect_select = purrr::cross2(1:height, 1:width) %>%
+  rect_select_tib = tidyr::expand_grid(r = 1:height, c = 1:width)
+  rect_select = map(1:nrow(rect_select_tib),
+                    ~ c(rect_select_tib$r[.x], rect_select_tib$c[.x])
+                    ) %>%
                     purrr::map(~ unlist(.x) + c(bot_left_corner_y - 1,
                                                 bot_left_corner_x - 1)) %>%
                     purrr::keep(~ .x[1] <= m && .x[2] <= n)
