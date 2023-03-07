@@ -55,6 +55,6 @@ plot.MltplxIntensity = function(mltplx_intensity, ...){
   ggplot(d, aes(X,Y,fill=intensity)) +
     geom_tile() +
     facet_wrap(~type) +
-    scale_fill_gradientn(colours = terrain.colors(15)) +
+    viridis::scale_fill_viridis() +
     ggtitle(paste0("Cell intensities"))
 }
