@@ -19,7 +19,8 @@ Imports:
     spatstat.geom,
     tidyr,
     magic,
-    RColorBrewer
+    RColorBrewer,
+    viridis
 Suggests: 
     covr,
     knitr,
