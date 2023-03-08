@@ -37,3 +37,24 @@ print.MltplxIntensity = function(mltplx_intensity){
   cat("Grid dimensions:", mltplx_intensity$dim[1], "x",
       mltplx_intensity$dim[1], "\n")
 }
+
+#' @export
+plot.MltplxIntensity = function(mltplx_intensity, ...){
+  args = list(...)
+  if(is.null(args$types)){
+    types = mltplx_intensity$cell_types
+  }else{
+    types = args$types
+  }
+
+  d = mltplx_intensity$intensities %>%
+    tibble::as_tibble() %>%
+    dplyr::select(all_of(types),X,Y) %>%
+    tidyr::pivot_longer(-c(X,Y),names_to = "type",values_to = "intensity")
+
+  ggplot(d, aes(X,Y,fill=intensity)) +
+    geom_tile() +
+    facet_wrap(~type) +
+    viridis::scale_fill_viridis() +
+    ggtitle(paste0("Cell intensities"))
+}
