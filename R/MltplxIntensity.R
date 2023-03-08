@@ -7,7 +7,7 @@
 #' @return `MltplxIntensity` object
 #' @export
 new_MltplxIntensity = function(mltplx_image, ps, bw){
-  intensity_object = pat.density(mltplx_image$ppp, eps = ps, sigma = bw)
+  intensity_object = pat.density(mltplx_image$ppp, eps = ps, sigma = bw, positive = TRUE)
   intensity_matrix = intensity_object$dens %>%
     mutate(X = intensity_object$X,
            Y = intensity_object$Y) %>%
