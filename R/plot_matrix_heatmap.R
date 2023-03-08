@@ -10,8 +10,8 @@
 #' @import ggplot2
 #' @importFrom grDevices colorRampPalette
 #' @importFrom stats reorder
-CH = function (m, t = "", min.v = NA, max.v = NA,
-               show_legend = TRUE, reflect = FALSE){
+plot_matrix_heatmap = function (m, t = "", min.v = NA, max.v = NA,
+                          show_legend = TRUE, reflect = FALSE){
   plot.tib = tibble(r = numeric(0), c = numeric(0), val = numeric(0))
   if(reflect){
     for (i in 1:ncol(m)) {
@@ -33,23 +33,18 @@ CH = function (m, t = "", min.v = NA, max.v = NA,
     max.v = max(plot.tib$val, na.rm = T)
   }
 
-  cols = colorRampPalette(rev(c("#0a0722", "#3d0965", "#721a6e",
-                                "#a52c60", "#d44842", "#f37819",
-                                "#fcb216")))(7)
-
- ggplot(plot.tib) + geom_tile(mapping = aes(x = c, y = reorder(r, -r),
-                                            fill = val)) +
-   labs(fill = "") +
-   ggtitle(t) +
-   scale_fill_gradientn(colors = cols,
-                        limits = c(min.v, max.v), na.value = "white") +
-   theme(axis.title.y = element_blank(),
-         axis.text.y = element_blank(),
-         axis.ticks.y = element_blank(),
-         axis.title.x = element_blank(),
-         axis.text.x = element_blank(),
-         axis.ticks.x = element_blank(),
-         panel.background = element_rect(fill = "white", colour = "black"),
-         panel.border = element_rect(linetype = "solid", fill = NA),
-         legend.position = ifelse(show_legend, "right", "none"))
+  ggplot(plot.tib) + geom_tile(mapping = aes(x = c, y = reorder(r, -r),
+                                             fill = val)) +
+    labs(fill = "") +
+    ggtitle(t) +
+    viridis::scale_fill_viridis(limits = c(min.v, max.v)) +
+    theme(axis.title.y = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank(),
+          panel.background = element_rect(fill = "white", colour = "black"),
+          panel.border = element_rect(linetype = "solid", fill = NA),
+          legend.position = ifelse(show_legend, "right", "none"))
 }
