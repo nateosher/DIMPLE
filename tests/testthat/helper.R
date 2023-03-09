@@ -22,7 +22,7 @@ add_mltplx_metadata <- function(exp,n_patients,seed=2024,n_groups=2) {
   
   gp_tb <- tibble(patient_id=unique(patient_ids),group=groups)
   
-  metadata <- left_join(metadata,gp_tb)
+  metadata <- left_join(metadata,gp_tb,by = "patient_id")
   
   exp <- update_metadata(exp,metadata)
 }
