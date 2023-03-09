@@ -5,6 +5,7 @@
 #' dimensions.
 #' @param square_side_length a double indicating the side length of each matrix
 #' entry. Defaults to 1, i.e. each matrix entry is a 1 by 1 unit square.
+#' @export
 SimulateGrid = function(intensity_list, marks = NULL, square_side_length = 1){
   # Because spatstat indexes from bottom left corner and matrices index from
   # top left, reflecting over the horizontal gives the desired configuration
@@ -52,7 +53,8 @@ SimulateGrid = function(intensity_list, marks = NULL, square_side_length = 1){
   final_sim_mat = do.call(rbind, final_sim_list)
 
   final_pointproc = ppp(x = final_sim_mat[,2], y = final_sim_mat[,1],
-                        marks = factor(final_sim_mat[,3],
+                        marks = factor(map_chr(final_sim_mat[,3],
+                                               ~ as.character(marks[.x])),
                                        levels = marks),
                         window = owin(c(0, square_side_length * grid_ncol),
                                       c(0, square_side_length * grid_nrow)))

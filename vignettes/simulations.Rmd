@@ -1,0 +1,175 @@
+---
+title: "simulations"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteBuilder{knitr::knitr}
+  %\VignetteIndexEntry{simulations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(DistDist)
+library(magrittr)
+```
+
+# Summary
+
+The `DistDist` package provides a simple but flexible way to generate simulations of arbitrary numbers of cell types with arbitrary degrees of overlap. This vignette explains how to use these functions.
+
+# Example 1: One cell type
+
+We'll begin by generating a simulation of a single cell type to show how the underlying functions work.
+
+```{r}
+sim_1 = SimulateGrid(
+                      list(
+                        GridRect(m = 100, 
+                                 n = 100, 
+                                 bot_left_corner_x = 10,  
+                                 bot_left_corner_y = 10,  
+                                 width = 50, 
+                                 height = 50, 
+                                 intensity = 0.1)
+                      ),
+                      square_side_length = 1
+                    )
+
+sim_1 %>% plot()
+```
+
+The function `SimulateGrid` takes a list of matrices which are expected to have the same dimension. Each of these matrices represents a grid of intensity values on the underlying space for a specific type of point. It also takes an argument `square_side_length`, which determines the size of the square in the space of the simulation that each matrix entry represents. Here we've specified it to be 1, meaning each entry is taken to be a 1 by 1 unit square. For those familiar with the `spatstat` package, the object returned is an object of class `ppp`.
+
+You're free to specify these matrices by hand, but this is quite tedious. To make this easier, we've provided a couple of helper functions to generate matrices of specified dimensions with geometric intensity patterns embedded within. One of these is `GridRect`, which produces a matrix of specified dimension with a rectangular non-zero intensity pattern within. Here are what the various arguments correspond to:
+
+* `m`: Number of rows of overall grid
+
+* `n`: Number of columns of overall grid
+
+* `bot_left_corner_x`: x coordinate of the bottom left corner of the rectangle
+
+* `bot_left_corner_y`: y coordinate of the bottom left corner of the rectangle
+
+* `width`: width of rectangle
+
+* `height`: height of rectangle
+
+* `intensity`: Intensity of point pattern on the rectangle
+
+The coordinates indicate locations in the intensity matrix; $(10, 10)$ represents the matrix entry that is tenth from the bottom and tenth from the left. This might seem strange at first, but this is because we use the `spatstat` convention of treating the bottom left corner as the origin, except in our case the bottom-left square of any matrix of intensities is $(1,1)$. This keeps things consistent between the point pattern representation and the matrix representation.
+
+Because we pass a list of matrices to the `SimulateGrid` function, this makes it easy to combine geometric shapes to create new intensities. For example:
+
+```{r}
+sim_2 = SimulateGrid(
+                      list(
+                        GridRect(m = 100, 
+                                 n = 100, 
+                                 bot_left_corner_x = 10,  
+                                 bot_left_corner_y = 10,  
+                                 width = 30, 
+                                 height = 30, 
+                                 intensity = 0.1) + 
+                        GridCircle(m = 100,
+                                   n = 100,
+                                   cx = 70,
+                                   cy = 70,
+                                   r = 20, 
+                                   intensity = 0.2)
+                      ),
+                      square_side_length = 1
+                    )
+
+sim_2 %>% plot()
+```
+
+Here we've created a pattern with two components, a square and a circle, by simply adding matrices together. Note that we use the other helper function currently provided, `GridCircle`, to generate the matrix for the circle. If you understand the signature for `GridRect`, the one for `GridCircle` should be pretty self explanatory, but the documentation gives more details if anything is unclear.
+
+One final thing to note is that you can plot the intensity matrices you generate prior to simulation using the provided `plot_matrix_heatmap` function:
+
+```{r}
+plot_matrix_heatmap(
+  GridRect(m = 100, 
+           n = 100, 
+           bot_left_corner_x = 10,  
+           bot_left_corner_y = 10,  
+           width = 30, 
+           height = 30, 
+           intensity = 0.1) + 
+  GridCircle(m = 100,
+             n = 100,
+             cx = 70,
+             cy = 70,
+             r = 20, 
+             intensity = 0.2)
+)
+```
+
+Above we've plotted a matrix generated by our utility functions, but it can be used with arbitrary matrices:
+
+```{r}
+plot_matrix_heatmap(
+  matrix(1:10, ncol = 2, byrow = TRUE)
+)
+```
+
+# Example 2: Multiple Cell Types
+
+It's quite trivial to generate simulations with multiple types: simply add more entries to the list passed to `SimulateGrid`. Here, we'll split the previous intensity patterns into two separate cell types:
+
+```{r}
+sim_3 = SimulateGrid(
+                      list(
+                        GridRect(m = 100, 
+                                 n = 100, 
+                                 bot_left_corner_x = 10,  
+                                 bot_left_corner_y = 10,  
+                                 width = 30, 
+                                 height = 30, 
+                                 intensity = 0.1), 
+                        GridCircle(m = 100,
+                                   n = 100,
+                                   cx = 70,
+                                   cy = 70,
+                                   r = 20, 
+                                   intensity = 0.2)
+                      ),
+                      square_side_length = 1
+                    )
+
+sim_3 %>% plot()
+```
+
+The names of these types default to numbers, but you can actually pass a vector of names for the sake of clarity:
+
+```{r}
+sim_4 = SimulateGrid(
+                      list(
+                        GridRect(m = 100, 
+                                 n = 100, 
+                                 bot_left_corner_x = 10,  
+                                 bot_left_corner_y = 10,  
+                                 width = 30, 
+                                 height = 30, 
+                                 intensity = 0.1), 
+                        GridCircle(m = 100,
+                                   n = 100,
+                                   cx = 70,
+                                   cy = 70,
+                                   r = 20, 
+                                   intensity = 0.2)
+                      ),
+                      marks = c("Tumor", "Immune"),
+                      square_side_length = 1
+                    )
+
+sim_4 %>% plot()
+```
+
