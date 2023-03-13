@@ -27,7 +27,6 @@ GridCircle = function(m, n, cx, cy, r, intensity, axis = NULL){
   })
   if(length(intensity) == 1){
     intensity_mat = intensity_mat + as.numeric(circle_mat) * intensity
-    intensity_mat = apply(intensity_mat, 2, rev)
   }else if(length(intensity) == 2){
     if(is.null(axis) || !(axis %in% c('x', 'X', 'y', 'Y'))){
       stop("axis of gradient must be specified as 'x' or 'y'")
@@ -54,5 +53,6 @@ GridCircle = function(m, n, cx, cy, r, intensity, axis = NULL){
     stop("intensity must either be scalar or vector of length 2")
   }
 
+  intensity_mat = apply(intensity_mat, 2, rev)
   return(intensity_mat)
 }
