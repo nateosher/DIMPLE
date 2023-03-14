@@ -23,7 +23,7 @@ fluidPage(shinyjs::useShinyjs(),
                          tableOutput('contents'),
                          selectInput("slide_ids_to_plot","Select slide ids to plot","",selected="",multiple=F),
                          selectInput("cell_types_to_plot","Select cell types to plot","",selected="",multiple=T),
-                         selectInput("dm_plot_mode","Select mode for distance matrix plot",c("heatmap","qplot"),selected="",multiple=F)
+                         selectInput("dm_plot_mode","Select mode for distance matrix plot",c("heatmap","network"),selected="",multiple=F)
                          
                        ),
                        mainPanel(
