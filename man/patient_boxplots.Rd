@@ -10,7 +10,7 @@ patient_boxplots(
   t1,
   t2,
   grouping_var = "Group",
-  label_spots = TRUE
+  p_val_col = "p.value"
 )
 }
 \arguments{
@@ -23,7 +23,7 @@ patient_boxplots(
 \item{grouping_var}{Optional; string to indicate variable to use to further
 group boxplots.}
 
-\item{label_spots}{Whether or not boxplots should be labeled with slide ids}
+\item{p_val_col}{can be either "p.adj" or "p.value" to show stars above boxplots that are significantly different than zero}
 }
 \value{
 ggplot2 plot
