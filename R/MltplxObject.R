@@ -1,4 +1,5 @@
 #' Creates new `MltplxObject` object.
+#'
 #' @param x Vector of x coordinates of cells
 #' @param y Vector of y coordinates of cells
 #' @param marks Vector of cell types
@@ -20,10 +21,13 @@
 #' @param .dist_metric_name Optional; not required, even when a distance
 #' matrix is passed. However, if you'd like to name the distance function
 #' you use something specific, you can pass this name as a string using
+#' @param xrange vector of size 2 with range of x-coordinates. If NULL, will default to c(min(x),max(x))
+#' @param yrange vector of size 2 with range of y-coordinates. If NULL, will default to c(min(y),max(y))
 #' this parameter. Otherwise, it defaults to the name of the function
 #' @return `MltplxObject` object
 #' @export
-new_MltplxObject = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
+new_MltplxObject = function(x, y, marks,slide_id, xrange = NULL, yrange = NULL,
+                            ps = NULL, bw = NULL,
                             dist_metric = NULL, .dist_metric_name = NULL){
 
   if(!is.null(.dist_metric_name)){
@@ -33,7 +37,7 @@ new_MltplxObject = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
   }
 
   # Make image
-  mltplx_image = new_MltplxImage(x, y, marks)
+  mltplx_image = new_MltplxImage(x, y, marks, xrange = xrange, yrange = yrange)
 
 
   # Make intensities, if applicable

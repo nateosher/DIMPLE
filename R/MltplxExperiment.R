@@ -3,6 +3,7 @@
 #' addition to storing the images themselves, this class can store estimates
 #' of the intensities of various point types, distances between those
 #' intensities, and metadata related to the patients that the slides belong to.
+#'
 #' @param x Vector of x coordinates of cells across all slides
 #' @param y Vector of y coordinates of cells across all slides
 #' @param marks Vector of cell types for each cell across all slides
@@ -20,18 +21,19 @@
 #' two intensity vectors. This can be any function that takes in two vectors
 #' and returns a scalar.
 #' @param metadata Optional: patient/slide level data. Must include *one* row
-#' per unique slide id, and a column `slide_id` indicating the slide to which
-#' each row corresponds.
+#' per unique slide id, and a column `slide_id` indicating the slide to which each row corresponds
+#' @param window_sizes dataframe with columns `slide_id`, `min_x`, `max_x`, `min_y` and `max_y` indicating the window dimensions for each slide
 #' @return `MltplxExperiment` object.
 #' @export
 #' @importFrom tibble tibble
 #' @importFrom magrittr `%>%`
 #' @import dplyr
 #' @import purrr
-new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
+new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
+                                ps = NULL, bw = NULL,
                                 dist_metric = NULL, metadata = NULL){
 
-  mltplx_experiment_check_inputs(x, y, marks, slide_id, ps, bw,
+  mltplx_experiment_check_inputs(x, y, marks, slide_id, ps, bw,window_sizes,
                                  dist_metric, metadata)
 
   full_tib = tibble(
@@ -44,6 +46,17 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
       as.numeric(),
     total_slides = max(slide_id_num)
   )
+  
+  if(!is.null(window_sizes)) {
+    window_sizes <- full_tib %>%
+      group_by(slide_id) %>%
+      summarise(min_x = min(x),
+                max_x = max(x),
+                min_y = min(y),
+                max_y = max(y))
+  }
+  
+  full_tib <- left_join(full_tib,window_sizes,by = "slide_id")
 
   dist_metric_name = substitute(dist_metric) %>% as.character()
   if(length(dist_metric_name) == 0)
@@ -55,9 +68,20 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
       # I changed this; leads to weird ordering bug if we group by
       # total # of slides as well
       ProgressBar(.y$slide_id_num, .x$total_slides[1])
-      new_MltplxObject(.x$x, .x$y, .x$marks, .y$slide_id, ps, bw,
-                                    dist_metric,
-                                    dist_metric_name)
+      
+      xrange <- c(.x$min_x[1],.x$max_x[1])
+      yrange <- c(.x$min_y[1],.x$max_y[1])
+
+      new_MltplxObject(.x$x,
+                       .x$y,
+                       .x$marks,
+                       .y$slide_id,
+                       xrange = xrange,
+                       yrange = yrange,
+                       ps = ps,
+                       bw = bw,
+                       dist_metric = dist_metric,
+                       .dist_metric_name = dist_metric_name)
     })
 
   ProgressBar(max(full_tib$total_slides) + 1, max(full_tib$total_slides))
@@ -80,7 +104,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, ps = NULL, bw = NULL,
   )
 }
 
-mltplx_experiment_check_inputs = function(x, y, marks, slide_id, ps, bw,
+mltplx_experiment_check_inputs = function(x, y, marks, slide_id, ps, bw,window_sizes,
                                           dist_metric, metadata){
 
   if(length(x) != length(y))
@@ -91,6 +115,8 @@ mltplx_experiment_check_inputs = function(x, y, marks, slide_id, ps, bw,
 
   if(length(slide_id) != length(x))
     stop("`slide_id` must be the same length as `x` and `y`")
+  
+  if(!is.null(window_sizes)) stopifnot("window_sizes does not contain correct columns!"=all(c("slide_id","min_x","max_x","min_y","max_y") %in% colnames(window_sizes)))
 
   # TODO: typechecks
   # TODO: refactor into sub-functions that can be called when other

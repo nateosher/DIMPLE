@@ -1,14 +1,23 @@
 #' Creates new `MltplxImage` object.
+#'
 #' @param x X coordinates of cells
 #' @param y Y coordinates of cells
+#' @param xrange vector of size 2 with range of x-coordinates. If NULL, will default to c(min(x),max(x))
+#' @param yrange vector of size 2 with range of y-coordinates. If NULL, will default to c(min(y),max(y))
 #' @param marks Cell types
+#'
 #' @return `MltplxImage` object
 #' @importFrom spatstat.geom ppp owin as.ppp
 #' @export
-new_MltplxImage = function(x, y, marks){
+new_MltplxImage = function(x, y, marks, xrange = NULL, yrange = NULL){
+  if(!is.null(xrange)) stopifnot("X-coordinates of cells must be within xrange!"=all(xrange[1] <= min(x), max(x) <= xrange[2]))
+  else xrange <- c(min(x),max(x))
+  
+  if(!is.null(yrange)) stopifnot("Y-coordinates of cells must be within yrange!"=all(yrange[1] <= min(y), max(y) <= yrange[2]))
+  else yrange <- c(min(y),max(y))
+                                                                
   ppp = ppp(x = x, y = y, marks = factor(marks),
-            window = owin(c(min(x), max(x)),
-                          c(min(y), max(y))))
+            window = owin(xrange,yrange))
 
   structure(
     list(
