@@ -21,6 +21,7 @@ new_MltplxDist = function(mltplx_intensity, dist_metric, .dist_metric_name){
   )
 }
 
+#' @export
 print.MltplxDist = function(dist){
   cat("MltplxDist object with", length(dist$cell_types), "cell types\n")
   cat("Distance metric:", dist$metric, "\n")

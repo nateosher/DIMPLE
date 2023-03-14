@@ -5,12 +5,16 @@
 #' dimensions.
 #' @param square_side_length a double indicating the side length of each matrix
 #' entry. Defaults to 1, i.e. each matrix entry is a 1 by 1 unit square.
-SimulateGrid = function(intensity_list, square_side_length = 1){
+#' @export
+SimulateGrid = function(intensity_list, marks = NULL, square_side_length = 1){
   # Because spatstat indexes from bottom left corner and matrices index from
   # top left, reflecting over the horizontal gives the desired configuration
   intensity_list = map(intensity_list, function(m){
     apply(m, 2, rev)
   })
+  if(is.null(marks)){
+    marks = 1:length(intensity_list)
+  }
   square_area = square_side_length * square_side_length
   n = length(intensity_list[[1]])
   grid_nrow = nrow(intensity_list[[1]])
@@ -30,23 +34,30 @@ SimulateGrid = function(intensity_list, square_side_length = 1){
   })
 
   cell_count_matrices = map(counts_lists, function(count_list){
+    if(length(count_list) == 0) return(NULL)
     do.call(rbind, map(count_list, \(l){
       matrix(c(rep(l[2], l[1]), rep(l[3], l[1])), ncol = 2) - 1
     }))
   })
 
   final_sim_list = imap(cell_count_matrices, function(m, i){
+    if(is.null(m)) return(NULL)
     m = m * square_side_length
     m[,1] = m[,1] + runif(nrow(m)) * square_side_length
     m[,2] = m[,2] + runif(nrow(m)) * square_side_length
     m = cbind(m, i)
   })
 
+  final_sim_list = compact(final_sim_list)
+
   final_sim_mat = do.call(rbind, final_sim_list)
 
   final_pointproc = ppp(x = final_sim_mat[,2], y = final_sim_mat[,1],
-                        marks = factor(final_sim_mat[,3]),
+                        marks = factor(map_chr(final_sim_mat[,3],
+                                               ~ as.character(marks[.x])),
+                                       levels = marks),
                         window = owin(c(0, square_side_length * grid_ncol),
                                       c(0, square_side_length * grid_nrow)))
 
+  return(final_pointproc)
 }

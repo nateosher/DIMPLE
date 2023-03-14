@@ -3,7 +3,7 @@
 #' @param y Y coordinates of cells
 #' @param marks Cell types
 #' @return `MltplxImage` object
-#' @importFrom spatstat.geom ppp owin
+#' @importFrom spatstat.geom ppp owin as.ppp
 #' @export
 new_MltplxImage = function(x, y, marks){
   ppp = ppp(x = x, y = y, marks = factor(marks),

@@ -7,7 +7,7 @@
 #' @return `MltplxIntensity` object
 #' @export
 new_MltplxIntensity = function(mltplx_image, ps, bw){
-  intensity_object = pat.density(mltplx_image$ppp, eps = ps, sigma = bw)
+  intensity_object = pat.density(mltplx_image$ppp, eps = ps, sigma = bw, positive = TRUE)
   intensity_matrix = intensity_object$dens %>%
     mutate(X = intensity_object$X,
            Y = intensity_object$Y) %>%
@@ -36,4 +36,25 @@ print.MltplxIntensity = function(mltplx_intensity){
   cat("Bandwidth:", mltplx_intensity$bw, "\n")
   cat("Grid dimensions:", mltplx_intensity$dim[1], "x",
       mltplx_intensity$dim[1], "\n")
+}
+
+#' @export
+plot.MltplxIntensity = function(mltplx_intensity, ...){
+  args = list(...)
+  if(is.null(args$types)){
+    types = mltplx_intensity$cell_types
+  }else{
+    types = args$types
+  }
+
+  d = mltplx_intensity$intensities %>%
+    tibble::as_tibble() %>%
+    dplyr::select(all_of(types),X,Y) %>%
+    tidyr::pivot_longer(-c(X,Y),names_to = "type",values_to = "intensity")
+
+  ggplot(d, aes(X,Y,fill=intensity)) +
+    geom_tile() +
+    facet_wrap(~type) +
+    viridis::scale_fill_viridis() +
+    ggtitle(paste0("Cell intensities"))
 }
