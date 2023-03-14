@@ -44,8 +44,12 @@ as_tibble.MltplxImage = function(im){
 
 #' @export
 plot.MltplxImage = function(im, ...){
-  ggplot(as_tibble(im)) +
-    geom_point(aes(x = x, y = y, color = `Cell Type`)) +
-    theme_bw()
+  as_tibble(im) %>% 
+    ggplot() +
+    geom_point(aes(x = x, y = y, color = `Cell Type`, shape=`Cell Type`),size=2) +
+    scale_shape_manual(values=1:length(unique(im$cell_types)),drop=FALSE) +
+    scale_color_manual( values=rep_len(cbfp, length(unique(im$cell_types))+1),drop=FALSE) +
+    ggtitle("Point pattern plot")-> p
+  print(p)
 }
 

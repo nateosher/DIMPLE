@@ -4,22 +4,39 @@
 #'
 #' @return ggplot heatmap
 #' @export
-plot_pairwise_group_heatmap <- function(df,p_val_col = "p.adj") {
+plot_pairwise_group_heatmap <- function(df,p_val_col = "p.adj",limits=NULL) {
   group_name <- unique(df$term)
-  df %>% {
+  df %>%     
+    na.omit(estimate) %>% 
+    mutate(estimate=signif(estimate,2)) %>%
+    arrange(type1, type2) %>%
+    {
     ggplot(.,aes(type1,type2,fill=estimate)) +
     geom_tile() +
     anglex() +
     sig_stars(p_values = p_val_col) +
-    scico::scale_fill_scico(palette = "vik",
-                            label = function(z) replace(z, c(1, length(z)), 
-                                                        c(paste0("Lesser in group ",group_name, " \u2193"),
-                                                          paste0("Greater in group ", group_name, " \u2191"))),
-                            breaks = round(seq(from=-max(abs(round(.$estimate,2)),na.rm=T),
-                                               to=max(abs(round(.$estimate,2)),na.rm=T),
-                                               length.out=5),2),
-                            limits = c(-max(abs(round(.$estimate,2)),na.rm=T),max(abs(round(.$estimate,2)),na.rm=T))
-    )
+    scale_x_discrete(drop = FALSE) +
+    scale_y_discrete(drop = FALSE) +
+        if(!is.null(limits)){
+          viridis::scale_fill_viridis(
+            label = function(z) replace(z, c(1, length(z)),
+                                        c(paste0("Lesser in ",group_name, " \u2193"),
+                                          paste0("Greater in ", group_name, " \u2191"))),
+            breaks = (seq(from=limits[1],
+                          to=limits[2],
+                          length.out=5)),
+            limits = c(limits[1],limits[2]) )
+        }else{
+          viridis::scale_fill_viridis(
+            label = function(z) replace(z, c(1, length(z)),
+                                        c(paste0("Lesser in ",group_name, " \u2193"),
+                                          paste0("Greater in ", group_name, " \u2191"))),
+            breaks = (seq(from=-max(abs(.$estimate),na.rm=T),
+                          to=max(abs(.$estimate),na.rm=T),
+                          length.out=5)),
+            limits = c(-max(abs(.$estimate),na.rm=T),max(abs(.$estimate),na.rm=T)) ) 
+        }
+
   }
 }
 
@@ -51,5 +68,5 @@ typewise_boxplots <- function(mltplx_experiment,
     } %>%
     ggplot(aes(!!sym(group_factor),dist)) +
     geom_boxplot() +
-    geom_jitter(color="orange")
+    geom_jitter(color=cbfp[1])
 }

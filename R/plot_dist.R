@@ -19,7 +19,7 @@ plot_dist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
         ggplot(aes(type1,type2,fill=dist)) +
         geom_tile() +
         anglex() +
-        scale_fill_gradient2() +
+        scale_fill_viridis() +
         ggtitle(paste0("Distance matrix for slide id ", id))
       print(p)
     }

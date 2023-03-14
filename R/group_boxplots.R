@@ -20,7 +20,7 @@ group_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group") {
            type2 == t2) %>% 
     ggplot(aes(!!sym(grouping_var),dist)) +
     geom_boxplot() +
-    geom_jitter(color="orange") +
+    geom_jitter(color=cbfp[1]) +
     ggtitle(paste0("Distance between ", t1, " and ", t2)) +
     ylab("Distance")
 }

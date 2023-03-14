@@ -8,6 +8,7 @@
 #' @param label_spots Whether or not boxplots should be labeled with slide ids
 #' @return ggplot2 plot
 #' @importFrom magrittr `%>%`
+#' @importFrom viridis 
 #' @export
 patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",
                              label_spots=TRUE) {
@@ -31,5 +32,6 @@ patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",
     anglex() +
     ggplot2::ylab("Distance") +
     ggplot2::ggtitle(paste0("Distance between ", t1,
-                            " and ", t2, " in all patients"))
+                            " and ", t2, " in all patients")) +
+    scale_fill_manual(values=cbfp)
 }

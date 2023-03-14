@@ -21,13 +21,13 @@ plot_ppp <- function(mltplx_experiment,slide_ids) {
     df %>%
       dplyr::filter(slide_id == id) %>%
       ggplot(aes(X,Y,color=type,shape=type)) +
-      geom_point() +
+      geom_point(size=2) +
       scale_shape_manual(name = "type",
                          label = levels(df$type),
                          values=1:nlevels(df$type),drop=FALSE) +
       scale_color_manual(name = "type",
                          label = levels(df$type),
-                         values=as.vector(pals::polychrome()),drop=FALSE) +
+                         values=rep_len(cbfp, length(unique(df$type))+1),drop=FALSE) +
       ggtitle(paste0("Point pattern plot for slide id ", id))-> p
     print(p)
   }
