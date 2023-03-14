@@ -9,39 +9,34 @@ test_that("Correct aggregation", {
   tb <- tibble(y=y,slide_id=exp$slide_ids) %>%
     left_join(exp$metadata)
 
-  m1 <- lm(y ~ group,data = tb) # don't aggregate to patient-level
+  # The grouped lm coefficient should just be equal to the difference in the
+  # aggregate function applied to the two groups
+  expected_val_max <- (tb %>% filter(group == "G2") %>% pull(y) %>% max()) -
+        (tb %>% filter(group == "G1") %>% pull(y) %>% max())
 
-  s1 <- summary(m1)
+  # Same with min
+  expected_val_min <- (tb %>% filter(group == "G2") %>% pull(y) %>% min()) -
+    (tb %>% filter(group == "G1") %>% pull(y) %>% min())
 
-  m2 <- lm_dist(exp,"group")
+  # Same with median (which is just the mean with 2 observations)
+  expected_val_median <- (tb %>% filter(group == "G2") %>% pull(y) %>% median()) -
+    (tb %>% filter(group == "G1") %>% pull(y) %>% median())
 
-  expect_false(s1$coefficients[2,1] == m2$estimate[1]) # estimate should not be the same since lm_dist aggregates
+  # Still doing both for good measure
+  expected_val_mean <- (tb %>% filter(group == "G2") %>% pull(y) %>% mean()) -
+    (tb %>% filter(group == "G1") %>% pull(y) %>% mean())
 
-  tb_agg <- tb %>%
-    group_by(patient_id,group) %>%
-    summarise(y = median(y)) %>%
-    ungroup()
+  # Now with lm_dist function
+  lm_dist_max <- lm_dist(exp, "group", agg_fun = max)
+  lm_dist_min <- lm_dist(exp, "group", agg_fun = min)
+  lm_dist_median <- lm_dist(exp, "group", agg_fun = median)
+  lm_dist_mean <- lm_dist(exp, "group", agg_fun = mean)
 
-  m1.1 <- lm(y ~ group,data=tb_agg)
-
-  s1.1 <- summary(m1.1)
-
-  expect_true(s1.1$coefficients[2,1] == m2$estimate[1]) # estimate should be the same
-
-  m2.1 <- lm_dist(exp,"group",agg_fun = max)
-
-  expect_false(s1.1$coefficients[2,1] == m2.1$estimate[1]) # estimate should not be the same since agg_fun is different
-
-  tb_agg <- tb %>%
-    group_by(patient_id,group) %>%
-    summarise(y = max(y)) %>%
-    ungroup()
-
-  m1.2 <- lm(y ~ group,data=tb_agg)
-
-  s1.2 <- summary(m1.2)
-
-  expect_true(s1.2$coefficients[2,1] == m2.1$estimate[1]) # estimate should be the same
+  # Results might not be exactly the same, but should be up to ~ 8 decimal places
+  expect_true(abs(lm_dist_max$estimate[1] - expected_val_max) < 0.00000001)
+  expect_true(abs(lm_dist_min$estimate[1] - expected_val_min) < 0.00000001)
+  expect_true(abs(lm_dist_median$estimate[1] - expected_val_median) < 0.00000001)
+  expect_true(abs(lm_dist_mean$estimate[1] - expected_val_mean) < 0.00000001)
 })
 
 test_that("lm_qdist works ", {

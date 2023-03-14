@@ -1,0 +1,89 @@
+---
+title: "A brief simulation study"
+output:
+  html_document:
+    df_print: paged
+---
+```{r include=FALSE}
+library(tidyverse);library(spatstat)
+devtools::load_all()
+```
+
+
+## Simulation settings 
+
+Each image contains the same one square of points of type 1 located at (10,10) with area 40X40 and intensity 0.1 generated on a 100x100 square
+
+```{r}
+set.seed(1)
+ppp0<-SimulateGrid(
+  list(
+    GridRect(100, 100, 10,  10,  40, 40, 0.1)
+  )
+)
+marks(ppp0) <- factor("1")
+plot(ppp0)
+```
+
+Going to vary the lower left corner, the area, and the intensity of an additional square of type 2. Then will generate intensities with varying ps and bw. Finally will generate distance matrices by cor and jsd. Here is my simulation code: 
+
+```{r warning=FALSE}
+# corners<-c(10,20,30,40,50,60,70)
+# sizes<-c(30,40,50)
+# pses<-c(1,3,5)
+# bws<-c(1,3,5,7)
+# intensities<-c(.05,.1)
+# reps<-c(1:20)
+# 
+# settings<-expand.grid(corners,sizes,pses,bws,intensities,reps)
+# names(settings)<-c("corner","size","ps","bw","intensity","rep")
+# dist.out<-array(dim=c(dim(settings)[1],2))
+# 
+# for(i in 1:dim(settings)[1]){
+# set.seed(i)
+# ppp1<-SimulateGrid(
+#   list(
+#     GridRect(100, 100, settings$corner[i], settings$corner[i], settings$size[i], settings$size[i], settings$intensity[i])
+#   )
+# )
+# marks(ppp1) <- factor("2")
+# ppp<-superimpose(ppp0,ppp1)
+# 
+# obj<-new_MltplxExperiment(x = ppp$x,
+#                           y = ppp$y,
+#                           marks = factor(ppp$marks),
+#                           slide_id = rep(1,length(ppp$x)),ps=settings$ps[i],bw=settings$bw[i])
+# obj$mltplx_objects[[1]]$mltplx_intensity$intensities[which(obj$mltplx_objects[[1]]$mltplx_intensity$intensities<=0)]<-.Machine$double.eps
+# dist.out[i,1]<-update_dist(obj,cor)$mltplx_objects[[1]]$mltplx_dist$dist[1,2]
+# dist.out[i,2]<-update_dist(obj,jsd)$mltplx_objects[[1]]$mltplx_dist$dist[1,2]
+# print(i)
+# 
+# }
+# 
+# colnames(dist.out)<-c("cor","jsd")
+# sim.out<-cbind.data.frame(settings,dist.out)
+# saveRDS(sim.out,"simluated_distances.RDS")
+```
+
+## Results 
+\begin{itemize}
+\item Facets going across: intensities of cell type 2
+\item Facets going down: pixel size 
+\item Xlab: bandwidth 
+\item Ylab: distance 
+\item Color: lower left corner location of cell type 2 (cell type 1 is at 10)
+\item shape: the length of the side of the square containing cell type 2 (cell type 1 is 40)
+\end{itemize}
+
+```{r}
+sim.out<-readRDS("simluated_distances.RDS")
+sim.out%>%pivot_longer(7:8)%>%filter(name=="cor")%>%ggplot(aes(as.factor(bw),value))+
+  geom_jitter(width=.3,height=0,aes(color=corner,shape=as.factor(size)),alpha=.6)+
+  facet_grid(ps~intensity)+ylim(-1,1)+ggtitle("Correlation")+theme_bw()+scale_color_viridis_c()+xlab("bw")
+sim.out%>%pivot_longer(7:8)%>%filter(name=="jsd")%>%ggplot(aes(as.factor(bw),value))+
+  geom_jitter(width=.3,height=0,aes(color=corner,shape=as.factor(size)),alpha=.6)+
+  facet_grid(ps~intensity)+ylim(0,1)+ggtitle("JSD")+theme_bw()+scale_color_viridis_c()+
+  xlab("bw")
+```
+
+When the 2 cell types are overlapping there is huge variability in cor. And is seems like variability increases with bandwidth. Also weird that the correlation becomes more negative as bandwidth increases? That is not intuite to me at all. 
