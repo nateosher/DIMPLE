@@ -4,7 +4,7 @@
 #'
 #' @return ggplot heatmap
 #' @export
-plot_pairwise_group_heatmap <- function(df,p_val_col = "p.adj") {
+plot_pairwise_group_heatmap <- function(df,p_val_col = "p.adj",limits=NULL) {
   group_name <- unique(df$term)
   df %>%     
     na.omit(estimate) %>% 
@@ -17,15 +17,26 @@ plot_pairwise_group_heatmap <- function(df,p_val_col = "p.adj") {
     sig_stars(p_values = p_val_col) +
     scale_x_discrete(drop = FALSE) +
     scale_y_discrete(drop = FALSE) +
-    viridis::scale_fill_viridis(
-                            label = function(z) replace(z, c(1, length(z)),
-                                                        c(paste0("Lesser in ",group_name, " \u2193"),
-                                                          paste0("Greater in ", group_name, " \u2191"))),
-                            breaks = (seq(from=min(.$estimate,na.rm=T),
-                                             to=max(.$estimate,na.rm=T),
-                                              length.out=5)),
-                            limits = c(min(.$estimate,na.rm=T),max(.$estimate,na.rm=T))
-    ) 
+        if(!is.null(limits)){
+          viridis::scale_fill_viridis(
+            label = function(z) replace(z, c(1, length(z)),
+                                        c(paste0("Lesser in ",group_name, " \u2193"),
+                                          paste0("Greater in ", group_name, " \u2191"))),
+            breaks = (seq(from=limits[1],
+                          to=limits[2],
+                          length.out=5)),
+            limits = c(limits[1],limits[2]) )
+        }else{
+          viridis::scale_fill_viridis(
+            label = function(z) replace(z, c(1, length(z)),
+                                        c(paste0("Lesser in ",group_name, " \u2193"),
+                                          paste0("Greater in ", group_name, " \u2191"))),
+            breaks = (seq(from=-max(abs(.$estimate),na.rm=T),
+                          to=max(abs(.$estimate),na.rm=T),
+                          length.out=5)),
+            limits = c(-max(abs(.$estimate),na.rm=T),max(abs(.$estimate),na.rm=T)) ) 
+        }
+
   }
 }
 
