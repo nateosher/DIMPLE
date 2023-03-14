@@ -8,7 +8,7 @@
 #
 
 library(shiny);library(ggplot2);library(dplyr);library(here);library(spatstat);library(tidyr);library(purrr);library(fuzzyjoin)
-library(devtools);library(ggpubr)
+library(devtools);library(ggpubr);library(viridis)
 devtools::load_all()
 source("helpers.R")
 
