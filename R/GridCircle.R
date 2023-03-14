@@ -37,7 +37,7 @@ GridCircle = function(m, n, cx, cy, r, intensity, axis = NULL){
       intensity_dif = intensity[2] - intensity[1]
 
       intensity_vals = map_dbl(circle_indices[,2],
-                      ~ intensity[1] + intensity_dif*(.x - min_col)/max_col)
+              ~ intensity[1] + intensity_dif*(.x - min_col)/(max_col - min_col))
       intensity_mat[circle_indices] = intensity_vals
     }else{
       circle_indices = which(circle_mat, arr.ind = TRUE)
@@ -46,7 +46,8 @@ GridCircle = function(m, n, cx, cy, r, intensity, axis = NULL){
       intensity_dif = intensity[2] - intensity[1]
 
       intensity_vals = map_dbl(circle_indices[,1],
-                               ~ intensity[1] + intensity_dif*(.x - min_row)/max_row)
+        ~ intensity[1] + intensity_dif*(max_row - .x)/
+                                        (max_row - min_row))
       intensity_mat[circle_indices] = intensity_vals
     }
   }else{

@@ -6,7 +6,7 @@
 with the specified intensity. Note that if the circle is not fully contained
 in the matrix, it will be truncated.}
 \usage{
-GridCircle(m, n, cx, cy, r, intensity)
+GridCircle(m, n, cx, cy, r, intensity, axis = NULL)
 }
 \arguments{
 \item{m}{Number of rows of overall grid}
@@ -19,7 +19,16 @@ GridCircle(m, n, cx, cy, r, intensity)
 
 \item{r}{Radius of circle}
 
-\item{intensity}{Intensity of point pattern on the circle}
+\item{intensity}{Intensity of point pattern on the rectangle; either a scalar
+value that will be constant on the entire rectangle, or a vector of two values
+indicating the values to be reached vertically or horizontally over the
+rectangle. Horizontal gradients always run left to right, vertical always
+run from top to bottom; by switching the order of the intensity vectors,
+you can achieve both increasing and decreasing gradients in arbitrary
+directions.}
+
+\item{axis}{Either 'x'/'X' or 'y'/'Y'. If intensity is passed as min/max
+gradient, this argument specifies which axis the gradient should occur across.}
 }
 \value{
 Intensity matrix of specified dimension with "circle" in specified
