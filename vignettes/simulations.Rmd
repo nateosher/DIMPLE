@@ -173,3 +173,97 @@ sim_4 = SimulateGrid(
 sim_4 %>% plot()
 ```
 
+# Example 3: Gradients
+
+The built in shapes also give the option to generate using a gradient; just pass a vector of two intensities and specify the axis, 'x' or 'y'. 
+
+```{r}
+sim_5 = SimulateGrid(
+                      list(
+                        GridRect(m = 100, 
+                                 n = 100, 
+                                 bot_left_corner_x = 1,  
+                                 bot_left_corner_y = 1,  
+                                 width = 5, 
+                                 height = 50, 
+                                 intensity = c(0, 0.2),
+                                 axis = 'y'), 
+                        GridRect(m = 100, 
+                                 n = 100, 
+                                 bot_left_corner_x = 95,  
+                                 bot_left_corner_y = 50,  
+                                 width = 5, 
+                                 height = 50, 
+                                 intensity = c(0, 0.2),
+                                 axis = 'y')
+                      ),
+                      marks = c("Tumor", "Immune"),
+                      square_side_length = 1
+                    )
+
+sim_5 %>% plot()
+```
+
+Gradients run top to bottom for vertical gradients, and left to right for horizontal gradients. They also run from the first argument to the intensity vector to the second, so to change the direction, you can just swap the arguments:
+
+```{r}
+sim_6 = SimulateGrid(
+                      list(
+                        GridRect(m = 100, 
+                                 n = 100, 
+                                 bot_left_corner_x = 1,  
+                                 bot_left_corner_y = 1,  
+                                 width = 5, 
+                                 height = 50, 
+                                 intensity = c(0.2, 0),
+                                 axis = 'y'), 
+                        GridRect(m = 100, 
+                                 n = 100, 
+                                 bot_left_corner_x = 95,  
+                                 bot_left_corner_y = 50,  
+                                 width = 5, 
+                                 height = 50, 
+                                 intensity = c(0.2, 0),
+                                 axis = 'y')
+                      ),
+                      marks = c("Tumor", "Immune"),
+                      square_side_length = 1
+                    )
+
+sim_6 %>% plot()
+```
+
+This also works for circles. Here are some example intensities:
+
+```{r}
+GridCircle(100, 100, 40, 40, 20, c(0, 0.2), axis = 'x') %>% 
+  plot_matrix_heatmap()
+
+GridCircle(100, 100, 40, 40, 20, c(0.2, 0), axis = 'x') %>% 
+  plot_matrix_heatmap()
+
+GridCircle(100, 100, 40, 40, 20, c(0, 0.2), axis = 'y') %>% 
+  plot_matrix_heatmap()
+
+GridCircle(100, 100, 40, 40, 20, c(0.2, 0), axis = 'y') %>% 
+  plot_matrix_heatmap()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
