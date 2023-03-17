@@ -47,7 +47,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
     total_slides = max(slide_id_num)
   )
   
-  if(!is.null(window_sizes)) {
+  if(is.null(window_sizes)) {
     window_sizes <- full_tib %>%
       group_by(slide_id) %>%
       summarise(min_x = min(x),
