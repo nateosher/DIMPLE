@@ -154,3 +154,82 @@ test_that("`add_QuantileDist` handles missing types", {
     dim(qd_df) == c(18, 5)
   ))
 })
+
+test_that("Window size parameter works", {
+  
+  data <- data.frame(slide_id = slide_ids,
+                     X = cell_x_values,
+                     Y = cell_y_values)
+  window_sizes = data %>%
+    group_by(slide_id) %>%
+    summarise(min_x = min(X) - 50,
+              max_x = max(X) + 20,
+              min_y = min(Y) - 30,
+              max_y = max(Y) + 10)
+  
+  # no error
+  mltplx_exp <- new_MltplxExperiment(x = cell_x_values,
+                                   y = cell_y_values,
+                                   window_sizes = window_sizes,
+                                   marks = factor(cell_marks),
+                                   slide_id = slide_ids)
+  
+  # check window sizes are correct
+  lapply(mltplx_exp$mltplx_objects,\(obj) {
+    ppp <- obj$mltplx_image$ppp
+    W <- ppp$window
+    
+    all(min(ppp$x) - 50 == W$xrange[1],
+        max(ppp$x) + 20 == W$xrange[2],
+        min(ppp$y) - 30 == W$yrange[1],
+        max(ppp$y) + 10 == W$yrange[2])
+  }) %>%
+    unlist() -> chk
+  
+  expect_true(all(chk))
+
+  # mis-named columns
+  window_sizes2 <- rename(window_sizes, max_X = max_x)
+  
+  
+  expect_error({
+    mltplx_exp <- new_MltplxExperiment(x = cell_x_values,
+                                     y = cell_y_values,
+                                     window_sizes = window_sizes2,
+                                     marks = factor(cell_marks),
+                                     slide_id = slide_ids)
+  })
+  
+  # window sizes are too small
+  window_sizes3 <- mutate(window_sizes,
+                         max_x = max_x - 25)
+  
+  expect_error({
+    mltplx_exp <- new_MltplxExperiment(x = cell_x_values,
+                                       y = cell_y_values,
+                                       window_sizes = window_sizes3,
+                                       marks = factor(cell_marks),
+                                       slide_id = slide_ids)
+  })
+  
+  # no error, no window_sizes given
+  mltplx_exp <- new_MltplxExperiment(x = cell_x_values,
+                                     y = cell_y_values,
+                                     marks = factor(cell_marks),
+                                     slide_id = slide_ids)
+  
+  # check window sizes are correct
+  lapply(mltplx_exp$mltplx_objects,\(obj) {
+    ppp <- obj$mltplx_image$ppp
+    W <- ppp$window
+    
+    all(min(ppp$x) == W$xrange[1],
+        max(ppp$x) == W$xrange[2],
+        min(ppp$y) == W$yrange[1],
+        max(ppp$y) == W$yrange[2])
+  }) %>%
+    unlist() -> chk
+  
+  expect_true(all(chk))
+  
+  })
