@@ -25,7 +25,11 @@ test_that("`MltplxDist` constructor works", {
 
   intensity_1 = new_MltplxIntensity(image_1, ps = 30, bw = 30)
 
-  dist_1 = new_MltplxDist(intensity_1, jsd, .dist_metric_name = "jsd")
+  jsd_e = function(v1, v2){
+    jsd(v1, v2, base = exp(1))
+  }
+
+  dist_1 = new_MltplxDist(intensity_1, jsd_e, .dist_metric_name = "jsd")
 
   expect_true(all(
     dist_1 %>% print() %>% capture.output() ==
