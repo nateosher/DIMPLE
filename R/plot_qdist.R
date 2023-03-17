@@ -3,18 +3,21 @@
 #' @param slide_ids Vector of ids of slides whose distance matrices you'd like
 #' to print
 #' @param mode String indicating plot type, either "heatmap" or "network"
+#' @param threshold When mode is "network", edges below this absolute value are
+#' excluded from the plot
 #' @return NULL
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
+#' @import qgraph
 #' @importFrom magic adiag
 #' @export
-plot_qdist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
+plot_qdist <- function(mltplx_experiment, slide_ids, mode = "heatmap", threshold = 0.1) {
   stopifnot("Quantile distances must exist"=!is.null(mltplx_experiment$mltplx_objects[[1]]$quantile_dist))
   if(mode == "heatmap") {
-    
+
     df <- qdist_to_df(mltplx_experiment) %>%
       tidyr::drop_na(qdist)
-    
+
     for(id in slide_ids) {
       p <- df %>%
         dplyr::filter(slide_id == id) %>%
@@ -34,10 +37,13 @@ plot_qdist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
       intervals <- qdist_to_df(mltplx_object) %>%
         distinct(type1,interval)
       nms <- colnames(mltplx_object$mltplx_dist$dist)
-      qgraph::qgraph(block.diag,threshold=0.1,layout="groups",groups=as.factor(intervals$interval),title=paste0("Network for slide id ", mltplx_object$slide_id),palette="gray")
-      
+      qgraph::qgraph(block.diag,threshold=threshold,layout="groups",
+                     groups=as.factor(intervals$interval),
+                     title=paste0("Network for slide id ", mltplx_object$slide_id),
+                     palette="gray")
+
     }
   } else {
     stop("Mode must be either heatmap or network")
-  } 
+  }
 }
