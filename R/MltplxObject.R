@@ -122,14 +122,15 @@ update_object_dist = function(mltplx_object, dist_metric,
 #'
 #' @return tibble with dist information
 #' @export
-dist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
+dist_to_df.MltplxObject <- function(mltplx_object,
+                                    reduce_symmetric = FALSE) {
   if(!is.null(mltplx_object$mltplx_dist)) {
     mat <- mltplx_object$mltplx_dist$dist
-    
+
     if(reduce_symmetric) {
       mat[lower.tri(mat)] <- NA
     }
-
+  
    df <- mat %>%
     as.data.frame.table() %>%
     rename(type1=Var1,
