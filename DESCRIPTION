@@ -20,7 +20,8 @@ Imports:
     tidyr,
     magic,
     RColorBrewer,
-    viridis
+    viridis,
+    qgraph
 Suggests: 
     covr,
     knitr,
