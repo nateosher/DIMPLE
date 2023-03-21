@@ -7,7 +7,7 @@ test_that("Correct aggregation", {
   y <- unlist(lapply(exp$mltplx_objects, \(obj) obj$mltplx_dist$dist[1,2]))
 
   tb <- tibble(y=y,slide_id=exp$slide_ids) %>%
-    left_join(exp$metadata)
+    left_join(exp$metadata,by="slide_id")
 
   # The grouped lm coefficient should just be equal to the difference in the
   # aggregate function applied to the two groups

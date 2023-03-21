@@ -5,7 +5,7 @@
 #' Wikipedia's notation.
 #' @return KLD as double
 #' @export
-kld = function(v1, v2, normalize = TRUE){
+kld = function(v1, v2, base = exp(1), normalize = TRUE){
   kld_checks(v1, v2)
 
   non_zero_both = which(v1 > 0 & v2 > 0)
@@ -24,7 +24,7 @@ kld = function(v1, v2, normalize = TRUE){
 
   return(
     sum(
-      v1_both * (log(v1_both) - log(v2_both))
+      v1_both * (logb(v1_both, base) - logb(v2_both, base))
     )
   )
 }
