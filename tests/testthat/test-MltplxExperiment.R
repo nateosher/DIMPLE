@@ -233,3 +233,18 @@ test_that("Window size parameter works", {
   expect_true(all(chk))
   
   })
+
+test_that("Factor levels are alphabetical in dist_to_df", {
+  cell_x_values = append(cell_x_values,runif(20, 0, 600))
+  cell_y_values = append(cell_y_values,runif(20, 0, 600))
+  cell_marks = append(cell_marks,rep("H1",20))
+  slide_ids = append(slide_ids,rep("Slide 4",20))
+  exp = new_MltplxExperiment(x = cell_x_values,
+                             y = cell_y_values,
+                             marks = factor(cell_marks),
+                             slide_id = slide_ids,
+                             ps = 30, bw = 40,dist_metric = cor)
+  df <- suppressWarnings(dist_to_df(exp,reduce_symmetric = TRUE))
+  
+  expect_equal(levels(df$type1),sort(levels(df$type1)))
+})
