@@ -175,7 +175,9 @@ dist_to_df.MltplxExperiment <- function(mltplx_experiment,reduce_symmetric = FAL
         left_join(.,mltplx_experiment$metadata,by="slide_id")
       else
         .
-    }
+    } %>%
+    mutate(type1 = factor(type1,levels = sort(levels(.$type1))),
+           type2 = factor(type2,levels = sort(levels(.$type2))))
 }
 
 #' @export
@@ -188,7 +190,9 @@ qdist_to_df.MltplxExperiment <- function(mltplx_experiment,reduce_symmetric = FA
         left_join(.,mltplx_experiment$metadata,by="slide_id")
       else
         .
-    }
+    } %>%
+    mutate(type1 = factor(type1,levels = sort(levels(.$type1))),
+           type2 = factor(type2,levels = sort(levels(.$type2))))
 }
 
 #' @export
