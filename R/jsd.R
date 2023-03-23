@@ -6,7 +6,7 @@
 #' @param v2 Second vector of values
 #' @return JSD as double
 #' @export
-jsd = function(v1, v2, normalize = TRUE){
+jsd = function(v1, v2, base = 2, normalize = TRUE){
   jsd_checks(v1, v2)
 
   non_zero_both = which(v1 > 0 & v2 > 0)
@@ -27,7 +27,7 @@ jsd = function(v1, v2, normalize = TRUE){
   M = 0.5 * (v1_both + v2_both)
 
   return(
-    0.5 * (kld(v1_both, M) + kld(v2_both, M))
+    0.5 * (kld(v1_both, M, base = base) + kld(v2_both, M, base = base))
   )
 }
 
