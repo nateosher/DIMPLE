@@ -22,13 +22,13 @@ lm_dist <- function(mltplx_experiment,
   if(!is.null(covariates)) {
     stopifnot("Covariates must be in patient metadata"=all(covariates %in% colnames(mltplx_experiment$metadata)))
   }
-  
+
   df <- mltplx_experiment %>%
     dist_to_df(reduce_symmetric = TRUE)
-  
+
   if(is.null(slide_ids)) slide_ids <- unique(df$slide_id)
   if(is.null(types)) types <- unique(df$type1)
-  
+
   fm_string <- paste0("dist ~ ", group_factor)
   if(!is.null(covariates)) fm_string <- paste0(fm_string, " + ",paste0(covariates,collapse = " + "))
   fm <- as.formula(fm_string)
@@ -52,7 +52,7 @@ lm_dist <- function(mltplx_experiment,
     ungroup() %>%
     filter(!stringr::str_detect(term,paste0(c("Intercept",covariates),collapse = "|"))) %>%
     mutate(p.adj = p.adjust(p.value,method="fdr"))
-  
+
   return(result)
 }
 
@@ -79,21 +79,21 @@ lm_qdist <- function(mltplx_experiment,
   stopifnot("Patient metadata must exist"=!is.null(mltplx_experiment$metadata))
   stopifnot("Group factor must be in patient metadata"=group_factor %in% colnames(mltplx_experiment$metadata))
   stopifnot("Quantile dist must be created first"=all(unlist(lapply(mltplx_experiment$mltplx_objects,\(obj) !is.null(obj$quantile_dist)))))
-  
-  
+
+
   df <- mltplx_experiment %>%
     qdist_to_df(reduce_symmetric = TRUE) %>%
     rename(intervals = interval)
   stopifnot("Interval must be in q_probs"=(interval %in% levels(df$intervals)))
-  
-  
+
+
   if(is.null(slide_ids)) slide_ids <- unique(df$slide_id)
   if(is.null(types)) types <- unique(df$type1)
-  
+
   fm_string <- paste0("qdist ~ ", group_factor)
   if(!is.null(covariates)) fm_string <- paste0(fm_string, " + ",paste0(covariates,collapse = " + "))
   fm <- as.formula(fm_string)
-  
+
   result <- df %>%
     filter(slide_id %in% slide_ids,
            interval == intervals,
@@ -114,6 +114,6 @@ lm_qdist <- function(mltplx_experiment,
     ungroup() %>%
     filter(!stringr::str_detect(term,paste0(c("Intercept",covariates),collapse = "|"))) %>%
     mutate(p.adj = p.adjust(p.value,method="fdr"))
-  
+
   return(result)
 }
