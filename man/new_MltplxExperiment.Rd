@@ -13,6 +13,7 @@ new_MltplxExperiment(
   y,
   marks,
   slide_id,
+  window_sizes = NULL,
   ps = NULL,
   bw = NULL,
   dist_metric = NULL,
@@ -29,6 +30,8 @@ new_MltplxExperiment(
 \item{slide_id}{Vector of ids indicating the slide to which each cell
 belongs}
 
+\item{window_sizes}{dataframe with columns \code{slide_id}, \code{min_x}, \code{max_x}, \code{min_y} and \code{max_y} indicating the window dimensions for each slide}
+
 \item{ps}{Optional: "pixel size" of intensity estimations. If you'd
 like to generate intensities while constructing the \code{MltplxExperiment}
 object, it will be broken up into squares that are roughly \code{ps} by \code{ps}
@@ -44,8 +47,7 @@ two intensity vectors. This can be any function that takes in two vectors
 and returns a scalar.}
 
 \item{metadata}{Optional: patient/slide level data. Must include \emph{one} row
-per unique slide id, and a column \code{slide_id} indicating the slide to which
-each row corresponds.}
+per unique slide id, and a column \code{slide_id} indicating the slide to which each row corresponds}
 }
 \value{
 \code{MltplxExperiment} object.

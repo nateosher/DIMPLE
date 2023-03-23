@@ -56,8 +56,6 @@ test_that("`plot_pairwise_group_heatmap` works", {
     plot_2 = plot_pairwise_group_heatmap(lm_dist_max, limits = c(-0.1, 0.1),
                                          p_val_col = "p.value")
   })
-
-
 })
 
 test_that("`typewise_boxplots` works", {
@@ -83,26 +81,46 @@ test_that("`typewise_boxplots` works", {
   expect_equal(ncol(plot_2$data), 6)
 })
 
+test_that("`plot_quantile_mask` works", {
+  expect_no_error({
+    plot_quantile_mask(exp, "X1", tibble(from = c(10, 30, 50, 70),
+                                         to = c(20, 40, 60, 80)),
+                       slide_ids = "S4")
+  })
+})
 
+test_that("`patient_boxplots` works", {
+  expect_no_error({
+    boxplots_1 = patient_boxplots(exp, "X1", "X2", grouping_var = "group")
+  })
 
+  expect_equal(nrow(boxplots_1$data), 19)
+  expect_equal(ncol(boxplots_1$data), 15)
+  exp_no_meta = exp
+  exp_no_meta$metadata = NULL
 
+  expect_error({
+    patient_boxplots(exp_no_meta, "X1", "X2", grouping_var = "group")
+  },"Patient metadata must exist")
+})
 
+test_that("`plot_qdist` works", {
+  expect_error({
+    plot_qdist(exp, "S5")
+  }, "Quantile distances must exist")
 
+  exp = add_QuantileDist(exp, cor, "X1",
+                         tibble(from = seq(10, 50, 10), to = seq(20, 60, 10)))
+  expect_no_error({
+    plot_qdist(exp, "S5")
+  })
 
+  expect_no_error({
+    plot_qdist(exp, "S5", mode = "network", threshold = 0)
+  }) %>%
+    expect_warning("Non-finite weights are omitted")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  expect_error({
+    plot_qdist(exp, "S5", mode = "joel mode")
+  }, "Mode must be either heatmap or network")
+})

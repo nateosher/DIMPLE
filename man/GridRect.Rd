@@ -6,7 +6,16 @@
 Note that if the specified rectangle is not fully contained in the matrix,
 it will be truncated.}
 \usage{
-GridRect(m, n, bot_left_corner_x, bot_left_corner_y, width, height, intensity)
+GridRect(
+  m,
+  n,
+  bot_left_corner_x,
+  bot_left_corner_y,
+  width,
+  height,
+  intensity,
+  axis = NULL
+)
 }
 \arguments{
 \item{m}{Number of rows of overall grid}
@@ -21,7 +30,16 @@ GridRect(m, n, bot_left_corner_x, bot_left_corner_y, width, height, intensity)
 
 \item{height}{height of rectangle}
 
-\item{intensity}{Intensity of point pattern on the rectangle}
+\item{intensity}{Intensity of point pattern on the rectangle; either a scalar
+value that will be constant on the entire rectangle, or a vector of two values
+indicating the values to be reached vertically or horizontally over the
+rectangle. Horizontal gradients always run left to right, vertical always
+run from top to bottom; by switching the order of the intensity vectors,
+you can achieve both increasing and decreasing gradients in arbitrary
+directions.}
+
+\item{axis}{Either 'x'/'X' or 'y'/'Y'. If intensity is passed as min/max
+gradient, this argument specifies which axis the gradient should occur across.}
 }
 \value{
 Intensity matrix of specified dimension with "rectangle" in

@@ -4,7 +4,7 @@
 \alias{plot_pairwise_group_heatmap}
 \title{Pairwise comparison between types across groups}
 \usage{
-plot_pairwise_group_heatmap(df, p_val_col = "p.adj")
+plot_pairwise_group_heatmap(df, p_val_col = "p.adj", limits = NULL)
 }
 \arguments{
 \item{df}{tibble. a result of a multiplex analysis, eg, lm_dist}

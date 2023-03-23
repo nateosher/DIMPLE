@@ -9,6 +9,8 @@ new_MltplxObject(
   y,
   marks,
   slide_id,
+  xrange = NULL,
+  yrange = NULL,
   ps = NULL,
   bw = NULL,
   dist_metric = NULL,
@@ -23,6 +25,11 @@ new_MltplxObject(
 \item{marks}{Vector of cell types}
 
 \item{slide_id}{Vector of slide ids, i.e. how should cells be grouped}
+
+\item{xrange}{vector of size 2 with range of x-coordinates. If NULL, will default to c(min(x),max(x))}
+
+\item{yrange}{vector of size 2 with range of y-coordinates. If NULL, will default to c(min(y),max(y))
+this parameter. Otherwise, it defaults to the name of the function}
 
 \item{ps}{Optional; if you'd like to generate intensity estimates when
 you first create these objects, this will determine the "pixel size," i.e.
@@ -43,8 +50,7 @@ is created.}
 
 \item{.dist_metric_name}{Optional; not required, even when a distance
 matrix is passed. However, if you'd like to name the distance function
-you use something specific, you can pass this name as a string using
-this parameter. Otherwise, it defaults to the name of the function}
+you use something specific, you can pass this name as a string using}
 }
 \value{
 \code{MltplxObject} object
