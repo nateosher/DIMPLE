@@ -3,6 +3,14 @@ exp <- add_mltplx_metadata(exp,n_patients=10)
 exp <- update_intensity(exp,ps=2,bw=3)
 exp <- update_dist(exp,cor)
 
+test_that("`plot_quantile_mask` works", {
+  expect_no_error({
+    plot_quantile_mask(exp, "X1", tibble(from = c(10, 30, 50, 70),
+                                         to = c(20, 40, 60, 80)),
+                       slide_ids = "S4")
+  })
+})
+
 test_that("`patient_boxplots` works", {
   expect_no_error({
     boxplots_1 = patient_boxplots(exp, "X1", "X2", grouping_var = "group")

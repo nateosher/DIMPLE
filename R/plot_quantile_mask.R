@@ -15,7 +15,7 @@
 
 plot_quantile_mask <- function(mltplx_experiment,mask_type,q_probs,slide_ids) {
   objs <- filter_mltplx_objects(mltplx_experiment,slide_ids)
-  
+
   df <- purrr::map_df(1:length(objs),\(i) {
     obj <- objs[[i]]
     if(!is.null(obj$quantile_dist) &&
@@ -33,15 +33,18 @@ plot_quantile_mask <- function(mltplx_experiment,mask_type,q_probs,slide_ids) {
       joined_q$slide_id<-obj$slide_id
       joined_q
     }
-  })
-  
+  }) %>%
+    mutate(
+      q_fac_for_plot = map2_chr(p1, p2, ~ paste0(.x, "-", .y)) %>% as.factor()
+    )
+
   for(id in slide_ids) {
-    
+
     ppp<-objs[[which(sapply(objs, "[[", 1)==id)]]$mltplx_image$ppp
     d<-df %>%dplyr::filter(slide_id == id)
     ggplot(d,aes(X,Y)) +
-      geom_tile(aes(fill=q_fac)) +
-      scale_fill_grey(start=0,end=1,name=paste0("Quantile of ", mask_type))+
+      geom_tile(aes(fill=q_fac_for_plot)) +
+      scale_fill_grey(start=0.2,end=0.8,name=paste0("Quantile of ", mask_type))+
       geom_point(aes(X,Y,color=type,shape=type),data=cbind.data.frame(X=ppp$x,Y=ppp$y,type=ppp$marks),size=2)+
       scale_shape_manual(name = "type",
                          label = levels(ppp$marks),
