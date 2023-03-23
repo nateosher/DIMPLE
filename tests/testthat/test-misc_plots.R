@@ -16,4 +16,24 @@ test_that("`patient_boxplots` works", {
   expect_error({
     patient_boxplots(exp_no_meta, "X1", "X2", grouping_var = "group")
   },"Patient metadata must exist")
+
+test_that("`plot_qdist` works", {
+  expect_error({
+    plot_qdist(exp, "S5")
+  }, "Quantile distances must exist")
+
+  exp = add_QuantileDist(exp, cor, "X1",
+                         tibble(from = seq(10, 50, 10), to = seq(20, 60, 10)))
+  expect_no_error({
+    plot_qdist(exp, "S5")
+  })
+
+  expect_no_error({
+    plot_qdist(exp, "S5", mode = "network", threshold = 0)
+  }) %>%
+    expect_warning("Non-finite weights are omitted")
+
+  expect_error({
+    plot_qdist(exp, "S5", mode = "joel mode")
+  }, "Mode must be either heatmap or network")
 })
