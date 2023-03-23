@@ -16,6 +16,7 @@ test_that("`patient_boxplots` works", {
   expect_error({
     patient_boxplots(exp_no_meta, "X1", "X2", grouping_var = "group")
   },"Patient metadata must exist")
+})
 
 test_that("`plot_qdist` works", {
   expect_error({
