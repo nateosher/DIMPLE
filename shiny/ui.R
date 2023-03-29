@@ -13,23 +13,57 @@ library(shiny)
 fluidPage(shinyjs::useShinyjs(),
           titlePanel("DistDist Shiny App"),
           tabsetPanel(
-            tabPanel("Upload Multiplex Experiment",
+            tabPanel("Visualize Multiplex Experiment",
                      sidebarLayout(
                        sidebarPanel(
                          fileInput('file1', 'Choose .RDS containing MltplxExperiment object',
                                    accept=c('.RDS')),
-                         
+                         actionButton("exampledata", "Use example CRC data"),
                          tags$br(),
                          tableOutput('contents'),
                          selectInput("slide_ids_to_plot","Select slide ids to plot","",selected="",multiple=F),
-                         selectInput("cell_types_to_plot","Select cell types to plot","",selected="",multiple=T),
+                         
                          selectInput("dm_plot_mode","Select mode for distance matrix plot",c("heatmap","network"),selected="",multiple=F)
                          
                        ),
                        mainPanel(
                          plotOutput('ppplot'),
-                         plotOutput('intensity_plot'),
                          plotOutput('dm_plot')
+                       )
+                     ),
+                     sidebarLayout(
+                       sidebarPanel(
+                         selectInput("cell_types_to_plot","Select cell types to plot intensities","",selected="",multiple=T)
+                       ),
+                       mainPanel(
+                         
+                         plotOutput('intensity_plot')
+                         
+                       )
+                     )
+            ),
+            tabPanel("Modeling",
+                     sidebarLayout(
+                       sidebarPanel(
+                         
+                         selectInput("group_factor","Select grouping factor","",selected="",multiple=F),
+                         selectInput("covariates","Select covariates to adjust for","",selected="",multiple=T),
+                         selectInput("agg","Select aggregating function",c("median","mean","max","min"),selected="",multiple=F)
+                       ),
+                       mainPanel(
+                         plotOutput('pairwise_group_heat')
+                       ),
+                     ),
+                     sidebarLayout(
+                       sidebarPanel(
+                         selectInput("cell_types1","Select cell type 1","",selected="",multiple=F),
+                         selectInput("cell_types2","Select cell type 2","",selected="",multiple=F)
+                       ),
+                       mainPanel(
+                         
+                         plotOutput('boxplot'),
+                         plotOutput('group_boxplot')
+                         
                        )
                      )
             )
@@ -109,7 +143,8 @@ fluidPage(shinyjs::useShinyjs(),
             #                
             #                selectInput('t1', 'Select cell type 1', "", selected = "tumor cells"),
             #                selectInput('t2', 'Select cell type 2', "", selected = "CD4+ T cells"),
-            #                selectInput('grouping_var', 'Select grouping variable', "", selected = "Patient")
+            #                selectInput('grouping_var', 'Select grouping variable', "", selecte
+            #d = "Patient")
             #              ),
             #              mainPanel(
             #                #pre(id = "console"),

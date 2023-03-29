@@ -27,8 +27,28 @@ function(input, output, session) {
     exp <- readRDS(inFile$datapath)
     
     updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
-    updateSelectInput(session, inputId = 'cell_types_to_plot', label = 'Select cell types to plot', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
+    updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
+    updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
     
+    if(!is.null(exp$metadata)){
+      updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
+      updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
+    }
+    
+    
+    return(exp)
+  })
+  
+  experiment<-eventReactive(input$exampledata,{
+    exp<-readRDS("CRC_example_jsd_10_30.RDS")
+    updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
+    updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
+    updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
+    
+    if(!is.null(exp$metadata)){
+      updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
+      updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
+    }
     return(exp)
   })
   
@@ -41,12 +61,23 @@ function(input, output, session) {
   output$ppplot <- renderPlot({ 
     req(experiment())
     req(input$slide_ids_to_plot)
-    plot_ppp(experiment(),input$slide_ids_to_plot)
+    p<-plot_ppp(experiment(),input$slide_ids_to_plot)
+    print(p)
+  })
+  
+  experiment1 <- reactive({ 
+    req(experiment()) 
+    req(input$slide_ids_to_plot)
+    experiment<-experiment()
+    exp1<-filter_mltplx_objects(experiment,input$slide_ids_to_plot)
+    updateSelectInput(session, inputId = 'cell_types_to_plot', label = 'Select cell types', choices = unique(unlist(lapply(lapply(exp1,'[[',3),'[[',2))), selected = "")
+    return(experiment)
   })
   
   #intensity plot  
+  #only make available cell types that are in the selected image
   output$intensity_plot <- renderPlot({ 
-    req(experiment())
+    req(experiment1())
     req(input$slide_ids_to_plot)
     req(input$cell_types_to_plot)
     plot_intensities(experiment(),input$cell_types_to_plot,input$slide_ids_to_plot)
@@ -56,6 +87,32 @@ function(input, output, session) {
     req(experiment())
     req(input$slide_ids_to_plot)
     plot_dist(experiment(),input$slide_ids_to_plot,mode=input$dm_plot_mode)
+  })
+  
+  agg_list<-list(mean,median,max,min)
+  names(agg_list)<-c("mean","median","max","min")
+  
+  output$pairwise_group_heat <- renderPlot({ 
+    req(experiment())
+    req(experiment()$metadata)
+    req(input$group_factor)
+    lmdist<-lm_dist(experiment(),input$group_factor,agg_fun = agg_list[[input$agg]],covariates = input$covariates)
+    
+    plot_pairwise_group_heatmap(lmdist,p_val_col = "p.adj")
+  })
+  
+  output$boxplot <- renderPlot({ 
+    req(experiment())
+    req(input$cell_types1)
+    req(input$cell_types2)
+    patient_boxplots(experiment(),input$cell_types1,input$cell_types2,grouping_var=input$group_factor)
+  })
+  
+  output$group_boxplot <- renderPlot({ 
+    req(experiment())
+    req(input$cell_types1)
+    req(input$cell_types2)
+    typewise_boxplots(experiment(),input$cell_types1,input$cell_types2,group_factor=input$group_factor)
   })
   
   
@@ -369,6 +426,7 @@ function(input, output, session) {
   # 
   
 }
+
 
 
 
