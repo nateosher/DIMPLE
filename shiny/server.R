@@ -39,6 +39,19 @@ function(input, output, session) {
     return(exp)
   })
   
+  experiment<-eventReactive(input$exampledata,{
+    exp<-readRDS("CRC_example_jsd_10_30.RDS")
+    updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
+    updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
+    updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
+    
+    if(!is.null(exp$metadata)){
+      updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
+      updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
+    }
+    return(exp)
+  })
+  
   # plot the message  
   output$contents <- renderPrint({ 
     experiment()
@@ -57,7 +70,7 @@ function(input, output, session) {
     req(input$slide_ids_to_plot)
     experiment<-experiment()
     exp1<-filter_mltplx_objects(experiment,input$slide_ids_to_plot)
-    updateSelectInput(session, inputId = 'cell_types_to_plot', label = 'Select grouping factor', choices = unique(unlist(lapply(lapply(exp1,'[[',3),'[[',2))), selected = "")
+    updateSelectInput(session, inputId = 'cell_types_to_plot', label = 'Select cell types', choices = unique(unlist(lapply(lapply(exp1,'[[',3),'[[',2))), selected = "")
     return(experiment)
   })
   
@@ -99,7 +112,7 @@ function(input, output, session) {
     req(experiment())
     req(input$cell_types1)
     req(input$cell_types2)
-    group_boxplots(experiment(),input$cell_types1,input$cell_types2,grouping_var=input$group_factor)
+    typewise_boxplots(experiment(),input$cell_types1,input$cell_types2,group_factor=input$group_factor)
   })
   
   

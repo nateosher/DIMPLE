@@ -18,7 +18,7 @@ fluidPage(shinyjs::useShinyjs(),
                        sidebarPanel(
                          fileInput('file1', 'Choose .RDS containing MltplxExperiment object',
                                    accept=c('.RDS')),
-                         
+                         actionButton("exampledata", "Use example CRC data"),
                          tags$br(),
                          tableOutput('contents'),
                          selectInput("slide_ids_to_plot","Select slide ids to plot","",selected="",multiple=F),
@@ -61,8 +61,8 @@ fluidPage(shinyjs::useShinyjs(),
                        ),
                        mainPanel(
                          
-                         plotOutput('boxplot')
-                         #plotOutput('group_boxplot')
+                         plotOutput('boxplot'),
+                         plotOutput('group_boxplot')
                          
                        )
                      )
