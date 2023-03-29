@@ -124,3 +124,18 @@ test_that("`plot_qdist` works", {
     plot_qdist(exp, "S5", mode = "joel mode")
   }, "Mode must be either heatmap or network")
 })
+
+test_that("`plot_scatter_dist` works", {
+  expect_no_error({
+    scatter_1 = plot_scatter_dist(exp, "X1", "X2", cont_var = "age")
+  })
+  
+  expect_equal(nrow(scatter_1$data), 19)
+  expect_equal(ncol(scatter_1$data), 7)
+  exp_no_meta = exp
+  exp_no_meta$metadata = NULL
+  
+  expect_error({
+    plot_scatter_dist(exp_no_meta, "X1", "X2", cont_var = "age")
+  },"Patient metadata must exist")
+})

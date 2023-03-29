@@ -20,7 +20,9 @@ add_mltplx_metadata <- function(exp,n_patients,seed=2024,n_groups=2) {
   
   groups <- sample(rep_len(sample(paste0("G",1:n_groups)),n_patients))
   
-  gp_tb <- tibble(patient_id=unique(patient_ids),group=groups)
+  ages <- runif(n_patients,min=0,max=100)
+  
+  gp_tb <- tibble(patient_id=unique(patient_ids),group=groups,age=ages)
   
   metadata <- left_join(metadata,gp_tb,by = "patient_id")
   
