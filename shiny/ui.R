@@ -18,9 +18,13 @@ fluidPage(shinyjs::useShinyjs(),
                        sidebarPanel(
                          fileInput('file1', 'Choose .RDS containing MltplxExperiment object',
                                    accept=c('.RDS')),
-                         actionButton("exampledata", "Use example CRC data"),
+                         "Or load the lung cancer data from the VectraPolarisData R package",
                          tags$br(),
+                         actionButton("exampledata", "Use lung cancer data"),
+                         tags$br(),
+                         #actionButton("exampledata1", "Use example CRC data"),
                          tableOutput('contents'),
+                         tags$br(),
                          selectInput("slide_ids_to_plot","Select slide ids to plot","",selected="",multiple=F),
                          
                          selectInput("dm_plot_mode","Select mode for distance matrix plot",c("heatmap","network"),selected="",multiple=F)
@@ -42,7 +46,7 @@ fluidPage(shinyjs::useShinyjs(),
                        )
                      )
             ),
-            tabPanel("Modeling",
+            tabPanel("Statistical Inference",
                      sidebarLayout(
                        sidebarPanel(
                          
