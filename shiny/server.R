@@ -18,40 +18,49 @@ options(shiny.maxRequestSize = 100000*1024^2)
 
 function(input, output, session) {
   
+  experiment<-reactive({
+     
+    if(!is.null(input$file1)){
+      inFile <- input$file1 
+      exp <- readRDS(inFile$datapath)
+    }else{
+      req(input$exampledata)
+      exp<-readRDS("lung_experiment_10_10_jsd.RDS")
+    }
+  
+    updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
+    updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
+    updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
+    
+    if(!is.null(exp$metadata)){
+      updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
+      updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
+    }
+    return(exp)
+  })
   
   # read in .rds file   
-  experiment <- reactive({ 
-    req(input$file1) 
-    
-    inFile <- input$file1 
-    
-    exp <- readRDS(inFile$datapath)
-    
-    updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
-    updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-    updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-    
-    if(!is.null(exp$metadata)){
-      updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
-      updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
-    }
-    
-    
-    return(exp)
-  })
+  # experiment <- reactive({ 
+  #   req(input$file1) 
+  #   
+  #   inFile <- input$file1 
+  #   
+  #   exp <- readRDS(inFile$datapath)
+  #   
+  #   updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
+  #   updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
+  #   updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
+  #   
+  #   if(!is.null(exp$metadata)){
+  #     updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
+  #     updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
+  #   }
+  #   
+  #   
+  #   return(exp)
+  # })
   
-  experiment<-eventReactive(input$exampledata,{
-    exp<-readRDS("lung_experiment_10_10_jsd.RDS")
-    updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
-    updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-    updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-    
-    if(!is.null(exp$metadata)){
-      updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
-      updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
-    }
-    return(exp)
-  })
+
   
   # experiment<-eventReactive(input$exampledata1,{
   #   exp<-readRDS("CRC_example_jsd_10_30.RDS")
