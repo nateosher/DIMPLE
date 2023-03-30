@@ -7,48 +7,46 @@
 #    http://shiny.rstudio.com/
 #
 
-library(shiny)
+library(shiny);library(shinythemes)
 
 
-fluidPage(shinyjs::useShinyjs(),
-          titlePanel("DistDist Shiny App"),
+
+fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
+          titlePanel("DM.ME"),
           tabsetPanel(
-            tabPanel("Visualize Multiplex Experiment",
+            tabPanel("Visualize Multiplex Object",
                      sidebarLayout(
                        sidebarPanel(
-                         fileInput('file1', 'Choose .RDS containing MltplxExperiment object',
+                         fileInput('file1', 'Choose .RDS containing MltplxExperiment',
                                    accept=c('.RDS')),
-                         "Or load the lung cancer data from the VectraPolarisData R package",
+                         "Or push button to load the lung cancer data from the VectraPolarisData R package:",
                          tags$br(),
                          actionButton("exampledata", "Use lung cancer data"),
+                         tags$br(),
+                         "A summary of the data will appear below once the data is loaded:",
                          tags$br(),
                          #actionButton("exampledata1", "Use example CRC data"),
                          tableOutput('contents'),
                          tags$br(),
-                         selectInput("slide_ids_to_plot","Select slide ids to plot","",selected="",multiple=F),
-                         
+                         selectInput("slide_ids_to_plot","Select slide id to plot","",selected="",multiple=F),
+                         tags$br(),
+                         "Select cell types to see their intensity plots",
+                         selectInput("cell_types_to_plot","Select cell types to plot intensities","",selected="",multiple=T),
+                         tags$br(),
                          selectInput("dm_plot_mode","Select mode for distance matrix plot",c("heatmap","network"),selected="",multiple=F)
                          
                        ),
                        mainPanel(
                          plotOutput('ppplot'),
+                         plotOutput('intensity_plot'),
                          plotOutput('dm_plot')
-                       )
-                     ),
-                     sidebarLayout(
-                       sidebarPanel(
-                         selectInput("cell_types_to_plot","Select cell types to plot intensities","",selected="",multiple=T)
-                       ),
-                       mainPanel(
-                         
-                         plotOutput('intensity_plot')
-                         
+
                        )
                      )
             ),
-            tabPanel("Statistical Inference",
+            tabPanel("Visualize Multiplex Experiment",
                      sidebarLayout(
-                       sidebarPanel(
+                       sidebarPanel( "Test each pairwise distance for association with a grouping factor from the patient metadata",
                          
                          selectInput("group_factor","Select grouping factor","",selected="",multiple=F),
                          selectInput("covariates","Select covariates to adjust for","",selected="",multiple=T),
@@ -59,7 +57,7 @@ fluidPage(shinyjs::useShinyjs(),
                        ),
                      ),
                      sidebarLayout(
-                       sidebarPanel(
+                       sidebarPanel("Choose two cell types to investigate the distribution of their distance with respect to the grouping factor",
                          selectInput("cell_types1","Select cell type 1","",selected="",multiple=F),
                          selectInput("cell_types2","Select cell type 2","",selected="",multiple=F)
                        ),
