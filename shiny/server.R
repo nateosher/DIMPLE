@@ -8,7 +8,7 @@
 #
 
 library(shiny);library(ggplot2);library(dplyr);library(here);library(spatstat);library(tidyr);library(purrr);library(fuzzyjoin)
-library(devtools);library(ggpubr);library(viridis)
+library(devtools);library(ggpubr);library(viridis);library(waiter)
 devtools::load_all()
 source("helpers.R")
 
@@ -17,6 +17,7 @@ options(shiny.maxRequestSize = 100000*1024^2)
 
 
 function(input, output, session) {
+  
   
   # read in .rds file   
   experiment <- reactive({ 
