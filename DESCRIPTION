@@ -21,7 +21,9 @@ Imports:
     magic,
     RColorBrewer,
     viridis,
-    qgraph
+    qgraph,
+    furrr,
+    progressr
 Suggests: 
     covr,
     knitr,
