@@ -4,7 +4,7 @@
 \alias{kld}
 \title{Computes Kullback–Leibler divergence between two vectors of values.}
 \usage{
-kld(v1, v2, normalize = TRUE)
+kld(v1, v2, base = exp(1), normalize = TRUE)
 }
 \arguments{
 \item{v1}{Vector of probabilities- this represents the P distribution using

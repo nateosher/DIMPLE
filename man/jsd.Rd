@@ -7,7 +7,7 @@ Vectors should be the same length, and may contain zeroes; however, the
 distance will only be computed on locations where both vectors are non-zero.
 Note that JSD is symmetric, so jsd(v1, v2) = jsd(v2, v1).}
 \usage{
-jsd(v1, v2, normalize = TRUE)
+jsd(v1, v2, base = 2, normalize = TRUE)
 }
 \arguments{
 \item{v1}{First vector of values}
