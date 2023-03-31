@@ -95,7 +95,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
   
   ids <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
   ids_orig_order <- unique(slide_id)
-  mltplx_objects <- mltplx_objects[order(match(ids,ids_orig_order))]
+  mltplx_objects <- reorder_list(mltplx_objects,ids,ids_orig_order)
 
   if(!is.null(metadata)) {
     check_metadata(mltplx_objects,metadata)
