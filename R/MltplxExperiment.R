@@ -95,7 +95,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
   
   ids <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
   ids_orig_order <- unique(slide_id)
-  mltplx_objects <- reorder_list(mltplx_objects,ids,ids_orig_order)
+  mltplx_objects <- mltplx_objects[order(match(ids,ids_orig_order))]
 
   if(!is.null(metadata)) {
     check_metadata(mltplx_objects,metadata)
@@ -214,16 +214,23 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
                                               .dist_metric_name = NULL) {
   slide_ids <- mltplx_experiment$slide_ids
   n_slides <- length(slide_ids)
-  mltplx_experiment$mltplx_objects <- map(mltplx_experiment$mltplx_objects,
-                                          \(obj,...) {
-                                            ProgressBar(which(obj$slide_id == slide_ids), n_slides)
-                                            add_QuantileDist(obj,...)
-                                            },
-                                          dist_metric,
-                                          mask_type,
-                                          q_probs,
-                                          .dist_metric_name)
-  ProgressBar(n_slides + 1, n_slides)
+  
+  mltplx_objects <- mltplx_experiment$mltplx_objects
+  
+  progressr::with_progress({
+    prog <- progressr::progressor(steps = n_slides)
+    mltplx_objects <- furrr::future_map(mltplx_objects, \(obj) {
+                                              obj <- add_QuantileDist(obj,
+                                                               dist_metric,
+                                                               mask_type,
+                                                               q_probs,
+                                                               .dist_metric_name)
+                                              prog()
+                                              return(obj)
+                                              })
+  })
+  
+  mltplx_experiment$mltplx_objects <- mltplx_objects
 
   mltplx_experiment
 }

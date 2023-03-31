@@ -11,7 +11,6 @@
 #' @export
 update_dist = function(mltplx_experiment, dist_metric){
   mltplx_objects <- mltplx_experiment$mltplx_objects
-  ids_orig_order <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
   .dist_metric_name = substitute(dist_metric) %>% as.character()
   
   progressr::with_progress({
@@ -25,8 +24,6 @@ update_dist = function(mltplx_experiment, dist_metric){
       return(obj)
     })
   })
-  ids <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
-  mltplx_objects <- reorder_list(mltplx_objects,ids,ids_orig_order)
   
   mltplx_experiment$mltplx_objects <- mltplx_objects
   mltplx_experiment$dist_metric_name = .dist_metric_name

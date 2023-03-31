@@ -12,8 +12,7 @@
 #' @export
 update_intensity = function(mltplx_experiment, ps, bw){
   mltplx_objects <- mltplx_experiment$mltplx_objects
-  ids_orig_order <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
-  
+
   total_objects = length(mltplx_objects)
   
   progressr::with_progress({
@@ -25,9 +24,6 @@ update_intensity = function(mltplx_experiment, ps, bw){
         return(obj)
     })
   })
-  
-  ids <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
-  mltplx_objects <- reorder_list(mltplx_objects,ids,ids_orig_order)
   
   mltplx_experiment$mltplx_objects <- mltplx_objects
   mltplx_experiment$ps = ps
