@@ -20,8 +20,9 @@ plot_scatter_dist <- function(mltplx_experiment,t1,t2,cont_var="Age",agg_fun=NUL
     mutate(across(!!sym(cont_var),as.numeric)) %>%
     {
       if(!is.null(agg_fun)) {
-        group_by(.,patient_id,type1,type2,!!sym(cont_var)) %>%
-          summarise(dist = agg_fun(dist,na.rm=T))
+        group_by(.,patient_id,type1,type2) %>%
+          mutate(dist = agg_fun(dist,na.rm=T)) %>%
+          distinct()
       } else .
     } %>%
     ggplot(aes(!!sym(cont_var),dist)) +
