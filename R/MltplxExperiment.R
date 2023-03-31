@@ -69,6 +69,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
     df <- df %>%
       select(x,y,marks)
   })
+  
   progressr::with_progress({
     prog <- progressr::progressor(steps = length(dfs))
     
@@ -76,7 +77,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
         xrange <- attr(df,"xrange")
         yrange <- attr(df,"yrange")
         slide_id <- attr(df,"slide_id")
-        new_MltplxObject(df$x,
+        obj <- new_MltplxObject(df$x,
                          df$y,
                          df$marks,
                          slide_id,
@@ -87,8 +88,14 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                          dist_metric = dist_metric,
                          .dist_metric_name = dist_metric_name)
         prog()
+        
+        return(obj)
       })
   })
+  
+  ids <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
+  ids_orig_order <- unique(slide_id)
+  mltplx_objects <- mltplx_objects[order(match(ids,ids_orig_order))]
 
   if(!is.null(metadata)) {
     check_metadata(mltplx_objects,metadata)
