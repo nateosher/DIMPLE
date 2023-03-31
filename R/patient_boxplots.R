@@ -1,16 +1,18 @@
 #' Box plots of distances between cell type intensities `t1` and `t2` across
 #' all slides in `mltplx_experiment`, grouped by patient.
+#'
 #' @param mltplx_experiment `MltplxExperiment` object
 #' @param t1 First cell type
 #' @param t2 Second cell type
 #' @param grouping_var Optional; string to indicate variable to use to further
 #' group boxplots.
 #' @param p_val_col can be either "p.adj" or "p.value" to show stars above boxplots that are significantly different than zero
+#' @param mu0 numeric, true value of the null hypothesis
 #' @return ggplot2 plot
 #' @importFrom magrittr `%>%`
 #' @importFrom viridis 
 #' @export
-patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",p_val_col = "p.value") {
+patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",p_val_col = "p.value",mu0=0) {
   stopifnot("Patient metadata must exist"=!is.null(mltplx_experiment$metadata))
 
   df <- mltplx_experiment %>%
@@ -22,7 +24,7 @@ patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",p_val_
     group_by(patient_id) %>%
     group_modify(~{
       tryCatch({
-        t.test(.x$dist)
+        t.test(.x$dist,mu=mu0)
       },error=\(e) NULL) %>%
         broom::tidy()
     }) %>%
