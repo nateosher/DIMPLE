@@ -93,6 +93,11 @@ print.MltplxObject = function(mltplx_object, ...){
 }
 
 #' @export
+plot.MltplxObject = function(mltplx_object, ...){
+  plot(mltplx_object$mltplx_image)
+}
+
+#' @export
 update_object_intensity = function(mltplx_object, ps, bw){
   mltplx_object$mltplx_intensity = new_MltplxIntensity(
     mltplx_object$mltplx_image, ps, bw
@@ -134,7 +139,7 @@ dist_to_df.MltplxObject <- function(mltplx_object,
     if(reduce_symmetric) {
       mat[lower.tri(mat)] <- NA
     }
-  
+
    df <- mat %>%
     as.data.frame.table() %>%
     rename(type1=Var1,
