@@ -5,13 +5,6 @@ cell_y_values = runif(3000, 0, 600)
 cell_marks = sample(c("Tumor", "Immune", "Other"), 3000, replace = TRUE)
 slide_ids = rep(paste("Slide", 1:10), each = 300)
 
-# mltplx_experiment = new_MltplxExperiment(x = cell_x_values,
-#                                                    y = cell_y_values,
-#                                                    marks = factor(cell_marks),
-#                                                    slide_id = slide_ids,
-#                                                    ps = 30, bw = 40,
-#                                          dist_metric = cor)
-
 test_that("`MltplxExperiment` constructor (no intensities/dists) works", {
   experiment_only = new_MltplxExperiment(x = cell_x_values,
                                          y = cell_y_values,
