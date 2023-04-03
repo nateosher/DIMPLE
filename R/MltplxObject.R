@@ -227,3 +227,12 @@ add_QuantileDist.MltplxObject <- function(mltplx_object,
   }
   mltplx_object
 }
+
+#'@export
+cell_type_counts.MltplxObject <- function(mltplx_object) {
+  mltplx_object$mltplx_image$ppp$marks %>%
+    table() %>%
+    as.data.frame() %>%
+    tidyr::pivot_wider(names_from = ".",values_from = "Freq") %>%
+    dplyr::mutate(slide_id = mltplx_object$slide_id)
+}

@@ -116,6 +116,61 @@ test_that("lm_qdist works ", {
 
 })
 
+test_that("Adjust counts",{
+  set.seed(2023)
+  total_n_cells = 10000
+  cell_x_values = runif(total_n_cells, 0, 600)
+  cell_y_values = runif(total_n_cells, 0, 600)
+  cell_marks = sample(c("Tumor", "Immune", "Other"), total_n_cells, replace = TRUE)
+  slide_ids = rep(paste("Slide", 1:10), each = 1000)
+  metadata = tibble(
+    slide_id = paste("Slide", 1:10),
+    patient_id = paste("Patient", 1:10),
+    stage = sample(1:4, 10, replace = TRUE),
+    age = sample(65:90, 10, replace = TRUE),
+    group = sample(rep(c("G1","G2"),each = 5),replace = FALSE)
+  )
+  exp = new_MltplxExperiment(x = cell_x_values,
+                            y = cell_y_values,
+                            marks = factor(cell_marks),
+                            slide_id = slide_ids,
+                            ps = 10, bw = 30,
+                            dist_metric = cor)
+  exp <- update_metadata(exp,metadata)
+  
+  # check after adjusting for counts
+  res1 <- lm_dist(exp,group_factor = "group",adjust_counts = TRUE)
+  df <- dist_to_df(exp,reduce_symmetric = TRUE)
+  ct_counts <- map_df(exp$mltplx_objects,\(mltplx_object) {
+    table(mltplx_object$mltplx_image$ppp$marks)
+  }) %>%
+    mutate(slide_id = metadata$slide_id)
+  df <- left_join(df,ct_counts,by="slide_id") %>%
+    filter(type1 == "Immune",
+           type2 == "Other") %>%
+    group_by(patient_id,group,Immune,Other) %>%
+    summarise(dist = median(dist)) %>%
+    ungroup()
+  expect_true(isTRUE(all.equal(unname(coef(lm(dist ~ group + Immune + Other,data=df)))[2],
+            res1 %>% filter(type1 == "Immune",type2 == "Other") %>% pull(estimate))))
+  
+  # check after NOT adjusting for counts
+  res2 <- lm_dist(exp,group_factor = "group",adjust_counts = FALSE)
+  df <- dist_to_df(exp,reduce_symmetric = TRUE)
+
+  df <- df %>%
+    filter(type1 == "Immune",
+           type2 == "Other") %>%
+    group_by(patient_id,group) %>%
+    summarise(dist = median(dist)) %>%
+    ungroup()
+  expect_true(isTRUE(all.equal(unname(coef(lm(dist ~ group,data=df)))[2],
+                               res2 %>% filter(type1 == "Immune",type2 == "Other") %>% pull(estimate))))
+  
+  expect_false(isTRUE(all.equal(unname(coef(lm(dist ~ group,data=df)))[2],
+                               res1 %>% filter(type1 == "Immune",type2 == "Other") %>% pull(estimate))))
+})
+
 # test_that("agg_fun with no na.rm option is rejected", {
 #   bad_fun <- function(x) sum(x)
 #
