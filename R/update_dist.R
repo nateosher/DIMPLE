@@ -10,15 +10,22 @@
 #' @importFrom purrr imap
 #' @export
 update_dist = function(mltplx_experiment, dist_metric){
-  total_objects = length(mltplx_experiment$mltplx_objects)
+  mltplx_objects <- mltplx_experiment$mltplx_objects
   .dist_metric_name = substitute(dist_metric) %>% as.character()
-  mltplx_experiment$mltplx_objects = mltplx_experiment$mltplx_objects %>%
-    imap(\(obj, i){
-      ProgressBar(i, total_objects)
-      update_object_dist(obj, dist_metric = dist_metric,
-                         .dist_metric_name = .dist_metric_name)
+  
+  progressr::with_progress({
+    prog <- progressr::progressor(steps = total_objects)
+    
+    mltplx_objects <- furrr::future_map(mltplx_objects, \(obj){
+      obj <- update_object_dist(obj,
+                                dist_metric = dist_metric,
+                                .dist_metric_name = .dist_metric_name)
+      prog()
+      return(obj)
     })
-  ProgressBar(total_objects + 1, total_objects)
+  })
+  
+  mltplx_experiment$mltplx_objects <- mltplx_objects
   mltplx_experiment$dist_metric_name = .dist_metric_name
   return(mltplx_experiment)
 }

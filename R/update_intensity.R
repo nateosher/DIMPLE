@@ -11,13 +11,21 @@
 #' @importFrom magrittr `%>%`
 #' @export
 update_intensity = function(mltplx_experiment, ps, bw){
-  total_objects = length(mltplx_experiment$mltplx_objects)
-  mltplx_experiment$mltplx_objects = mltplx_experiment$mltplx_objects %>%
-    purrr::imap(\(obj, i){
-      ProgressBar(i, total_objects)
-      update_object_intensity(obj, ps = ps, bw = bw)
+  mltplx_objects <- mltplx_experiment$mltplx_objects
+
+  total_objects = length(mltplx_objects)
+  
+  progressr::with_progress({
+    prog <- progressr::progressor(steps = total_objects)
+    
+    mltplx_objects <- furrr::future_map(mltplx_objects, \(obj){
+        obj <- update_object_intensity(obj, ps = ps, bw = bw)
+        prog()
+        return(obj)
     })
-  ProgressBar(total_objects + 1, total_objects)
+  })
+  
+  mltplx_experiment$mltplx_objects <- mltplx_objects
   mltplx_experiment$ps = ps
   mltplx_experiment$bw = bw
   return(mltplx_experiment)

@@ -40,11 +40,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
     x = x,
     y = y,
     marks = marks,
-    slide_id = slide_id,
-    slide_id_num = slide_id %>%
-      factor(levels = unique(slide_id)) %>%
-      as.numeric(),
-    total_slides = max(slide_id_num)
+    slide_id = slide_id
   )
   
   if(is.null(window_sizes)) {
@@ -62,29 +58,44 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
   if(length(dist_metric_name) == 0)
     dist_metric_name = NULL
 
-  mltplx_objects = full_tib %>%
-    group_by(slide_id_num, slide_id) %>%
-    group_map(~{
-      # I changed this; leads to weird ordering bug if we group by
-      # total # of slides as well
-      ProgressBar(.y$slide_id_num, .x$total_slides[1])
-      
-      xrange <- c(.x$min_x[1],.x$max_x[1])
-      yrange <- c(.x$min_y[1],.x$max_y[1])
-
-      new_MltplxObject(.x$x,
-                       .x$y,
-                       .x$marks,
-                       .y$slide_id,
-                       xrange = xrange,
-                       yrange = yrange,
-                       ps = ps,
-                       bw = bw,
-                       dist_metric = dist_metric,
-                       .dist_metric_name = dist_metric_name)
-    })
-
-  ProgressBar(max(full_tib$total_slides) + 1, max(full_tib$total_slides))
+  dfs <- full_tib %>%
+    group_by(slide_id) %>%
+    group_split()
+  
+  dfs <- lapply(dfs,\(df) {
+    attr(df,"slide_id") <- unique(df$slide_id)
+    attr(df,"xrange") <- c(unique(df$min_x),unique(df$max_x))
+    attr(df,"yrange") <- c(unique(df$min_y),unique(df$max_y))
+    df <- df %>%
+      select(x,y,marks)
+  })
+  
+  progressr::with_progress({
+    prog <- progressr::progressor(steps = length(dfs))
+    
+    mltplx_objects <- furrr::future_map(dfs,\(df) {
+        xrange <- attr(df,"xrange")
+        yrange <- attr(df,"yrange")
+        slide_id <- attr(df,"slide_id")
+        obj <- new_MltplxObject(df$x,
+                         df$y,
+                         df$marks,
+                         slide_id,
+                         xrange = xrange,
+                         yrange = yrange,
+                         ps = ps,
+                         bw = bw,
+                         dist_metric = dist_metric,
+                         .dist_metric_name = dist_metric_name)
+        prog()
+        
+        return(obj)
+      })
+  })
+  
+  ids <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
+  ids_orig_order <- unique(slide_id)
+  mltplx_objects <- mltplx_objects[order(match(ids,ids_orig_order))]
 
   if(!is.null(metadata)) {
     check_metadata(mltplx_objects,metadata)
@@ -203,16 +214,23 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
                                               .dist_metric_name = NULL) {
   slide_ids <- mltplx_experiment$slide_ids
   n_slides <- length(slide_ids)
-  mltplx_experiment$mltplx_objects <- map(mltplx_experiment$mltplx_objects,
-                                          \(obj,...) {
-                                            ProgressBar(which(obj$slide_id == slide_ids), n_slides)
-                                            add_QuantileDist(obj,...)
-                                            },
-                                          dist_metric,
-                                          mask_type,
-                                          q_probs,
-                                          .dist_metric_name)
-  ProgressBar(n_slides + 1, n_slides)
+  
+  mltplx_objects <- mltplx_experiment$mltplx_objects
+  
+  progressr::with_progress({
+    prog <- progressr::progressor(steps = n_slides)
+    mltplx_objects <- furrr::future_map(mltplx_objects, \(obj) {
+                                              obj <- add_QuantileDist(obj,
+                                                               dist_metric,
+                                                               mask_type,
+                                                               q_probs,
+                                                               .dist_metric_name)
+                                              prog()
+                                              return(obj)
+                                              })
+  })
+  
+  mltplx_experiment$mltplx_objects <- mltplx_objects
 
   mltplx_experiment
 }
