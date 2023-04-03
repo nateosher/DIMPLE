@@ -19,6 +19,7 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
                        sidebarPanel(
                          fileInput('file1', 'Choose .RDS containing MltplxExperiment',
                                    accept=c('.RDS')),
+
                          "Or push button to load the lung cancer data from the VectraPolarisData R package:",
                          tags$br(),
                          actionButton("exampledata", "Use lung cancer data"),

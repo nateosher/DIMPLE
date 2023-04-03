@@ -66,8 +66,8 @@ test_that("`typewise_boxplots` works", {
   # Slide S4 doesn't have any cells of type 2; so there should only be 19 rows
   expect_equal(nrow(plot_1$data), 19)
 
-  # But still 6 columns
-  expect_equal(ncol(plot_1$data), 6)
+  # But still 7 columns
+  expect_equal(ncol(plot_1$data), 7)
 
   expect_no_error({
     plot_2 = typewise_boxplots(exp, "X1", "X2", group_factor = "group", agg_fun = max)
@@ -95,7 +95,7 @@ test_that("`patient_boxplots` works", {
   })
 
   expect_equal(nrow(boxplots_1$data), 19)
-  expect_equal(ncol(boxplots_1$data), 15)
+  expect_equal(ncol(boxplots_1$data), 16)
   exp_no_meta = exp
   exp_no_meta$metadata = NULL
 
@@ -123,4 +123,19 @@ test_that("`plot_qdist` works", {
   expect_error({
     plot_qdist(exp, "S5", mode = "joel mode")
   }, "Mode must be either heatmap or network")
+})
+
+test_that("`plot_scatter_dist` works", {
+  expect_no_error({
+    scatter_1 = plot_scatter_dist(exp, "X1", "X2", cont_var = "age")
+  })
+  
+  expect_equal(nrow(scatter_1$data), 19)
+  expect_equal(ncol(scatter_1$data), 7)
+  exp_no_meta = exp
+  exp_no_meta$metadata = NULL
+  
+  expect_error({
+    plot_scatter_dist(exp_no_meta, "X1", "X2", cont_var = "age")
+  },"Patient metadata must exist")
 })
