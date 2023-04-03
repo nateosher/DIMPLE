@@ -134,7 +134,7 @@ dist_to_df.MltplxObject <- function(mltplx_object,
     if(reduce_symmetric) {
       mat[lower.tri(mat)] <- NA
     }
-  
+
    df <- mat %>%
     as.data.frame.table() %>%
     rename(type1=Var1,
@@ -193,6 +193,11 @@ qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
     warning(paste0("Multiplex object corresponding to slide id ", mltplx_object$slide_id," does not contain a quantile distance array."))
     tibble::tibble()
   }
+}
+
+#' @export
+plot.MltplxObject = function(mltplx_object, ...){
+  plot(mltplx_object$mltplx_image)
 }
 
 #' @export

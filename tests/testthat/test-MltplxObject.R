@@ -26,6 +26,11 @@ test_that("`MltplxObject` constructor works", {
     )
   })
 
+  # Plot function should work
+  expect_no_error({
+    plot(obj_1)
+  })
+
   print_output = capture.output(print(obj_1))
   expect_true(all(
     print_output ==
