@@ -93,6 +93,33 @@ print.MltplxObject = function(mltplx_object, ...){
 }
 
 #' @export
+plot_dist.MltplxObject <- function(mltplx_object, mode = "heatmap") {
+  if(mode == "heatmap") {
+    df <- mltplx_object %>%
+      dist_to_df() %>%
+      tidyr::drop_na(dist)
+
+    p <- df %>%
+      # dplyr::filter(slide_id == mltplx_object$slide_id) %>%
+      ggplot(aes(type1,type2,fill=dist)) +
+      geom_tile() +
+      anglex() +
+      viridis::scale_fill_viridis() +
+      xlab("") + ylab("") +
+      ggtitle(paste0("Distance matrix for slide id ", mltplx_object$slide_id))
+
+    print(p)
+  } else if(mode == "network") {
+    nms <- colnames(mltplx_object$mltplx_dist$dist)
+    qgraph::qgraph(mltplx_object$mltplx_dist$dist,layout = "circle",
+                   threshold=0.1,labels=nms,label.cex=2.5,
+                   label.scale.equal=T)
+  } else {
+    stop("Mode must be either heatmap or network")
+  }
+}
+
+#' @export
 update_object_intensity = function(mltplx_object, ps, bw){
   mltplx_object$mltplx_intensity = new_MltplxIntensity(
     mltplx_object$mltplx_image, ps, bw
@@ -134,7 +161,7 @@ dist_to_df.MltplxObject <- function(mltplx_object,
     if(reduce_symmetric) {
       mat[lower.tri(mat)] <- NA
     }
-  
+
    df <- mat %>%
     as.data.frame.table() %>%
     rename(type1=Var1,

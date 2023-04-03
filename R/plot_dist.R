@@ -7,7 +7,7 @@
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
-plot_dist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
+plot_dist.MltplxExperiment <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
   if(mode == "heatmap") {
     df <- mltplx_experiment %>%
       dist_to_df() %>%
@@ -19,7 +19,8 @@ plot_dist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
         ggplot(aes(type1,type2,fill=dist)) +
         geom_tile() +
         anglex() +
-        scale_fill_viridis() +
+        viridis::scale_fill_viridis() +
+        xlab("") + ylab("") +
         ggtitle(paste0("Distance matrix for slide id ", id))
       print(p)
     }
