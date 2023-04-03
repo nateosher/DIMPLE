@@ -7,7 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
-library(shiny);library(shinythemes)
+library(shiny);library(shinythemes);library(waiter)
 
 
 
