@@ -15,5 +15,8 @@ filter_exp = function(mltplx_experiment, id_list){
     filtered_exp$metadata = filtered_exp$metadata %>%
       dplyr::filter(slide_id %in% id_list)
   }
+  if(length(filtered_exp$mltplx_objects) == 0)
+    warning("resulting `MltplxExperiment` has no slides")
+
   return(filtered_exp)
 }

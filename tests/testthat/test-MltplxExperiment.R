@@ -260,6 +260,11 @@ test_that("`filter_exp` works", {
     filter_exp(exp[[1]], c("S2", "S3"))
   }, "`mltplx_experiment` argument must be of class `MltplxExperiment`")
 
+  # Filter such that no slides are included
+  expect_warning({
+    filter_exp(exp, c("NONEXISTANT ID"))
+  }, "resulting `MltplxExperiment` has no slides")
+
   # Filter to only the second and third slides
   expect_no_error({
     exp_subset = filter_exp(exp, c("S2", "S3"))
