@@ -31,11 +31,11 @@ create_ppp = function(X,Y,cell_types,keep_types="all",ranges=NULL) {
 
   filt = df %>%
     dplyr::filter(cell_types %in% keep_types) %>%
-    dplyr::mutate(cell_types = as.factor(cell_types))
+    dplyr::mutate(cell_types = factor(cell_types, levels = unique(cell_types)))
 
-  pat = spatstat.geom::ppp(filt$X,filt$Y,c(Xmin,Xmax),c(Ymin,Ymax))
-
-  spatstat.geom::marks(pat) <- filt$cell_types
+  pat = spatstat.geom::ppp(filt$X,filt$Y,
+                           marks = filt$cell_types,
+                           window = owin(c(Xmin,Xmax),c(Ymin,Ymax)))
 
   return(pat)
 }
