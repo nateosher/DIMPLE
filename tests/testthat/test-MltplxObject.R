@@ -122,6 +122,10 @@ test_that("`MltplxObject` constructor works", {
       c(3,3)
   ))
 
+  expect_no_error({
+    plot_dist(obj_3)
+  })
+
   expect_true(all(
     colnames(obj_3$mltplx_dist$dist) ==
       c("Immune", "Other", "Tumor")
