@@ -10,7 +10,8 @@ patient_boxplots(
   t1,
   t2,
   grouping_var = "Group",
-  p_val_col = "p.value"
+  p_val_col = "p.value",
+  mu0 = 0
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ patient_boxplots(
 group boxplots.}
 
 \item{p_val_col}{can be either "p.adj" or "p.value" to show stars above boxplots that are significantly different than zero}
+
+\item{mu0}{numeric, true value of the null hypothesis}
 }
 \value{
 ggplot2 plot
