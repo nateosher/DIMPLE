@@ -26,9 +26,9 @@ jsd = function(v1, v2, base = 2, normalize = TRUE){
 
   M = 0.5 * (v1_both + v2_both)
 
-  return(
+  return(sqrt(
     0.5 * (kld(v1_both, M, base = base) + kld(v2_both, M, base = base))
-  )
+  ))
 }
 
 jsd_checks = function(v1, v2){
