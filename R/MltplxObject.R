@@ -92,8 +92,16 @@ print.MltplxObject = function(mltplx_object, ...){
       "\n")
 }
 
+#' Plots distance matrix of `MltplxObject`, if one has been generated.
+#' @param mltplx_object Object of class `MltplxObject`
+#' @param mode String indicating plot type, either "heatmap" or "network"
+#' @return NULL
+#' @importFrom magrittr `%>%`
+#' @import ggplot2
 #' @export
 plot_dist.MltplxObject <- function(mltplx_object, mode = "heatmap") {
+  if(is.null(mltplx_object$mltplx_dist))
+    stop("no distance matrix has been generated for this `MltplxObject`; see `update_object_dist` function")
   if(mode == "heatmap") {
     df <- mltplx_object %>%
       dist_to_df() %>%
@@ -119,6 +127,14 @@ plot_dist.MltplxObject <- function(mltplx_object, mode = "heatmap") {
   }
 }
 
+#' Update the intensities generated for a specific `MltplxObject`
+#' @param mltplx_object object of class `MltplxObject` to be updated
+#' @param ps "Pixel size" of intensity estimations. Results in squares that are
+#' roughly `ps` by `ps` units.
+#' @param bw This determines the bandwidth of the
+#' smoothing of the values assigned to each square of the intensity
+#' estimations. Larger values result in "smoother" intensities, while smaller
+#' values result in "coarser" estimations.
 #' @export
 update_object_intensity = function(mltplx_object, ps, bw){
   mltplx_object$mltplx_intensity = new_MltplxIntensity(
@@ -127,6 +143,13 @@ update_object_intensity = function(mltplx_object, ps, bw){
   return(mltplx_object)
 }
 
+#' Update the distance matrices generated for a specific `MltplxObject`
+#' @param mltplx_object object of class `MltplxObject` to be updated
+#' @param dist_metric distance metric to be used; can be any function that takes
+#' in two vectors of the same length and produces a scalar
+#' @param .dist_metric_name Optional; you can use this argument to specify the
+#' name of the distance metric you use
+#' @export
 update_object_dist = function(mltplx_object, dist_metric,
                               .dist_metric_name = NULL){
   if(is.null(mltplx_object$mltplx_intensity))
