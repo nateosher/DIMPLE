@@ -40,7 +40,7 @@ test_that("jsd works", {
     jsd(seq(1, 10, by = 1) / sum(1:10),
         seq(10, 1, by = -1) / sum(1:10),
         base = exp(1)) -
-    0.151303372
+      0.388977341
     ) <= desired_precision
   )
 
@@ -49,7 +49,7 @@ test_that("jsd works", {
       jsd(seq(1, 100, by = 1) / sum(1:100),
           seq(100, 1, by = -1) / sum(1:100),
           base = exp(1)) -
-        0.188272596
+        0.43390390
     ) <= desired_precision
   )
 
