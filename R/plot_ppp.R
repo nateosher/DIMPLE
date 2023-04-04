@@ -11,6 +11,9 @@ plot_ppp <- function(mltplx_experiment,slide_ids) {
   objs <- filter_mltplx_objects(mltplx_experiment,slide_ids)
   pats <- lapply(objs,\(obj) obj$mltplx_image$ppp)
 
+  if(length(objs) == 0)
+    stop("ids not present in given `MltplxExperiment` object")
+
   df <- purrr::map_df(1:length(pats),\(i) {
     pat <- pats[[i]]
     slide_id <- slide_ids[[i]]

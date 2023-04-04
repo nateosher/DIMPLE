@@ -12,12 +12,12 @@
 #' @importFrom dplyr filter
 group_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group") {
   stopifnot("Patient metadata must exist"=!is.null(mltplx_experiment$metadata))
-  stopifnot("Patient metadata must contain grouping variable"= grouping_var %in% colnames(metadata))
+  stopifnot("Patient metadata must contain grouping variable"= grouping_var %in% colnames(mltplx_experiment$metadata))
 
   mltplx_experiment %>%
     dist_to_df %>%
     filter(type1 == t1,
-           type2 == t2) %>% 
+           type2 == t2) %>%
     ggplot(aes(!!sym(grouping_var),dist)) +
     geom_boxplot() +
     geom_jitter(color=cbfp[1]) +

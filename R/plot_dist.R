@@ -8,6 +8,10 @@
 #' @import ggplot2
 #' @export
 plot_dist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
+  experiment_ids = map_chr(mltplx_experiment$mltplx_objects, ~ .x$slide_id)
+  if(!any(slide_ids %in% experiment_ids))
+    stop("no slide ids passed as argument are present in `MlptlxExperiment` object")
+
   if(mode == "heatmap") {
     df <- mltplx_experiment %>%
       dist_to_df() %>%
@@ -19,7 +23,7 @@ plot_dist <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
         ggplot(aes(type1,type2,fill=dist)) +
         geom_tile() +
         anglex() +
-        scale_fill_viridis() +
+        viridis::scale_fill_viridis() +
         ggtitle(paste0("Distance matrix for slide id ", id))
       print(p)
     }
