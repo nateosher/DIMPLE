@@ -129,13 +129,68 @@ test_that("`plot_scatter_dist` works", {
   expect_no_error({
     scatter_1 = plot_scatter_dist(exp, "X1", "X2", cont_var = "age")
   })
-  
+
   expect_equal(nrow(scatter_1$data), 19)
   expect_equal(ncol(scatter_1$data), 7)
   exp_no_meta = exp
   exp_no_meta$metadata = NULL
-  
+
   expect_error({
     plot_scatter_dist(exp_no_meta, "X1", "X2", cont_var = "age")
   },"Patient metadata must exist")
+})
+
+test_that("`plot_ppp` works", {
+  expect_no_error({
+    plot_ppp(exp, paste0("S", 1:4))
+  })
+
+  expect_error({
+    plot_ppp(exp, "nonexistant")
+  }, "ids not present in given `MltplxExperiment` object")
+})
+
+test_that("`plot_dist.MltplxExperiment` works", {
+  expect_no_error({
+    plot_dist(exp, "S1")
+  })
+
+  expect_error({
+    plot_dist(exp, "nonexistant")
+  }, "no slide ids passed as argument are present in `MlptlxExperiment` object")
+})
+
+test_that("`plot_intensities` works", {
+  expect_no_error({
+    plot_intensities(exp, c("S1", "S2"), "X1")
+  })
+
+  expect_error({
+    plot_intensities(exp, c("S1", "S2"), "nonexistant")
+  }, "none of the cell types passed as arguments are present in subset of slides selected")
+
+  expect_error({
+    plot_intensities(exp, "nonexistant", "X1")
+  }, "none of the slide ids passed as arguments are present in `MltplxExperiment` object")
+
+})
+
+test_that("`group_boxplots` works", {
+  expect_no_error({
+    group_boxplots(exp, "X1", "X2", grouping_var = "group")
+  })
+
+  expect_error({
+    group_boxplots(exp %>% (\(x) {
+      x$metadata = NULL
+      x
+      }), "X1", "X2", grouping_var = "group")
+  }, "Patient metadata must exist")
+
+  expect_error({
+    group_boxplots(exp, "X1", "X2", grouping_var = "nonexistant")
+  }, "Patient metadata must contain grouping variable")
+
+
+
 })

@@ -1,15 +1,27 @@
 #' Plots intensities for selected cell types and selected slides of
 #' `MltplxExperiment` object.
 #' @param mltplx_experiment `MltplxExperiment` object
-#' @param types Vector of cell types whose intensities you'd like to plot
 #' @param slide_ids Vector of slide ids for which you would like to plot
 #' the selected cell intensities.
+#' @param types Vector of cell types whose intensities you'd like to plot
 #' @return NULL
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
-plot_intensities <- function(mltplx_experiment,types,slide_ids) {
+plot_intensities <- function(mltplx_experiment,slide_ids,types) {
   objs <- filter_mltplx_objects(mltplx_experiment,slide_ids)
+
+  all_cell_types = map(objs, ~ .x$mltplx_image$cell_types) %>%
+    unlist() %>%
+    unique()
+
+  all_slide_ids = map_chr(objs, ~ .x$slide_id)
+
+  if(!any(slide_ids %in% all_slide_ids))
+    stop("none of the slide ids passed as arguments are present in `MltplxExperiment` object")
+
+  if(!any(types %in% all_cell_types))
+    stop("none of the cell types passed as arguments are present in subset of slides selected")
 
   df <- purrr::map_df(1:length(objs),\(i) {
     obj <- objs[[i]]
@@ -30,7 +42,7 @@ plot_intensities <- function(mltplx_experiment,types,slide_ids) {
       ggplot(aes(X,Y,fill=intensity)) +
       geom_tile() +
       facet_wrap(~type) +
-      scale_fill_viridis() +
+      viridis::scale_fill_viridis() +
       ggtitle(paste0("Intensity plot for slide id ", id)) -> p
     print(p)
   }
