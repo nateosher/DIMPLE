@@ -156,7 +156,7 @@ test_that("`add_QuantileDist` handles missing types", {
 })
 
 test_that("Window size parameter works", {
-  
+
   data <- data.frame(slide_id = slide_ids,
                      X = cell_x_values,
                      Y = cell_y_values)
@@ -166,32 +166,32 @@ test_that("Window size parameter works", {
               max_x = max(X) + 20,
               min_y = min(Y) - 30,
               max_y = max(Y) + 10)
-  
+
   # no error
   mltplx_exp <- new_MltplxExperiment(x = cell_x_values,
                                    y = cell_y_values,
                                    window_sizes = window_sizes,
                                    marks = factor(cell_marks),
                                    slide_id = slide_ids)
-  
+
   # check window sizes are correct
   lapply(mltplx_exp$mltplx_objects,\(obj) {
     ppp <- obj$mltplx_image$ppp
     W <- ppp$window
-    
+
     all(min(ppp$x) - 50 == W$xrange[1],
         max(ppp$x) + 20 == W$xrange[2],
         min(ppp$y) - 30 == W$yrange[1],
         max(ppp$y) + 10 == W$yrange[2])
   }) %>%
     unlist() -> chk
-  
+
   expect_true(all(chk))
 
   # mis-named columns
   window_sizes2 <- rename(window_sizes, max_X = max_x)
-  
-  
+
+
   expect_error({
     mltplx_exp <- new_MltplxExperiment(x = cell_x_values,
                                      y = cell_y_values,
@@ -199,11 +199,11 @@ test_that("Window size parameter works", {
                                      marks = factor(cell_marks),
                                      slide_id = slide_ids)
   })
-  
+
   # window sizes are too small
   window_sizes3 <- mutate(window_sizes,
                          max_x = max_x - 25)
-  
+
   expect_error({
     mltplx_exp <- new_MltplxExperiment(x = cell_x_values,
                                        y = cell_y_values,
@@ -211,27 +211,27 @@ test_that("Window size parameter works", {
                                        marks = factor(cell_marks),
                                        slide_id = slide_ids)
   })
-  
+
   # no error, no window_sizes given
   mltplx_exp <- new_MltplxExperiment(x = cell_x_values,
                                      y = cell_y_values,
                                      marks = factor(cell_marks),
                                      slide_id = slide_ids)
-  
+
   # check window sizes are correct
   lapply(mltplx_exp$mltplx_objects,\(obj) {
     ppp <- obj$mltplx_image$ppp
     W <- ppp$window
-    
+
     all(min(ppp$x) == W$xrange[1],
         max(ppp$x) == W$xrange[2],
         min(ppp$y) == W$yrange[1],
         max(ppp$y) == W$yrange[2])
   }) %>%
     unlist() -> chk
-  
+
   expect_true(all(chk))
-  
+
   })
 
 test_that("Factor levels are alphabetical in dist_to_df", {
@@ -245,6 +245,36 @@ test_that("Factor levels are alphabetical in dist_to_df", {
                              slide_id = slide_ids,
                              ps = 30, bw = 40,dist_metric = cor)
   df <- suppressWarnings(dist_to_df(exp,reduce_symmetric = TRUE))
-  
+
   expect_equal(levels(df$type1),sort(levels(df$type1)))
+})
+
+test_that("`filter_exp` works", {
+  exp <- build_mltplx_exp(200, n_slides = 20, seed=2025)
+  exp <- add_mltplx_metadata(exp,n_patients=10)
+  exp <- update_intensity(exp,ps=2,bw=3)
+  exp <- update_dist(exp,cor)
+
+  # Try passing a non-MltplxExperiment Object
+  expect_error({
+    filter_exp(exp[[1]], c("S2", "S3"))
+  }, "`mltplx_experiment` argument must be of class `MltplxExperiment`")
+
+  # Filter such that no slides are included
+  expect_warning({
+    filter_exp(exp, c("NONEXISTANT ID"))
+  }, "resulting `MltplxExperiment` has no slides")
+
+  # Filter to only the second and third slides
+  expect_no_error({
+    exp_subset = filter_exp(exp, c("S2", "S3"))
+  })
+
+  expect_equal(length(exp_subset$mltplx_objects), 2)
+  expect_equal(nrow(exp_subset$metadata), 2)
+  expect_equal(ncol(exp_subset$metadata), 4)
+  expect_true(all(
+    exp_subset$metadata$slide_id %in% c("S2", "S3")
+  ))
+
 })
