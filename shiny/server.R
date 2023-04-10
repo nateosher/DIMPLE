@@ -116,7 +116,7 @@ function(input, output, session) {
     req(experiment1())
     req(input$slide_ids_to_plot)
     req(input$cell_types_to_plot)
-    plot_intensities(experiment(),input$cell_types_to_plot,input$slide_ids_to_plot)
+    plot_intensities(experiment(),types=input$cell_types_to_plot,slide_ids=input$slide_ids_to_plot)
   })
   
   output$dm_plot <- renderPlot({ 
