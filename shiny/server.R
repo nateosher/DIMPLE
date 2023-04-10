@@ -119,7 +119,7 @@ function(input, output, session) {
     req(experiment())
     req(experiment()$metadata)
     req(input$group_factor)
-    lmdist<-lm_dist(experiment(),input$group_factor,agg_fun = agg_list[[input$agg]],covariates = input$covariates)
+    lmdist<-lm_dist(experiment(),input$group_factor,agg_fun = agg_list[[input$agg]],covariates = input$covariates,adjust_counts = input$adjust_counts)
     
     plot_pairwise_group_heatmap(lmdist,p_val_col = "p.adj")
   })

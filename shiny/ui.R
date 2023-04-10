@@ -51,7 +51,8 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
                          
                          selectInput("group_factor","Select grouping factor","",selected="",multiple=F),
                          selectInput("covariates","Select covariates to adjust for","",selected="",multiple=T),
-                         selectInput("agg","Select aggregating function",c("median","mean","max","min"),selected="",multiple=F)
+                         selectInput("agg","Select aggregating function",c("median","mean","max","min"),selected="",multiple=F),
+                         selectInput("adjust_counts","Adjust for cell type counts",c("TRUE","FALSE"),selected="",multiple=F)
                        ),
                        mainPanel(
                          plotOutput('pairwise_group_heat')
