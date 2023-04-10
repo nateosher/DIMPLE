@@ -25,7 +25,7 @@ plot_quantile_mask <- function(mltplx_experiment,mask_type,q_probs,slide_ids) {
        ){
       joined_q<- obj$quantile_dist$xy_qfac
       joined_q$slide_id<-obj$slide_id
-      joined_q
+      joined_q%>%full_join(obj$quantile_dist$quantiles,by="q_fac")
     }else{
       intensities<-obj$mltplx_intensity$intensities%>%
         as.data.frame()
