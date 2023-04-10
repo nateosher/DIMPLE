@@ -39,7 +39,6 @@ function(input, output, session) {
     return(exp)
   })
   
-<<<<<<< HEAD
   # read in .rds file   
   # experiment <- reactive({ 
   #   req(input$file1) 
