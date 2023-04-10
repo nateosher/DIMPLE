@@ -25,7 +25,7 @@ function(input, output, session) {
       exp <- readRDS(inFile$datapath)
     }else{
       req(input$exampledata)
-      exp<-readRDS("lung_experiment_10_10_jsd.RDS")
+      exp<-readRDS("lung_experiment_10_30_jsd_qdist.RDS")
     }
   
     updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
@@ -33,60 +33,11 @@ function(input, output, session) {
     updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
     
     if(!is.null(exp$metadata)){
-      updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
+      updateSelectInput(session, inputId = 'group_factor', label = 'Select covariate to test', choices = names(exp$metadata), selected = "")
       updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
     }
     return(exp)
   })
-  
-  # read in .rds file   
-  # experiment <- reactive({ 
-  #   req(input$file1) 
-  #   
-  #   inFile <- input$file1 
-  #   
-  #   exp <- readRDS(inFile$datapath)
-  #   
-  #   updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
-  #   updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-  #   updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-  #   
-  #   if(!is.null(exp$metadata)){
-  #     updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
-  #     updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
-  #   }
-  #   
-  #   
-  #   return(exp)
-  # })
-  
-
-  
-  # experiment<-eventReactive(input$exampledata1,{
-  #   exp<-readRDS("CRC_example_jsd_10_30.RDS")
-  #   updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
-  #   updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-  #   updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-  # 
-  #   if(!is.null(exp$metadata)){
-  #     updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
-  #     updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
-  #   }
-  #   return(exp)
-  # })
-  
-  # experiment<-eventReactive(input$exampledata1,{
-  #   exp<-readRDS("CRC_example_jsd_10_30.RDS")
-  #   updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
-  #   updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-  #   updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-  # 
-  #   if(!is.null(exp$metadata)){
-  #     updateSelectInput(session, inputId = 'group_factor', label = 'Select grouping factor', choices = names(exp$metadata), selected = "")
-  #     updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
-  #   }
-  #   return(exp)
-  # })
   
   # plot the message  
   output$contents <- renderPrint({ 
@@ -97,7 +48,15 @@ function(input, output, session) {
   output$ppplot <- renderPlot({ 
     req(experiment())
     req(input$slide_ids_to_plot)
-    p<-plot_ppp(experiment(),input$slide_ids_to_plot)
+    if(input$y_n_quantile_mask=="Y"){
+      req(experiment1())
+      req(input$slide_ids_to_plot)
+        qdist1<-filter_mltplx_objects(experiment(),input$slide_ids_to_plot)[[1]]$quantile_dist
+        p<-plot_quantile_mask(experiment(),qdist1$mask_type,cbind.data.frame(from=c(qdist1$quantiles[,3]),to=c(qdist1$quantiles[,4])),input$slide_ids_to_plot) 
+    }else{
+      p<-plot_ppp(experiment(),input$slide_ids_to_plot)
+    }
+
     print(p)
   })
   
@@ -106,9 +65,10 @@ function(input, output, session) {
     req(input$slide_ids_to_plot)
     experiment<-experiment()
     exp1<-filter_mltplx_objects(experiment,input$slide_ids_to_plot)
-    updateSelectInput(session, inputId = 'cell_types_to_plot', label = 'Select cell types', choices = unique(unlist(lapply(lapply(exp1,'[[',3),'[[',2))), selected = "")
+    updateSelectInput(session, inputId = 'cell_types_to_plot', label = 'Select cell types to plot intensities', choices = unique(unlist(lapply(lapply(exp1,'[[',3),'[[',2))), selected = "")
     return(experiment)
   })
+  
   
   #intensity plot  
   #only make available cell types that are in the selected image
@@ -125,6 +85,7 @@ function(input, output, session) {
     plot_dist(experiment(),input$slide_ids_to_plot,mode=input$dm_plot_mode)
   })
   
+
   agg_list<-list(mean,median,max,min)
   names(agg_list)<-c("mean","median","max","min")
   
@@ -132,25 +93,49 @@ function(input, output, session) {
     req(experiment())
     req(experiment()$metadata)
     req(input$group_factor)
-    lmdist<-lm_dist(experiment(),input$group_factor,agg_fun = agg_list[[input$agg]],covariates = input$covariates,adjust_counts = input$adjust_counts)
+    req(input$var_type)
+    if(input$var_type=="continuous"){
+      exp<-experiment()
+      exp$metadata<-exp$metadata%>% 
+        mutate(across(!!sym(input$group_factor),as.numeric))
+    }else{
+      exp<-experiment()
+      exp$metadata<-exp$metadata%>% 
+        mutate(across(!!sym(input$group_factor),as.factor))
+    }
+    
+    if(input$strat_qdist=="Y"){
+      lmdist<-lm_qdist(exp,input$group_factor,interval=NULL,agg_fun = agg_list[[input$agg]],covariates = input$covariates)
+      
+    }else{
+      lmdist<-lm_dist(exp,input$group_factor,agg_fun = agg_list[[input$agg]],covariates = input$covariates,adjust_counts = input$adjust_counts)
+      
+      
+    }
     
     plot_pairwise_group_heatmap(lmdist,p_val_col = "p.adj")
   })
   
-  output$boxplot <- renderPlot({ 
+  # output$boxplot <- renderPlot({ 
+  #   req(experiment())
+  #   req(input$cell_types1)
+  #   req(input$cell_types2)
+  #   patient_boxplots(experiment(),input$cell_types1,input$cell_types2,grouping_var=input$group_factor)
+  # })
+  
+  output$group_boxplot_or_cont <- renderPlot({ 
     req(experiment())
     req(input$cell_types1)
     req(input$cell_types2)
-    patient_boxplots(experiment(),input$cell_types1,input$cell_types2,grouping_var=input$group_factor)
+    if(input$var_type=="categorical"){
+      typewise_boxplots(experiment(),input$cell_types1,input$cell_types2,group_factor=input$group_factor)
+    }else{
+      plot_scatter_dist(experiment(),input$cell_types1,input$cell_types2,cont_var=input$group_factor,agg_fun=NULL,smooth="loess")
+    }
+    
   })
   
-  output$group_boxplot <- renderPlot({ 
-    req(experiment())
-    req(input$cell_types1)
-    req(input$cell_types2)
-    typewise_boxplots(experiment(),input$cell_types1,input$cell_types2,group_factor=input$group_factor)
-  })
-  
+
   
   # metadata <- reactive({ 
   #   req(input$file2) 

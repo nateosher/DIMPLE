@@ -30,8 +30,8 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
                          tableOutput('contents'),
                          tags$br(),
                          selectInput("slide_ids_to_plot","Select slide id to plot","",selected="",multiple=F),
+                         selectInput("y_n_quantile_mask","Plot quantile mask?",c("Y","N"),selected="N",multiple=F),
                          tags$br(),
-                         "Select cell types to see their intensity plots",
                          selectInput("cell_types_to_plot","Select cell types to plot intensities","",selected="",multiple=T),
                          tags$br(),
                          selectInput("dm_plot_mode","Select mode for distance matrix plot",c("heatmap","network"),selected="",multiple=F)
@@ -40,16 +40,18 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
                        mainPanel(
                          plotOutput('ppplot'),
                          plotOutput('intensity_plot'),
-                         plotOutput('dm_plot')
+                         plotOutput('dm_plot'),
+                         #plotOutput('quantile_mask')
 
                        )
                      )
             ),
             tabPanel("Visualize Multiplex Experiment",
                      sidebarLayout(
-                       sidebarPanel( "Test each pairwise distance for association with a grouping factor from the patient metadata",
-                         
-                         selectInput("group_factor","Select grouping factor","",selected="",multiple=F),
+                       sidebarPanel( "Test each pairwise distance for association with a patient-level covatiate from the patient metadata",
+                         selectInput("strat_qdist","Stratefied by quantiles?",c("Y","N"),selected="N",multiple=F),
+                         selectInput("group_factor","Select covariate to test","",selected="",multiple=F),
+                         selectInput("var_type","Select type of variable",c("continous","categorical"),multiple=F),
                          selectInput("covariates","Select covariates to adjust for","",selected="",multiple=T),
                          selectInput("agg","Select aggregating function",c("median","mean","max","min"),selected="",multiple=F),
                          selectInput("adjust_counts","Adjust for cell type counts",c("TRUE","FALSE"),selected="",multiple=F)
@@ -64,9 +66,9 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
                          selectInput("cell_types2","Select cell type 2","",selected="",multiple=F)
                        ),
                        mainPanel(
-                         
-                         plotOutput('boxplot'),
-                         plotOutput('group_boxplot')
+                        
+                         #plotOutput('boxplot'),
+                         plotOutput('group_boxplot_or_cont')
                          
                        )
                      )
