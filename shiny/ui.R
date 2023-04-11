@@ -34,8 +34,8 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
                          tags$br(),
                          selectInput("cell_types_to_plot","Select cell types to plot intensities","",selected="",multiple=T),
                          tags$br(),
-                         selectInput("dm_plot_mode","Select mode for distance matrix plot",c("heatmap","network"),selected="",multiple=F)
-                         
+                         selectInput("dm_plot_mode","Select mode for distance matrix plot",c("heatmap","network"),selected="",multiple=F),
+                         selectInput("y_n_qdist","Plot distances stratified by quantile?",c("Y","N"),selected="N",multiple=F)
                        ),
                        mainPanel(
                          plotOutput('ppplot'),

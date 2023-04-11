@@ -82,7 +82,13 @@ function(input, output, session) {
   output$dm_plot <- renderPlot({ 
     req(experiment())
     req(input$slide_ids_to_plot)
-    plot_dist(experiment(),input$slide_ids_to_plot,mode=input$dm_plot_mode)
+    req(input$y_n_qdist)
+    if(input$y_n_qdist=="Y"){
+      plot_qdist(experiment(),input$slide_ids_to_plot,mode=input$dm_plot_mode)
+    }else{
+      plot_dist(experiment(),input$slide_ids_to_plot,mode=input$dm_plot_mode)
+    }
+    
   })
   
 
