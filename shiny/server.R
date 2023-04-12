@@ -134,23 +134,15 @@ function(input, output, session) {
   pairwise_group_heat<-function(){
     req(experiment())
     req(experiment()$metadata)
-    req(input$group_factor)
     req(input$var_type)
-    if(input$var_type=="continuous"){
-      exp<-experiment()
-      exp$metadata<-exp$metadata%>% 
-        mutate(across(!!sym(input$group_factor),as.numeric))
-    }else{
-      exp<-experiment()
-      exp$metadata<-exp$metadata%>% 
-        mutate(across(!!sym(input$group_factor),as.factor))
-    }
     
     #if(input$strat_qdist=="Y"){
     #  lmdist<-lm_qdist(exp,input$group_factor,interval=NULL,agg_fun = agg_list[[input$agg]],covariates = input$covariates)
     
     #}else{
-    lmdist<-lm_dist(exp,input$group_factor,agg_fun = agg_list[[input$agg]],covariates = input$covariates,adjust_counts = input$adjust_counts)
+    adjust<-ifelse(input$adjust_counts=="Yes",TRUE,FALSE)
+    
+    lmdist<-lm_dist(experiment(),input$group_factor,agg_fun = agg_list[[input$agg]],covariates = input$covariates,adjust_counts = adjust)
     
     
     #  }
