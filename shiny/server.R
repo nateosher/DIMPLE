@@ -45,19 +45,22 @@ function(input, output, session) {
   })
   
   #point pattern plot 
-  output$ppplot <- renderPlot({ 
+  ppplot<-function(){
     req(experiment())
     req(input$slide_ids_to_plot)
     if(input$y_n_quantile_mask=="Y"){
       req(experiment1())
       req(input$slide_ids_to_plot)
-        qdist1<-filter_mltplx_objects(experiment(),input$slide_ids_to_plot)[[1]]$quantile_dist
-        p<-plot_quantile_mask(experiment(),qdist1$mask_type,cbind.data.frame(from=c(qdist1$quantiles[,3]),to=c(qdist1$quantiles[,4])),input$slide_ids_to_plot) 
+      qdist1<-filter_mltplx_objects(experiment(),input$slide_ids_to_plot)[[1]]$quantile_dist
+      p<-plot_quantile_mask(experiment(),qdist1$mask_type,cbind.data.frame(from=c(qdist1$quantiles[,3]),to=c(qdist1$quantiles[,4])),input$slide_ids_to_plot) 
     }else{
       p<-plot_ppp(experiment(),input$slide_ids_to_plot)
     }
-
-    print(p)
+    p
+  }
+  
+  output$ppplot <- renderPlot({ 
+    ppplot()
   })
   
   experiment1 <- reactive({ 
@@ -72,14 +75,17 @@ function(input, output, session) {
   
   #intensity plot  
   #only make available cell types that are in the selected image
-  output$intensity_plot <- renderPlot({ 
-    req(experiment1())
+  intensity_plot<-function(){req(experiment1())
     req(input$slide_ids_to_plot)
     req(input$cell_types_to_plot)
     plot_intensities(experiment(),types=input$cell_types_to_plot,slide_ids=input$slide_ids_to_plot)
-  })
+  }
   
-  output$dm_plot <- renderPlot({ 
+  output$intensity_plot <- renderPlot({ 
+    intensity_plot()
+ })
+  
+  dm_plot<-function(){
     req(experiment())
     req(input$slide_ids_to_plot)
     req(input$y_n_qdist)
@@ -88,39 +94,76 @@ function(input, output, session) {
     }else{
       plot_dist(experiment(),input$slide_ids_to_plot,mode=input$dm_plot_mode)
     }
-    
+  }
+  
+  output$dm_plot <- renderPlot({ 
+
+    dm_plot()
   })
   
+  
+  output$save_pp <- downloadHandler(
+    #filename="save.png",
+    filename = "ppplot.pdf" , # variable with filename
+    content = function(file) {
+      #ggsave(ppplot(), filename = file)
+    
+     ggsave(file,plot=ppplot()) 
+    
+    })
+  
+  output$save_int <- downloadHandler(
+    #filename="save.png",
+    filename = "intensities.pdf" , # variable with filename
+    content = function(file) {
+      #ggsave(ppplot(), filename = file)
+      ggsave(file,plot=intensity_plot())
+    })
+  
+  output$save_dm <- downloadHandler(
+    #filename="save.png",
+    filename = "dm.pdf" , # variable with filename
+    content = function(file) {
+      #ggsave(ppplot(), filename = file)
+      ggsave(file,plot=dm_plot())
+    })
 
   agg_list<-list(mean,median,max,min)
   names(agg_list)<-c("mean","median","max","min")
   
-  output$pairwise_group_heat <- renderPlot({ 
+  pairwise_group_heat<-function(){
     req(experiment())
     req(experiment()$metadata)
-    req(input$group_factor)
     req(input$var_type)
-    if(input$var_type=="continuous"){
-      exp<-experiment()
-      exp$metadata<-exp$metadata%>% 
-        mutate(across(!!sym(input$group_factor),as.numeric))
-    }else{
-      exp<-experiment()
-      exp$metadata<-exp$metadata%>% 
-        mutate(across(!!sym(input$group_factor),as.factor))
-    }
     
     #if(input$strat_qdist=="Y"){
     #  lmdist<-lm_qdist(exp,input$group_factor,interval=NULL,agg_fun = agg_list[[input$agg]],covariates = input$covariates)
-      
+    
     #}else{
-      lmdist<-lm_dist(exp,input$group_factor,agg_fun = agg_list[[input$agg]],covariates = input$covariates,adjust_counts = input$adjust_counts)
-      
-      
-  #  }
+    adjust<-ifelse(input$adjust_counts=="Yes",TRUE,FALSE)
+    
+    lmdist<-lm_dist(experiment(),input$group_factor,agg_fun = agg_list[[input$agg]],covariates = input$covariates,adjust_counts = adjust)
+    
+    
+    #  }
     
     plot_pairwise_group_heatmap(lmdist,p_val_col = "p.adj")
+  }
+  
+  output$pairwise_group_heat <- renderPlot({ 
+    pairwise_group_heat()
   })
+  
+  output$save_heat <- downloadHandler(
+    #filename="save.png",
+    filename = "heatmap.pdf" , # variable with filename
+    content = function(file) {
+      #ggsave(ppplot(), filename = file)
+      #png(file)
+      ggsave(file,plot=pairwise_group_heat())
+      #dev.off()
+    })
+
   
   # output$boxplot <- renderPlot({ 
   #   req(experiment())
@@ -129,7 +172,7 @@ function(input, output, session) {
   #   patient_boxplots(experiment(),input$cell_types1,input$cell_types2,grouping_var=input$group_factor)
   # })
   
-  output$group_boxplot_or_cont <- renderPlot({ 
+  group_boxplot_or_cont<-function(){
     req(experiment())
     req(input$cell_types1)
     req(input$cell_types2)
@@ -139,9 +182,21 @@ function(input, output, session) {
       plot_scatter_dist(experiment(),input$cell_types1,input$cell_types2,cont_var=input$group_factor,agg_fun=NULL,smooth="loess")
     }
     
-  })
-
+  }
   
+  output$group_boxplot_or_cont <- renderPlot({ 
+    group_boxplot_or_cont()
+  })
+  
+  
+  output$save_scatter <- downloadHandler(
+    #filename="save.png",
+    filename = "scatter.pdf" , # variable with filename
+    content = function(file) {
+      #ggsave(ppplot(), filename = file)
+      ggsave(file,plot=group_boxplot_or_cont())
+    })
+
 }
 
 
