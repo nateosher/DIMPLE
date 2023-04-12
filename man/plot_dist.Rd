@@ -4,7 +4,7 @@
 \alias{plot_dist}
 \title{Plots distance matrices for selected slides in a \code{MltplxExperiment} object}
 \usage{
-plot_dist(mltplx_experiment, slide_ids, mode = "heatmap")
+plot_dist(mltplx_experiment, slide_ids, mode = "heatmap", net_threshold = 0.1)
 }
 \arguments{
 \item{mltplx_experiment}{\code{MltplxExperiment} objects}
@@ -13,6 +13,9 @@ plot_dist(mltplx_experiment, slide_ids, mode = "heatmap")
 to print}
 
 \item{mode}{String indicating plot type, either "heatmap" or "network"}
+
+\item{net_threshold}{When mode is "network", edges below this absolute value are
+excluded from the plot}
 }
 \description{
 Plots distance matrices for selected slides in a \code{MltplxExperiment} object
