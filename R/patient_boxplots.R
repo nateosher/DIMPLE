@@ -43,7 +43,7 @@ patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",p_val_
   df %>%
     mutate(across(gp,factor) ) %>%
     mutate(gp_bin = as.numeric(gp)) %>%
-    mutate(patient_id= fct_reorder(patient_id,gp_bin)) %>%
+    mutate(patient_id= reorder(patient_id,gp_bin)) %>%
     ggplot2::ggplot(.,aes(x=patient_id,y=dist,fill=gp)) +
     ggplot2::geom_boxplot() +
     ggplot2::geom_text(aes(label=ifelse(!!sym(p_val_col) < 0.05,"*","")), size = 20 / .pt, y = max(df$dist)) +
