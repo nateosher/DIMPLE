@@ -278,3 +278,31 @@ test_that("`filter_exp` works", {
   ))
 
 })
+
+test_that("`as_tibble` works", {
+  exp <- build_mltplx_exp(200, n_slides = 20, seed=2025)
+  expect_error({
+    as_tibble(exp)
+  }, "no metadata attached and no distance matrices generated")
+
+  exp <- add_mltplx_metadata(exp,n_patients=10)
+
+  expect_warning({
+    as_tibble(exp)
+  }, "no distance matrices generated; returning metadata")
+
+
+  exp <- update_intensity(exp,ps=2,bw=3)
+  exp <- update_dist(exp,cor)
+
+  expect_no_error({
+    exp_tib = as_tibble(exp)
+  })
+
+  expect_equal(nrow(exp_tib), 20)
+  expect_equal(ncol(exp_tib), 7)
+  expect_equal(colnames(exp_tib)[5], "X1~X2")
+  expect_equal(colnames(exp_tib)[6], "X1~X3")
+  expect_equal(colnames(exp_tib)[7], "X2~X3")
+
+})
