@@ -121,7 +121,8 @@ plot_dist.MltplxObject <- function(mltplx_object, mode = "heatmap") {
     nms <- colnames(mltplx_object$mltplx_dist$dist)
     qgraph::qgraph(mltplx_object$mltplx_dist$dist,layout = "circle",
                    threshold=0.1,labels=nms,label.cex=2.5,
-                   label.scale.equal=T)
+                   label.scale.equal=T,
+                   title = paste0("Distance network for slide id ", mltplx_object$slide_id))
   } else {
     stop("Mode must be either heatmap or network")
   }

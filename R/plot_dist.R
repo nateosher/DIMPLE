@@ -8,29 +8,8 @@
 #' @import ggplot2
 #' @export
 plot_dist.MltplxExperiment <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
-  if(mode == "heatmap") {
-    df <- mltplx_experiment %>%
-      dist_to_df() %>%
-      tidyr::drop_na(dist)
-
-    for(id in slide_ids) {
-      p <- df %>%
-        dplyr::filter(slide_id == id) %>%
-        ggplot(aes(type1,type2,fill=dist)) +
-        geom_tile() +
-        anglex() +
-        viridis::scale_fill_viridis() +
-        xlab("") + ylab("") +
-        ggtitle(paste0("Distance matrix for slide id ", id))
-      print(p)
-    }
-  } else if(mode == "network") {
     filtered_exp <- filter_mltplx_objects(mltplx_experiment,slide_ids)
     for(mltplx_object in filtered_exp) {
-      nms <- colnames(mltplx_object$mltplx_dist$dist)
-      qgraph::qgraph(mltplx_object$mltplx_dist$dist,layout = "circle",threshold=0.1,labels=nms,label.cex=2.5,label.scale.equal=T)
+      plot_dist(mltplx_object, mode = mode)
     }
-  } else {
-    stop("Mode must be either heatmap or network")
-  }
 }
