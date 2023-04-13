@@ -27,20 +27,22 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
                          "A summary of the data will appear below once the data is loaded:",
                          tags$br(),
                          #actionButton("exampledata1", "Use example CRC data"),
-                         tableOutput('contents'),
+                         
+                         #tableOutput('contents'),
+                         span(tableOutput("contents"), style="color:green"),
                          tags$br(),
                          selectInput("slide_ids_to_plot","Select slide id to plot","",selected="",multiple=F),
                          selectInput("y_n_quantile_mask","Plot quantile mask?",c("Y","N"),selected="N",multiple=F),
                          tags$br(),
                          selectInput("cell_types_to_plot","Select cell types to plot intensities","",selected="",multiple=T),
                          tags$br(),
-                         selectInput("dm_plot_mode","Select mode for distance matrix plot",c("heatmap","network"),selected="",multiple=F)
-                         
-                       ),
+                         selectInput("dm_plot_mode","Select mode for distance matrix plot",c("heatmap","network"),selected="",multiple=F),
+                         selectInput("y_n_qdist","Plot distances stratified by quantile?",c("Y","N"),selected="N",multiple=F)
+                         ),
                        mainPanel(
-                         plotOutput('ppplot'),
-                         plotOutput('intensity_plot'),
-                         plotOutput('dm_plot'),
+                         plotOutput('ppplot'),downloadButton("save_pp", "download plot"),
+                         plotOutput('intensity_plot'),downloadButton("save_int", "download plot"),
+                         plotOutput('dm_plot'),downloadButton("save_dm", "download plot")
                          #plotOutput('quantile_mask')
 
                        )
@@ -54,10 +56,10 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
                          selectInput("var_type","Select type of variable",c("continous","categorical"),multiple=F),
                          selectInput("covariates","Select covariates to adjust for","",selected="",multiple=T),
                          selectInput("agg","Select aggregating function",c("median","mean","max","min"),selected="",multiple=F),
-                         selectInput("adjust_counts","Adjust for cell type counts",c("TRUE","FALSE"),selected="",multiple=F)
+                         selectInput("adjust_counts","Adjust for cell type counts",c("Yes","No"),selected="",multiple=F)
                        ),
                        mainPanel(
-                         plotOutput('pairwise_group_heat')
+                         plotOutput('pairwise_group_heat'),downloadButton("save_heat", "download plot")
                        ),
                      ),
                      sidebarLayout(
@@ -68,7 +70,7 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
                        mainPanel(
                         
                          #plotOutput('boxplot'),
-                         plotOutput('group_boxplot_or_cont')
+                         plotOutput('group_boxplot_or_cont'),downloadButton("save_scatter", "download plot")
                          
                        )
                      )

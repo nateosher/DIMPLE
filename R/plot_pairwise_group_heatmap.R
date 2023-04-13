@@ -18,7 +18,7 @@ plot_pairwise_group_heatmap <- function(df,p_val_col = "p.adj",limits=NULL) {
     scale_x_discrete(drop = FALSE) +
     scale_y_discrete(drop = FALSE) +
         if(!is.null(limits)){
-          viridis::scale_fill_viridis(
+          scale_fill_gradient2(
             label = function(z) replace(z, c(1, length(z)),
                                         c(paste0("Lesser in ",group_name, " \u2193"),
                                           paste0("Greater in ", group_name, " \u2191"))),
@@ -27,7 +27,7 @@ plot_pairwise_group_heatmap <- function(df,p_val_col = "p.adj",limits=NULL) {
                           length.out=5)),
             limits = c(limits[1],limits[2]) )
         }else{
-          viridis::scale_fill_viridis(
+          scale_fill_gradient2(
             label = function(z) replace(z, c(1, length(z)),
                                         c(paste0("Lesser in ",group_name, " \u2193"),
                                           paste0("Greater in ", group_name, " \u2191"))),
