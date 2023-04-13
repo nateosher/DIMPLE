@@ -2,7 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-DistDist.Rproj
+*.Rproj
 cran-comments.md
 inst/doc
 scratch
