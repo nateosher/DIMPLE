@@ -36,10 +36,10 @@ test_that("`MltplxDist` constructor works", {
     c("MltplxDist object with 3 cell types",
       "Distance metric: jsd ",
       "",
-      "           Immune      Other      Tumor",
-      "Immune         NA 0.08881169 0.08352748",
-      "Other  0.08881169         NA 0.08874943",
-      "Tumor  0.08352748 0.08874943         NA"
+      "          Immune     Other     Tumor",
+      "Immune        NA 0.2980129 0.2890112",
+      "Other  0.2980129        NA 0.2979084",
+      "Tumor  0.2890112 0.2979084        NA"
       )
   ))
 

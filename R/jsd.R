@@ -9,26 +9,17 @@
 jsd = function(v1, v2, base = 2, normalize = TRUE){
   jsd_checks(v1, v2)
 
-  non_zero_both = which(v1 > 0 & v2 > 0)
-
-  if(length(non_zero_both) == 0)
-    stop(paste("vectors have no common entries with nonzero values-",
-               "JSD cannot be computed"))
-
-  v1_both = v1[non_zero_both]
-  v2_both = v2[non_zero_both]
-
 
   if(normalize){
-    v1_both = v1_both / sum(v1_both)
-    v2_both = v2_both / sum(v2_both)
+    v1 = v1 / sum(v1)
+    v2 = v2 / sum(v2)
   }
 
-  M = 0.5 * (v1_both + v2_both)
+  M = 0.5 * (v1 + v2)
 
-  return(
-    0.5 * (kld(v1_both, M, base = base) + kld(v2_both, M, base = base))
-  )
+  return(sqrt(
+    0.5 * (kld(v1, M, base = base) + kld(v2, M, base = base))
+  ))
 }
 
 jsd_checks = function(v1, v2){
@@ -46,4 +37,10 @@ jsd_checks = function(v1, v2){
 
   if(any(v1 < 0 | v2 < 0))
     stop("vectors values must be >= 0")
+
+  non_zero_both = which(v1 > 0 & v2 > 0)
+
+  if(length(non_zero_both) == 0)
+    stop(paste("vectors have no common entries with nonzero values-",
+               "JSD cannot be computed"))
 }
