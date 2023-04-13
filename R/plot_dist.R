@@ -8,6 +8,10 @@
 #' @import ggplot2
 #' @export
 plot_dist.MltplxExperiment <- function(mltplx_experiment, slide_ids, mode = "heatmap") {
+    experiment_ids = map_chr(mltplx_experiment$mltplx_objects, ~ .x$slide_id)
+    if(!any(slide_ids %in% experiment_ids))
+      stop("no slide ids passed as argument are present in `MlptlxExperiment` object")
+
     filtered_exp <- filter_mltplx_objects(mltplx_experiment,slide_ids)
     for(mltplx_object in filtered_exp) {
       plot_dist(mltplx_object, mode = mode)
