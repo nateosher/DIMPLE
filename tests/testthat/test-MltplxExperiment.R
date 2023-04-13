@@ -134,6 +134,28 @@ test_that("`add_QuantileDist` handles missing types", {
     exp_with_qd = add_QuantileDist(exp,cor,mask_type = "X3",q_probs)
   })
 
+  # Check print generic for MltplxExperiment
+  expect_true(all(
+    capture.output(print(exp_with_qd)) ==
+    c("MltplxExperiment with 2 slides",
+    "Intensities generated with pixel size 2 and bandwidth 3 ",
+    "No distance matrices generated",
+    "No attached metadata",
+    "2 quantile distance arrays generated for mask X3 ")
+  ))
+
+  # And MltplxObject
+  expect_true(all(
+    capture.output(print(exp_with_qd[[2]])) ==
+      c("MltplxObject ",
+        "Slide id: B ",
+        "Image with 50 cells across 3 cell types",
+        "Cell types: X1, X2, X3 ",
+        "Intensity generated with pixel size 2 and bandwidth 3 ",
+        "No distance matrix generated (yet)",
+        "2 quantile distance arrays generated for mask X3 ")
+  ))
+
   # First quantile dist should be NA
   expect_true(is.na(exp_with_qd[[1]]$quantile_dist))
 

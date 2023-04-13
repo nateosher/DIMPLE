@@ -88,7 +88,7 @@ print.MltplxObject = function(mltplx_object, ...){
   }else{
     cat("No distance matrix generated (yet)\n")
   }
-  if(!is.null(mltplx_object$quantile_dist)){
+  if(!is.null(mltplx_object$quantile_dist) && length(mltplx_object$quantile_dist) > 1){
     cat(dim(mltplx_object$quantile_dist$quantile_dist_array)[3],
         "quantile distance arrays generated for mask",
         mltplx_object$quantile_dist$mask_type,
