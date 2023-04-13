@@ -29,6 +29,7 @@
 #' @importFrom magrittr `%>%`
 #' @import dplyr
 #' @import purrr
+#' @import tidyr
 new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                                 ps = NULL, bw = NULL,
                                 dist_metric = NULL, metadata = NULL){

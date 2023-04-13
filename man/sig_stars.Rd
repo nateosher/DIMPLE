@@ -4,7 +4,7 @@
 \alias{sig_stars}
 \title{GGplot helper to color heatmap tiles by whether or not they are significant according to an adjusted p-value}
 \usage{
-sig_stars(alpha = 0.05, p_values = "p.adj")
+sig_stars(alpha = 0.05, p_values = "p.adj", color = "white")
 }
 \arguments{
 \item{alpha}{Significance level}
