@@ -42,7 +42,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
     marks = marks,
     slide_id = slide_id
   )
-  
+
   if(is.null(window_sizes)) {
     window_sizes <- full_tib %>%
       group_by(slide_id) %>%
@@ -51,7 +51,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                 min_y = min(y),
                 max_y = max(y))
   }
-  
+
   full_tib <- left_join(full_tib,window_sizes,by = "slide_id")
 
   dist_metric_name = substitute(dist_metric) %>% as.character()
@@ -61,7 +61,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
   dfs <- full_tib %>%
     group_by(slide_id) %>%
     group_split()
-  
+
   dfs <- lapply(dfs,\(df) {
     attr(df,"slide_id") <- unique(df$slide_id)
     attr(df,"xrange") <- c(unique(df$min_x),unique(df$max_x))
@@ -69,10 +69,10 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
     df <- df %>%
       select(x,y,marks)
   })
-  
+
   progressr::with_progress({
     prog <- progressr::progressor(steps = length(dfs))
-    
+
     mltplx_objects <- furrr::future_map(dfs,\(df) {
         xrange <- attr(df,"xrange")
         yrange <- attr(df,"yrange")
@@ -88,11 +88,11 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                          dist_metric = dist_metric,
                          .dist_metric_name = dist_metric_name)
         prog()
-        
+
         return(obj)
       })
   })
-  
+
   ids <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
   ids_orig_order <- unique(slide_id)
   mltplx_objects <- mltplx_objects[order(match(ids,ids_orig_order))]
@@ -126,7 +126,7 @@ mltplx_experiment_check_inputs = function(x, y, marks, slide_id, ps, bw,window_s
 
   if(length(slide_id) != length(x))
     stop("`slide_id` must be the same length as `x` and `y`")
-  
+
   if(!is.null(window_sizes)) stopifnot("window_sizes does not contain correct columns!"=all(c("slide_id","min_x","max_x","min_y","max_y") %in% colnames(window_sizes)))
 
   # TODO: typechecks
@@ -160,9 +160,15 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
   if(!is.null(mltplx_experiment$metadata)){
     cat("Metadata has", ncol(mltplx_experiment$metadata), "columns\n")
   }else{
-    cat("No attached metadata")
+    cat("No attached metadata\n")
   }
-  cat("\n\n")
+
+  if(!is.null(mltplx_experiment$qdist_mask)){
+    cat(mltplx_experiment$qdist_n_quantiles,
+        "quantile distance arrays generated for mask",
+        mltplx_experiment$qdist_mask,
+        "\n")
+  }
 }
 
 #' @export
@@ -214,9 +220,9 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
                                               .dist_metric_name = NULL) {
   slide_ids <- mltplx_experiment$slide_ids
   n_slides <- length(slide_ids)
-  
+
   mltplx_objects <- mltplx_experiment$mltplx_objects
-  
+
   progressr::with_progress({
     prog <- progressr::progressor(steps = n_slides)
     mltplx_objects <- furrr::future_map(mltplx_objects, \(obj) {
@@ -229,8 +235,10 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
                                               return(obj)
                                               })
   })
-  
+
   mltplx_experiment$mltplx_objects <- mltplx_objects
+  mltplx_experiment$qdist_mask <- mask_type
+  mltplx_experiment$qdist_n_quantiles = nrow(q_probs)
 
   mltplx_experiment
 }
