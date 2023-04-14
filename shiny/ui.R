@@ -52,7 +52,9 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
             tabPanel("Visualize Multiplex Experiment",
                      sidebarLayout(
                        sidebarPanel( "Test each pairwise distance for association with a patient-level covatiate from the patient metadata",
-                        # selectInput("strat_qdist","Stratefied by quantiles?",c("Y","N"),selected="N",multiple=F),
+                         selectInput("strat_qdist","Stratified by quantiles?",c("Y","N"),selected="N",multiple=F),
+                         selectInput("which_qdist","Which quantile?","",multiple=F),
+                    
                          selectInput("group_factor","Select covariate to test","",selected="",multiple=F),
                          selectInput("var_type","Select type of variable",c("continous","categorical"),multiple=F),
                          selectInput("covariates","Select covariates to adjust for","",selected="",multiple=T),

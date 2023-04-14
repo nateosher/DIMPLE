@@ -80,6 +80,7 @@ lm_dist <- function(mltplx_experiment,
 #' @param covariates vector of metadata columns to adjust for in linear model
 #' @param slide_ids vector of slide_ids
 #' @param types vector of types
+#' @param adjust_counts whether or not to adjust for the total counts of each cell type in the linear model
 #' @import dplyr
 #' @return tibble containing all pairwise type comparisons between the groups in the grouping factor, along with inferential statistics
 #' @export
@@ -89,7 +90,8 @@ lm_qdist <- function(mltplx_experiment,
                     agg_fun = median,
                     covariates = NULL,
                     slide_ids = NULL,
-                    types = NULL
+                    types = NULL,
+                    adjust_counts = TRUE
 ) {
   stopifnot("Patient metadata must exist"=!is.null(mltplx_experiment$metadata))
   stopifnot("Group factor must be in patient metadata"=group_factor %in% colnames(mltplx_experiment$metadata))
@@ -108,16 +110,30 @@ lm_qdist <- function(mltplx_experiment,
   fm_string <- paste0("qdist ~ ", group_factor)
   if(!is.null(covariates)) fm_string <- paste0(fm_string, " + ",paste0(covariates,collapse = " + "))
   fm <- as.formula(fm_string)
+  fm_immutable <- as.formula(fm_string)
+  fm <- fm_immutable
+  
+  if(adjust_counts) {
+    ct_counts <- cell_type_counts(mltplx_experiment)
+    colnames(ct_counts) <- make.names(colnames(ct_counts))
+    df <- df %>%
+      left_join(ct_counts, by = "slide_id")
+  }
 
   result <- df %>%
     filter(slide_id %in% slide_ids,
-           interval == intervals,
+           intervals == interval,
            type1 %in% types | type2 %in% types) %>% # from reduce_symmetric
     group_by(patient_id,type1,type2) %>%
     mutate(.,qdist = agg_fun(qdist,na.rm = T)) %>%
     distinct(type1,type2,qdist,patient_id,.keep_all = T) %>%
     group_by(type1,type2) %>%
     group_modify(~{
+      if(adjust_counts) {
+        fm_string <- format(fm_immutable)
+        fm_string <- paste0(fm_string," + ",make.names(.y$type1)," + ",make.names(.y$type2))
+        fm <- as.formula(fm_string)
+      }      
       tryCatch({
         lm(fm,data=.x)
       },error=\(e) {
@@ -127,8 +143,9 @@ lm_qdist <- function(mltplx_experiment,
         broom::tidy()
     }) %>%
     ungroup() %>%
-    filter(!stringr::str_detect(term,paste0(c("Intercept",covariates),collapse = "|"))) %>%
+    filter(!stringr::str_detect(term,paste0(c("Intercept",covariates,make.names(levels(df$type1))),collapse = "|"))) %>%
     mutate(p.adj = p.adjust(p.value,method="fdr"))
+  
 
   return(result)
 }
