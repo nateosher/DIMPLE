@@ -29,7 +29,7 @@ To install with vignettes (which we recommend), use the command:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("nateosher/DIMPLE", vuild_vignettes = TRUE)
+devtools::install_github("nateosher/DIMPLE", build_vignettes = TRUE)
 ```
 
 ## Example
