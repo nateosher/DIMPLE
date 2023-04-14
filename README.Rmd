@@ -108,24 +108,3 @@ plot(lung_experiment[[1]])
 
 To learn more about these data structures and how to utilize them for exploration, check out the `mltplx-experiment` vignette. `DIMPLE` also provides functions for simulating Multiplex Imaging data- an overview of this functionality can be found in the `simulations` vignette
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
