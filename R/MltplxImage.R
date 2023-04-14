@@ -12,10 +12,10 @@
 new_MltplxImage = function(x, y, marks, xrange = NULL, yrange = NULL){
   if(!is.null(xrange)) stopifnot("X-coordinates of cells must be within xrange!"=all(xrange[1] <= min(x), max(x) <= xrange[2]))
   else xrange <- c(min(x),max(x))
-  
+
   if(!is.null(yrange)) stopifnot("Y-coordinates of cells must be within yrange!"=all(yrange[1] <= min(y), max(y) <= yrange[2]))
   else yrange <- c(min(y),max(y))
-                                                                
+
   ppp = ppp(x = x, y = y, marks = factor(marks),
             window = owin(xrange,yrange))
 
@@ -53,11 +53,12 @@ as_tibble.MltplxImage = function(im){
 
 #' @export
 plot.MltplxImage = function(im, ...){
-  as_tibble(im) %>% 
+  as_tibble(im) %>%
     ggplot() +
     geom_point(aes(x = x, y = y, color = `Cell Type`, shape=`Cell Type`),size=2) +
     scale_shape_manual(values=1:length(unique(im$cell_types)),drop=FALSE) +
     scale_color_manual( values=rep_len(cbfp, length(unique(im$cell_types))+1),drop=FALSE) +
+    theme_bw() +
     ggtitle("Point pattern plot")-> p
   print(p)
 }
