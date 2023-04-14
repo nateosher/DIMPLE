@@ -12,7 +12,7 @@ library(shiny);library(shinythemes);library(waiter)
 
 
 fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
-          titlePanel("DM.ME"),
+          titlePanel("DIMPLE"),
           tabsetPanel(
             tabPanel("Visualize Multiplex Object",
                      sidebarLayout(
@@ -23,6 +23,7 @@ fluidPage(shinyjs::useShinyjs(),autoWaiter(),theme = shinytheme("slate"),
                          "Or push button to load the lung cancer data from the VectraPolarisData R package:",
                          tags$br(),
                          actionButton("exampledata", "Use lung cancer data"),
+                         tags$br(),
                          tags$br(),
                          "A summary of the data will appear below once the data is loaded:",
                          tags$br(),
