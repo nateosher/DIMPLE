@@ -258,3 +258,5 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
 cell_type_counts.MltplxExperiment <- function(mltplx_experiment) {
   map_df(mltplx_experiment$mltplx_objects,cell_type_counts)
 }
+
+
