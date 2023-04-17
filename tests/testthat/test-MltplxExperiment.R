@@ -278,3 +278,53 @@ test_that("`filter_exp` works", {
   ))
 
 })
+
+test_that("`list.as_MltplxExperiment` works", {
+  set.seed(24601)
+  obj_list = map(1:3, \(i){
+    SimulateGrid(
+      list(
+        GridRect(m = 100,
+                 n = 100,
+                 bot_left_corner_x = 10 + 10 * i,
+                 bot_left_corner_y = 10 + 10 * i,
+                 width = 50,
+                 height = 50,
+                 intensity = 0.1)
+      ),
+      square_side_length = 1
+    )
+  })
+
+  expect_no_error({
+    list_exp = as_MltplxExperiment(obj_list)
+  })
+
+  expect_equal(class(list_exp), "MltplxExperiment")
+
+  expect_true(all(
+    (list_exp %>% print() %>% capture.output()) ==
+      c("MltplxExperiment with 3 slides",
+        "No intensities generated",
+        "No distance matrices generated",
+        "No attached metadata",
+        "")
+  ))
+
+  expect_true(all(
+    (list_exp[[1]] %>% print() %>% capture.output()) ==
+    c("MltplxObject ",
+    "Slide id: PGWGNI ",
+    "Image with 271 cells across 1 cell types",
+    "Cell types: Type 1 ",
+    "No intensity generated (yet)",
+    "No distance matrix generated (yet)",
+    "0 quantile distance arrays generated. ")
+  ))
+
+  expect_error(as_MltplxExperiment(list(1, 2)),
+    paste('to convert "list" object to "MltplxObject" object,',
+          'all elements of list must be of class "MltplxObject"')
+  )
+
+})
