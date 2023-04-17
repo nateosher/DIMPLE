@@ -23,7 +23,7 @@ new_MltplxImage = function(x, y, marks, xrange = NULL, yrange = NULL){
 
   if(!is.null(yrange)){
     if(length(y) > 0){
-      stopifnot("Y-coordinates of cells must be within xrange!"=all(
+      stopifnot("Y-coordinates of cells must be within yrange!"=all(
           yrange[1] <= min(y), max(y) <= yrange[2]
         )
       )
