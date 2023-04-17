@@ -5,15 +5,15 @@
 \title{Plots intensities for selected cell types and selected slides of
 \code{MltplxExperiment} object.}
 \usage{
-plot_intensities(mltplx_experiment, types, slide_ids)
+plot_intensities(mltplx_experiment, slide_ids, types)
 }
 \arguments{
 \item{mltplx_experiment}{\code{MltplxExperiment} object}
 
-\item{types}{Vector of cell types whose intensities you'd like to plot}
-
 \item{slide_ids}{Vector of slide ids for which you would like to plot
 the selected cell intensities.}
+
+\item{types}{Vector of cell types whose intensities you'd like to plot}
 }
 \description{
 Plots intensities for selected cell types and selected slides of

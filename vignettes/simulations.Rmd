@@ -16,13 +16,13 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(DistDist)
+library(DIMPLE)
 library(magrittr)
 ```
 
 # Summary
 
-The `DistDist` package provides a simple but flexible way to generate simulations of arbitrary numbers of cell types with arbitrary degrees of overlap. This vignette explains how to use these functions.
+The `DIMPLE` package provides a simple but flexible way to generate simulations of arbitrary numbers of cell types with arbitrary degrees of overlap. This vignette explains how to use these functions.
 
 # Example 1: One cell type
 

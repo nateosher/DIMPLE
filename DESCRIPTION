@@ -1,4 +1,4 @@
-Package: DistDist
+Package: DIMPLE
 Title: A package for working with Multiplex Imaging data
 Version: 0.0.0.9000
 Authors@R: 
