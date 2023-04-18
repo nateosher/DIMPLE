@@ -334,8 +334,7 @@ test_that("`list.as_MltplxExperiment` works", {
       c("MltplxExperiment with 3 slides",
         "No intensities generated",
         "No distance matrices generated",
-        "No attached metadata",
-        "")
+        "No attached metadata")
   ))
 
   expect_true(all(
@@ -345,8 +344,7 @@ test_that("`list.as_MltplxExperiment` works", {
     "Image with 271 cells across 1 cell types",
     "Cell types: Type 1 ",
     "No intensity generated (yet)",
-    "No distance matrix generated (yet)",
-    "0 quantile distance arrays generated. ")
+    "No distance matrix generated (yet)")
   ))
 
   expect_error(as_MltplxExperiment(list(1, 2)),

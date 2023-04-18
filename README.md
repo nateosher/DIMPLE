@@ -132,7 +132,6 @@ lung_experiment[[1]]
 #> Cell types: CD14, CD19, CD4, CD8, CK, Other 
 #> No intensity generated (yet)
 #> No distance matrix generated (yet)
-#> 0 quantile distance arrays generated.
 ```
 
 Using the implemented generic functions, this allows for quick
