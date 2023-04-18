@@ -149,6 +149,21 @@ test_that("`plot_ppp` works", {
   }, "ids not present in given `MltplxExperiment` object")
 })
 
+test_that("`plot_dist.MltplxObject` works", {
+  expect_no_error({
+    plot_dist(exp[[1]])
+  })
+
+  expect_no_error({
+    plot_dist(exp[[1]], mode = "network")
+  })
+
+  expect_no_error({
+    plot_dist(exp[[1]], mode = "network", invert_dist = FALSE)
+  })
+
+})
+
 test_that("`plot_dist.MltplxExperiment` works", {
   expect_no_error({
     plot_dist(exp, "S1")
