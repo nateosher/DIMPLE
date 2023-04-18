@@ -13,7 +13,7 @@ SimulateGrid = function(intensity_list, marks = NULL, square_side_length = 1){
     apply(m, 2, rev)
   })
   if(is.null(marks)){
-    marks = 1:length(intensity_list)
+    marks = paste("Type", 1:length(intensity_list))
   }
   square_area = square_side_length * square_side_length
   n = length(intensity_list[[1]])
@@ -59,5 +59,15 @@ SimulateGrid = function(intensity_list, marks = NULL, square_side_length = 1){
                         window = owin(c(0, square_side_length * grid_ncol),
                                       c(0, square_side_length * grid_nrow)))
 
-  return(final_pointproc)
+  final_MltplxObject = new_MltplxObject(x = final_sim_mat[,2],
+                                      y = final_sim_mat[,1],
+                                      marks = map_chr(final_sim_mat[,3],
+                                                      ~ as.character(marks[.x])),
+                                      slide_id = sample(LETTERS, 6, replace = TRUE) %>%
+                                                  paste0(collapse = ""),
+                                      xrange = c(0, square_side_length * grid_ncol),
+                                      yrange = c(0, square_side_length * grid_nrow)
+  )
+
+  return(final_MltplxObject)
 }

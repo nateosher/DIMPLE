@@ -95,7 +95,7 @@ test_that("`patient_boxplots` works", {
   })
 
   expect_equal(nrow(boxplots_1$data), 19)
-  expect_equal(ncol(boxplots_1$data), 16)
+  expect_equal(ncol(boxplots_1$data), 18)
   exp_no_meta = exp
   exp_no_meta$metadata = NULL
 

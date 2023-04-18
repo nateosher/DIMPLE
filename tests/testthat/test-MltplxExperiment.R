@@ -134,6 +134,28 @@ test_that("`add_QuantileDist` handles missing types", {
     exp_with_qd = add_QuantileDist(exp,cor,mask_type = "X3",q_probs)
   })
 
+  # Check print generic for MltplxExperiment
+  expect_true(all(
+    capture.output(print(exp_with_qd)) ==
+    c("MltplxExperiment with 2 slides",
+    "Intensities generated with pixel size 2 and bandwidth 3 ",
+    "No distance matrices generated",
+    "No attached metadata",
+    "2 quantile distance arrays generated for mask X3 ")
+  ))
+
+  # And MltplxObject
+  expect_true(all(
+    capture.output(print(exp_with_qd[[2]])) ==
+      c("MltplxObject ",
+        "Slide id: B ",
+        "Image with 50 cells across 3 cell types",
+        "Cell types: X1, X2, X3 ",
+        "Intensity generated with pixel size 2 and bandwidth 3 ",
+        "No distance matrix generated (yet)",
+        "2 quantile distance arrays generated for mask X3 ")
+  ))
+
   # First quantile dist should be NA
   expect_true(is.na(exp_with_qd[[1]]$quantile_dist))
 
@@ -276,5 +298,86 @@ test_that("`filter_exp` works", {
   expect_true(all(
     exp_subset$metadata$slide_id %in% c("S2", "S3")
   ))
+
+})
+
+
+test_that("`as_tibble` works", {
+  exp <- build_mltplx_exp(200, n_slides = 20, seed=2025)
+  expect_error({
+    as_tibble(exp)
+  }, "no metadata attached and no distance matrices generated")
+
+  exp <- add_mltplx_metadata(exp,n_patients=10)
+
+  expect_warning({
+    as_tibble(exp)
+  }, "no distance matrices generated; returning metadata")
+
+
+  exp <- update_intensity(exp,ps=2,bw=3)
+  exp <- update_dist(exp,cor)
+
+  expect_no_error({
+    exp_tib = as_tibble(exp)
+  })
+
+  expect_equal(nrow(exp_tib), 20)
+  expect_equal(ncol(exp_tib), 7)
+  expect_equal(colnames(exp_tib)[5], "X1~X2")
+  expect_equal(colnames(exp_tib)[6], "X1~X3")
+  expect_equal(colnames(exp_tib)[7], "X2~X3")
+})
+
+test_that("`list.as_MltplxExperiment` works", {
+  set.seed(24601)
+  obj_list = map(1:3, \(i){
+    SimulateGrid(
+      list(
+        GridRect(m = 100,
+                 n = 100,
+                 bot_left_corner_x = 10 + 10 * i,
+                 bot_left_corner_y = 10 + 10 * i,
+                 width = 50,
+                 height = 50,
+                 intensity = 0.1)
+      ),
+      square_side_length = 1
+    )
+  })
+
+  expect_no_error({
+    list_exp = as_MltplxExperiment(obj_list)
+  })
+
+  expect_equal(class(list_exp), "MltplxExperiment")
+
+  expect_equal(list_exp[[1]]$mltplx_image$ppp$window$xrange[1], 0)
+  expect_equal(list_exp[[1]]$mltplx_image$ppp$window$xrange[2], 100)
+  expect_equal(list_exp[[1]]$mltplx_image$ppp$window$yrange[1], 0)
+  expect_equal(list_exp[[1]]$mltplx_image$ppp$window$yrange[2], 100)
+
+  expect_true(all(
+    (list_exp %>% print() %>% capture.output()) ==
+      c("MltplxExperiment with 3 slides",
+        "No intensities generated",
+        "No distance matrices generated",
+        "No attached metadata")
+  ))
+
+  expect_true(all(
+    (list_exp[[1]] %>% print() %>% capture.output()) ==
+    c("MltplxObject ",
+    "Slide id: PGWGNI ",
+    "Image with 271 cells across 1 cell types",
+    "Cell types: Type 1 ",
+    "No intensity generated (yet)",
+    "No distance matrix generated (yet)")
+  ))
+
+  expect_error(as_MltplxExperiment(list(1, 2)),
+    paste('to convert "list" object to "MltplxObject" object,',
+          'all elements of list must be of class "MltplxObject"')
+  )
 
 })

@@ -231,18 +231,22 @@ test_that("`SimulateGrid` works", {
       GridRect(100, 100, 80, 80, 20, 20, 0.1)
     )
   )
+
+  # Should return a `MltplxObject`
+  expect_equal(class(sim1), "MltplxObject")
+
   # There should be at least one point in the lower left square
-  expect_true(any(sim1$x < 20 & sim1$y < 20))
+  expect_true(any(sim1$mltplx_image$ppp$x < 20 & sim1$mltplx_image$ppp$y < 20))
 
   # And in the upper right square
-  expect_true(any(sim1$x > 80 & sim1$y > 80))
+  expect_true(any(sim1$mltplx_image$ppp$x > 80 & sim1$mltplx_image$ppp$y > 80))
 
   # The marks should be discrete
-  expect_equal(sim1$marks %>% class(), "factor")
+  expect_equal(sim1$mltplx_image$ppp$marks %>% class(), "factor")
 
   # And there should be two marks: 1 and 2
   expect_true(all(
-    sim1$marks %>% levels() == c("1", "2")
+    sim1$mltplx_image$ppp$marks %>% levels() == c("Type 1", "Type 2")
   ))
 
   # Handle edge case where no points are generated
@@ -255,16 +259,14 @@ test_that("`SimulateGrid` works", {
     )
   })
 
-  expect_equal(sim2$n, 0)
-
-  expect_equal(sim2$marks %>% levels() %>% length(), 2)
+  expect_equal(sim2$mltplx_image$ppp$n, 0)
 
   expect_true(all(
-    sim2$window$xrange == c(0, 100)
+    sim2$mltplx_image$ppp$window$xrange == c(0, 100)
   ))
 
   expect_true(all(
-    sim2$window$yrange == c(0, 100)
+    sim2$mltplx_image$ppp$window$yrange == c(0, 100)
   ))
 })
 
