@@ -18,12 +18,11 @@ Imports:
     spatstat.explore,
     spatstat.geom,
     tidyr,
-    magic,
     RColorBrewer,
     viridis,
-    qgraph,
     furrr,
-    progressr
+    progressr,
+    ggnetwork
 Suggests: 
     covr,
     knitr,

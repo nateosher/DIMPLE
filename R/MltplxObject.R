@@ -103,16 +103,16 @@ print.MltplxObject = function(mltplx_object, ...){
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
-plot_dist.MltplxObject <- function(mltplx_object, mode = "heatmap") {
+plot_dist.MltplxObject <- function(mltplx_object, mode = "heatmap",
+                                   net_threshold = 0, invert_dist = TRUE) {
   if(is.null(mltplx_object$mltplx_dist))
     stop("no distance matrix has been generated for this `MltplxObject`; see `update_object_dist` function")
   if(mode == "heatmap") {
     df <- mltplx_object %>%
-      dist_to_df() %>%
+      dist_to_df(reduce_symmetric = TRUE) %>%
       tidyr::drop_na(dist)
 
     p <- df %>%
-      # dplyr::filter(slide_id == mltplx_object$slide_id) %>%
       ggplot(aes(type1,type2,fill=dist)) +
       geom_tile() +
       anglex() +
@@ -122,11 +122,38 @@ plot_dist.MltplxObject <- function(mltplx_object, mode = "heatmap") {
 
     print(p)
   } else if(mode == "network") {
-    nms <- colnames(mltplx_object$mltplx_dist$dist)
-    qgraph::qgraph(mltplx_object$mltplx_dist$dist,layout = "circle",
-                   threshold=0.1,labels=nms,label.cex=2.5,
-                   label.scale.equal=T,
-                   title = paste0("Distance network for slide id ", mltplx_object$slide_id))
+    g <- igraph::graph_from_adjacency_matrix(mltplx_object$mltplx_dist$dist,weighted=TRUE)
+    p <- g %>%
+      ggnetwork::ggnetwork(.,layout = igraph::layout_in_circle(.)) %>%
+      dplyr::mutate(sgn = factor(ifelse(sign(weight) < 0,"Negative","Positive"))) %>%
+      dplyr::filter(abs(weight) >= net_threshold) %>%
+      (\(d){
+        if(invert_dist){
+          d = d %>%
+            mutate(
+              weight = map_dbl(weight, \(w){
+                if(w == 0) return(w)
+                else if(w > 0) return(max(abs(weight)) - w)
+                else return(-max(abs(weight)) - w)
+              })
+            )
+        }
+        d
+      }) %>%
+      ggplot2::ggplot(aes(x = x, y = y, xend = xend, yend = yend)) +
+      ggnetwork::geom_edges(aes(color=sgn,linewidth=abs(weight))) +
+      ggnetwork::geom_nodes(color="#E58601",size=10) +
+      ggnetwork::geom_nodetext(aes( label = name),
+                               fontface = "bold",color="#D3DDDC") +
+      theme(legend.position = "none") +
+      theme_minimal() +
+      theme(axis.text = element_blank(),
+            axis.title = element_blank(),
+            panel.background = element_rect(fill = "#24281A"),
+            panel.grid = element_blank()) +
+      guides(linewidth="none",color="none") +
+      ggplot2::scale_color_manual(values=c("Positive"="#46ACC8","Negative"="#B40F20"))
+    suppressWarnings(print(p))
   } else {
     stop("Mode must be either heatmap or network")
   }

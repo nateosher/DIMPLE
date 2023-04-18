@@ -4,7 +4,7 @@
 \alias{plot_qdist}
 \title{Plots quantile distance matrices for selected slides in a \code{MltplxExperiment} object}
 \usage{
-plot_qdist(mltplx_experiment, slide_ids, mode = "heatmap", threshold = 0.1)
+plot_qdist(mltplx_experiment, slide_ids, mode = "heatmap", net_threshold = 0.1)
 }
 \arguments{
 \item{mltplx_experiment}{\code{MltplxExperiment} objects}
@@ -14,7 +14,7 @@ to print}
 
 \item{mode}{String indicating plot type, either "heatmap" or "network"}
 
-\item{threshold}{When mode is "network", edges below this absolute value are
+\item{net_threshold}{When mode is "network", edges below this absolute value are
 excluded from the plot}
 }
 \description{

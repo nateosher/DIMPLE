@@ -13,6 +13,9 @@
 to print}
 
 \item{mode}{String indicating plot type, either "heatmap" or "network"}
+
+\item{net_threshold}{When mode is "network", edges below this absolute value are
+excluded from the plot}
 }
 \description{
 Plots distance matrices for selected slides in a \code{MltplxExperiment} object

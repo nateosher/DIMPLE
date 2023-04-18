@@ -116,9 +116,8 @@ test_that("`plot_qdist` works", {
   })
 
   expect_no_error({
-    plot_qdist(exp, "S5", mode = "network", threshold = 0)
-  }) %>%
-    expect_warning("Non-finite weights are omitted")
+    plot_qdist(exp, "S5", mode = "network", net_threshold = 0)
+  })
 
   expect_error({
     plot_qdist(exp, "S5", mode = "joel mode")
