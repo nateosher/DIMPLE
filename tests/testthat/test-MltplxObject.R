@@ -122,6 +122,18 @@ test_that("`MltplxObject` constructor works", {
       c(3,3)
   ))
 
+  expect_no_error({
+    plot_dist(obj_3)
+  })
+
+  expect_no_error({
+    plot_dist(obj_3, mode = "network")
+  })
+
+  expect_error({
+    plot_dist(obj_1)
+  }, "no distance matrix has been generated for this `MltplxObject`; see `update_object_dist` function")
+
   expect_true(all(
     colnames(obj_3$mltplx_dist$dist) ==
       c("Immune", "Other", "Tumor")
