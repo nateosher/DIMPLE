@@ -15,4 +15,3 @@ plot_dist <- function(x,...) UseMethod("plot_dist")
 
 #'@export
 as_MltplxExperiment <- function(x,...) UseMethod("as_MltplxExperiment")
-

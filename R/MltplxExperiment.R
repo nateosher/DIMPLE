@@ -29,6 +29,7 @@
 #' @importFrom magrittr `%>%`
 #' @import dplyr
 #' @import purrr
+#' @import tidyr
 new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                                 ps = NULL, bw = NULL,
                                 dist_metric = NULL, metadata = NULL){
@@ -222,6 +223,25 @@ dist_to_df.MltplxExperiment <- function(mltplx_experiment,reduce_symmetric = FAL
     } %>%
     mutate(type1 = factor(type1,levels = sort(levels(.$type1))),
            type2 = factor(type2,levels = sort(levels(.$type2))))
+}
+
+#' @export
+as_tibble.MltplxExperiment <- function(mltplx_experiment) {
+  if(is.null(mltplx_experiment$dist_metric_name) &&
+     is.null(mltplx_experiment$metadata)){
+    stop("no metadata attached and no distance matrices generated")
+  }else if(is.null(mltplx_experiment$dist_metric_name)){
+    warning("no distance matrices generated; returning metadata")
+    mltplx_experiment$metadata
+  }else{
+    dist_to_df(mltplx_experiment, reduce_symmetric = TRUE) %>%
+      as_tibble() %>%
+      mutate(
+        cell_types = map2_chr(type1, type2, ~ paste0(.x, "~", .y))
+      ) %>%
+      select(-type1, -type2) %>%
+      pivot_wider(names_from = "cell_types", values_from = "dist")
+  }
 }
 
 #' @export
