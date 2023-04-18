@@ -38,8 +38,7 @@ test_that("`MltplxObject` constructor works", {
     "Image with 300 cells across 3 cell types",
     "Cell types: Immune, Other, Tumor ",
     "No intensity generated (yet)",
-    "No distance matrix generated (yet)",
-    "0 quantile distance arrays generated. ")
+    "No distance matrix generated (yet)")
   ))
 
   expect_null(obj_1$mltplx_intensity)
@@ -75,8 +74,7 @@ test_that("`MltplxObject` constructor works", {
       "Image with 300 cells across 3 cell types",
       "Cell types: Immune, Other, Tumor ",
       "Intensity generated with pixel size 10 and bandwidth 30 ",
-      "No distance matrix generated (yet)",
-      "0 quantile distance arrays generated. ")
+      "No distance matrix generated (yet)")
   ))
 
   expect_equal(obj_2$mltplx_intensity$ps, 10)
@@ -107,8 +105,7 @@ test_that("`MltplxObject` constructor works", {
         "Image with 300 cells across 3 cell types",
         "Cell types: Immune, Other, Tumor ",
         "Intensity generated with pixel size 10 and bandwidth 30 ",
-        "Distance matrix generated using cor ",
-        "0 quantile distance arrays generated. ")
+        "Distance matrix generated using cor ")
   ))
 
   expect_equal(obj_3$mltplx_dist$metric, "cor")

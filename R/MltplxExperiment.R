@@ -160,9 +160,15 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
   if(!is.null(mltplx_experiment$metadata)){
     cat("Metadata has", ncol(mltplx_experiment$metadata), "columns\n")
   }else{
-    cat("No attached metadata")
+    cat("No attached metadata\n")
   }
-  cat("\n\n")
+
+  if(!is.null(mltplx_experiment$qdist_mask)){
+    cat(mltplx_experiment$qdist_n_quantiles,
+        "quantile distance arrays generated for mask",
+        mltplx_experiment$qdist_mask,
+        "\n")
+  }
 }
 
 #' @export
@@ -258,6 +264,8 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
   })
 
   mltplx_experiment$mltplx_objects <- mltplx_objects
+  mltplx_experiment$qdist_mask <- mask_type
+  mltplx_experiment$qdist_n_quantiles = nrow(q_probs)
 
   mltplx_experiment
 }
