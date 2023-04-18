@@ -9,3 +9,6 @@ add_QuantileDist <- function(x,...) UseMethod("add_QuantileDist")
 
 #'@export
 cell_type_counts <- function(x,...) UseMethod("cell_type_counts")
+
+#'@export
+as_MltplxExperiment <- function(x,...) UseMethod("as_MltplxExperiment")

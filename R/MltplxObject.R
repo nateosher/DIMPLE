@@ -197,7 +197,7 @@ qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
 
 #' @export
 plot.MltplxObject = function(mltplx_object, ...){
-  plot(mltplx_object$mltplx_image)
+  plot(mltplx_object$mltplx_image, id = mltplx_object$slide_id)
 }
 
 #' @export

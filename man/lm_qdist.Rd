@@ -11,7 +11,8 @@ lm_qdist(
   agg_fun = median,
   covariates = NULL,
   slide_ids = NULL,
-  types = NULL
+  types = NULL,
+  adjust_counts = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ lm_qdist(
 \item{slide_ids}{vector of slide_ids}
 
 \item{types}{vector of types}
+
+\item{adjust_counts}{whether or not to adjust for the total counts of each cell type in the linear model}
 }
 \value{
 tibble containing all pairwise type comparisons between the groups in the grouping factor, along with inferential statistics
