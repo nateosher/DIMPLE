@@ -181,7 +181,15 @@ as_MltplxExperiment.list = function(l, ...){
   y = map(l, ~ .x$mltplx_image$ppp$y) %>% unlist()
   marks = map(l, ~ .x$mltplx_image$ppp$marks) %>% unlist()
   slide_ids = map(l, ~ rep(.x$slide_id, .x$mltplx_image$ppp$n)) %>% unlist()
-  new_MltplxExperiment(x = x, y = y, marks = marks, slide_id = slide_ids)
+  window_sizes = tibble(
+    slide_id = map_chr(l, ~ .x$slide_id),
+    min_x = map_dbl(l, ~ .x$mltplx_image$ppp$window$xrange[1]),
+    max_x = map_dbl(l, ~ .x$mltplx_image$ppp$window$xrange[2]),
+    min_y = map_dbl(l, ~ .x$mltplx_image$ppp$window$yrange[1]),
+    max_y = map_dbl(l, ~ .x$mltplx_image$ppp$window$yrange[2])
+  )
+  new_MltplxExperiment(x = x, y = y, marks = marks, slide_id = slide_ids,
+                       window_sizes = window_sizes)
 }
 
 #' @export
