@@ -302,6 +302,11 @@ test_that("`list.as_MltplxExperiment` works", {
 
   expect_equal(class(list_exp), "MltplxExperiment")
 
+  expect_equal(list_exp[[1]]$mltplx_image$ppp$window$xrange[1], 0)
+  expect_equal(list_exp[[1]]$mltplx_image$ppp$window$xrange[2], 100)
+  expect_equal(list_exp[[1]]$mltplx_image$ppp$window$yrange[1], 0)
+  expect_equal(list_exp[[1]]$mltplx_image$ppp$window$yrange[2], 100)
+
   expect_true(all(
     (list_exp %>% print() %>% capture.output()) ==
       c("MltplxExperiment with 3 slides",
