@@ -161,9 +161,42 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
   if(!is.null(mltplx_experiment$metadata)){
     cat("Metadata has", ncol(mltplx_experiment$metadata), "columns\n")
   }else{
-    cat("No attached metadata")
+    cat("No attached metadata\n")
   }
-  cat("\n\n")
+
+  if(!is.null(mltplx_experiment$qdist_mask)){
+    cat(mltplx_experiment$qdist_n_quantiles,
+        "quantile distance arrays generated for mask",
+        mltplx_experiment$qdist_mask,
+        "\n")
+  }
+}
+
+#' @export
+as_MltplxExperiment.list = function(l, ...){
+  list_classes = map(l, ~ class(.x))
+  n_classes = map_dbl(list_classes, ~ length(.x))
+  unique_classes = unlist(list_classes) %>% unique()
+  if(any(n_classes > 1) ||
+    length(unique_classes) > 1 ||
+    unique_classes[1] != "MltplxObject"){
+    stop(paste('to convert "list" object to "MltplxObject" object, all',
+               'elements of list must be of class "MltplxObject"'))
+  }
+
+  x = map(l, ~ .x$mltplx_image$ppp$x) %>% unlist()
+  y = map(l, ~ .x$mltplx_image$ppp$y) %>% unlist()
+  marks = map(l, ~ .x$mltplx_image$ppp$marks) %>% unlist()
+  slide_ids = map(l, ~ rep(.x$slide_id, .x$mltplx_image$ppp$n)) %>% unlist()
+  window_sizes = tibble(
+    slide_id = map_chr(l, ~ .x$slide_id),
+    min_x = map_dbl(l, ~ .x$mltplx_image$ppp$window$xrange[1]),
+    max_x = map_dbl(l, ~ .x$mltplx_image$ppp$window$xrange[2]),
+    min_y = map_dbl(l, ~ .x$mltplx_image$ppp$window$yrange[1]),
+    max_y = map_dbl(l, ~ .x$mltplx_image$ppp$window$yrange[2])
+  )
+  new_MltplxExperiment(x = x, y = y, marks = marks, slide_id = slide_ids,
+                       window_sizes = window_sizes)
 }
 
 #' @export
@@ -251,6 +284,8 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
   })
 
   mltplx_experiment$mltplx_objects <- mltplx_objects
+  mltplx_experiment$qdist_mask <- mask_type
+  mltplx_experiment$qdist_n_quantiles = nrow(q_probs)
 
   mltplx_experiment
 }
@@ -259,3 +294,5 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
 cell_type_counts.MltplxExperiment <- function(mltplx_experiment) {
   map_df(mltplx_experiment$mltplx_objects,cell_type_counts)
 }
+
+
