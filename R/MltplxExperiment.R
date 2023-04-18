@@ -42,7 +42,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
     marks = marks,
     slide_id = slide_id
   )
-  
+
   if(is.null(window_sizes)) {
     window_sizes <- full_tib %>%
       group_by(slide_id) %>%
@@ -51,7 +51,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                 min_y = min(y),
                 max_y = max(y))
   }
-  
+
   full_tib <- left_join(full_tib,window_sizes,by = "slide_id")
 
   dist_metric_name = substitute(dist_metric) %>% as.character()
@@ -61,7 +61,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
   dfs <- full_tib %>%
     group_by(slide_id) %>%
     group_split()
-  
+
   dfs <- lapply(dfs,\(df) {
     attr(df,"slide_id") <- unique(df$slide_id)
     attr(df,"xrange") <- c(unique(df$min_x),unique(df$max_x))
@@ -69,10 +69,10 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
     df <- df %>%
       select(x,y,marks)
   })
-  
+
   progressr::with_progress({
     prog <- progressr::progressor(steps = length(dfs))
-    
+
     mltplx_objects <- furrr::future_map(dfs,\(df) {
         xrange <- attr(df,"xrange")
         yrange <- attr(df,"yrange")
@@ -88,11 +88,11 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                          dist_metric = dist_metric,
                          .dist_metric_name = dist_metric_name)
         prog()
-        
+
         return(obj)
       })
   })
-  
+
   ids <- unlist(lapply(mltplx_objects,\(obj) obj$slide_id))
   ids_orig_order <- unique(slide_id)
   mltplx_objects <- mltplx_objects[order(match(ids,ids_orig_order))]
@@ -126,7 +126,7 @@ mltplx_experiment_check_inputs = function(x, y, marks, slide_id, ps, bw,window_s
 
   if(length(slide_id) != length(x))
     stop("`slide_id` must be the same length as `x` and `y`")
-  
+
   if(!is.null(window_sizes)) stopifnot("window_sizes does not contain correct columns!"=all(c("slide_id","min_x","max_x","min_y","max_y") %in% colnames(window_sizes)))
 
   # TODO: typechecks
@@ -163,6 +163,33 @@ print.MltplxExperiment = function(mltplx_experiment, ...){
     cat("No attached metadata")
   }
   cat("\n\n")
+}
+
+#' @export
+as_MltplxExperiment.list = function(l, ...){
+  list_classes = map(l, ~ class(.x))
+  n_classes = map_dbl(list_classes, ~ length(.x))
+  unique_classes = unlist(list_classes) %>% unique()
+  if(any(n_classes > 1) ||
+    length(unique_classes) > 1 ||
+    unique_classes[1] != "MltplxObject"){
+    stop(paste('to convert "list" object to "MltplxObject" object, all',
+               'elements of list must be of class "MltplxObject"'))
+  }
+
+  x = map(l, ~ .x$mltplx_image$ppp$x) %>% unlist()
+  y = map(l, ~ .x$mltplx_image$ppp$y) %>% unlist()
+  marks = map(l, ~ .x$mltplx_image$ppp$marks) %>% unlist()
+  slide_ids = map(l, ~ rep(.x$slide_id, .x$mltplx_image$ppp$n)) %>% unlist()
+  window_sizes = tibble(
+    slide_id = map_chr(l, ~ .x$slide_id),
+    min_x = map_dbl(l, ~ .x$mltplx_image$ppp$window$xrange[1]),
+    max_x = map_dbl(l, ~ .x$mltplx_image$ppp$window$xrange[2]),
+    min_y = map_dbl(l, ~ .x$mltplx_image$ppp$window$yrange[1]),
+    max_y = map_dbl(l, ~ .x$mltplx_image$ppp$window$yrange[2])
+  )
+  new_MltplxExperiment(x = x, y = y, marks = marks, slide_id = slide_ids,
+                       window_sizes = window_sizes)
 }
 
 #' @export
@@ -214,9 +241,9 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
                                               .dist_metric_name = NULL) {
   slide_ids <- mltplx_experiment$slide_ids
   n_slides <- length(slide_ids)
-  
+
   mltplx_objects <- mltplx_experiment$mltplx_objects
-  
+
   progressr::with_progress({
     prog <- progressr::progressor(steps = n_slides)
     mltplx_objects <- furrr::future_map(mltplx_objects, \(obj) {
@@ -229,7 +256,7 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
                                               return(obj)
                                               })
   })
-  
+
   mltplx_experiment$mltplx_objects <- mltplx_objects
 
   mltplx_experiment
@@ -239,3 +266,5 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
 cell_type_counts.MltplxExperiment <- function(mltplx_experiment) {
   map_df(mltplx_experiment$mltplx_objects,cell_type_counts)
 }
+
+

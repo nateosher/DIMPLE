@@ -31,19 +31,27 @@ patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",p_val_
     ungroup() %>%
     mutate(p.adj = p.adjust(p.value,method="fdr"))
   
+  
+  
+  df <- df %>%
+    left_join(res,by="patient_id")
+  if(is.null(grouping_var)) {
+    df$gp <- 1
+  } else {
+    df$gp <- df %>% pull(!!sym(grouping_var))
+  }
   df %>%
-    left_join(res,by="patient_id") %>%
-    mutate(across(!!sym(grouping_var),factor) ) %>%
-    {
-      if(!is.null(grouping_var)) ggplot2::ggplot(.,aes(x=patient_id,y=dist,
-                                              fill=!!sym(grouping_var)))
-      else ggplot2::ggplot(.,aes(x=patient_id,y=dist))
-    } +
+    mutate(across(gp,factor) ) %>%
+    mutate(gp_bin = as.numeric(gp)) %>%
+    mutate(patient_id= reorder(patient_id,gp_bin)) %>%
+    ggplot2::ggplot(.,aes(x=patient_id,y=dist,fill=gp)) +
     ggplot2::geom_boxplot() +
     ggplot2::geom_text(aes(label=ifelse(!!sym(p_val_col) < 0.05,"*","")), size = 20 / .pt, y = max(df$dist)) +
     anglex() +
     ggplot2::ylab("Distance") +
     ggplot2::ggtitle(paste0("Distance between ", t1,
                             " and ", t2, " in all patients")) +
-    scale_fill_manual(values=cbfp)
+    scale_fill_manual(values=cbfp) +
+    labs(fill=grouping_var) +
+    ggplot2::guides(color="none")
 }
