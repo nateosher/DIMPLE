@@ -31,8 +31,11 @@ function(input, output, session) {
     updateSelectInput(session, inputId = 'slide_ids_to_plot', label = 'Select slide ids to plot', choices = exp$slide_ids, selected = "")
     updateSelectInput(session, inputId = 'cell_types1', label = 'Select first cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
     updateSelectInput(session, inputId = 'cell_types2', label = 'Select second cell type', choices = unique(unlist(lapply(lapply(exp$mltplx_objects,'[[',3),'[[',2))), selected = "")
-    updateSelectInput(session, inputId = 'which_qdist', label = 'Which quantile?', choices = unique(paste0(unlist(lapply(lapply(lapply(lapply(exp$mltplx_objects,'[[',5),'[',5),'[[',1),'[',3))%>%na.omit(),"-",unlist(lapply(lapply(lapply(lapply(exp$mltplx_objects,'[[',5),'[',5),'[[',1),'[',4))%>%na.omit())), selected = "")
-
+    if(!is.null(exp$mltplx_objects[[1]]$qdist)){
+      updateSelectInput(session, inputId = 'which_qdist', label = 'Which quantile?', choices = unique(paste0(unlist(lapply(lapply(lapply(lapply(exp$mltplx_objects,'[[',5),'[',5),'[[',1),'[',3))%>%na.omit(),"-",unlist(lapply(lapply(lapply(lapply(exp$mltplx_objects,'[[',5),'[',5),'[[',1),'[',4))%>%na.omit())), selected = "")
+      
+    }
+    
     if(!is.null(exp$metadata)){
       updateSelectInput(session, inputId = 'group_factor', label = 'Select covariate to test', choices = names(exp$metadata), selected = "")
       updateSelectInput(session, inputId = 'covariates', label = 'Select covariates to adjust for', choices = names(exp$metadata), selected = "")
