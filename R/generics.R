@@ -15,3 +15,6 @@ plot_dist_matrix <- function(x,...) UseMethod("plot_dist_matrix")
 
 #'@export
 as_MltplxExperiment <- function(x,...) UseMethod("as_MltplxExperiment")
+
+#'@export
+plot_qdist_matrix <- function(x,...) UseMethod("plot_qdist_matrix")
