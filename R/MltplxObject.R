@@ -264,6 +264,42 @@ update_object_dist = function(mltplx_object, dist_metric,
   return(mltplx_object)
 }
 
+#' Plots intensities for selected cell types of `MltplxObject` object.
+#' @param mltplx_object `MltplxObject` object
+#' @param types Vector of cell types whose intensities you'd like to plot
+#' @return NULL
+#' @importFrom magrittr `%>%`
+#' @import ggplot2
+#' @export
+plot_intensity_surface.MltplxObject <- function(mltplx_object,types = NULL) {
+  if(is.null(mltplx_object$mltplx_intensity))
+    stop("intensities have not been generated for this `MltplxObject`")
+
+  all_cell_types = mltplx_object$mltplx_image$cell_types
+
+  if(is.null(types))
+    types = all_cell_types
+
+  intens <- mltplx_object$mltplx_intensity$intensities
+
+  df <- intens %>%
+    tibble::as_tibble() %>%
+    dplyr::select(all_of(types),X,Y) %>%
+    tidyr::pivot_longer(-c(X,Y),names_to = "type",values_to = "intensity") %>%
+    filter(type %in% types)
+
+  df$slide_id <- mltplx_object$slide_id
+
+  df %>%
+    ggplot(aes(X,Y,fill=intensity)) +
+    geom_tile() +
+    facet_wrap(~type) +
+    viridis::scale_fill_viridis() +
+    ggtitle(paste0("Intensity plot for slide id ", mltplx_object$slide_id)) -> p
+
+  p
+}
+
 
 #' Title
 #'

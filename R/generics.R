@@ -18,3 +18,6 @@ as_MltplxExperiment <- function(x,...) UseMethod("as_MltplxExperiment")
 
 #'@export
 plot_qdist_matrix <- function(x,...) UseMethod("plot_qdist_matrix")
+
+#'@export
+plot_intensity_surface <- function(x,...) UseMethod("plot_intensity_surface")
