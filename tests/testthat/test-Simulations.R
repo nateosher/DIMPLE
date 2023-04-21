@@ -270,11 +270,11 @@ test_that("`SimulateGrid` works", {
   ))
 })
 
-test_that("`plot_matrix_heatmap` works", {
+test_that("`plot_simulation_heatmap` works", {
   matrix_1 = GridCircle(100, 100, 30, 30, 10, 0.1) +
     GridCircle(100, 100, 70, 70, 10, 0.15)
 
-  plot_1 = plot_matrix_heatmap(matrix_1)
+  plot_1 = plot_simulation_heatmap(matrix_1)
 
   expect_true(all(
     plot_1$data %>% dim() == c(10000, 3)
@@ -292,7 +292,7 @@ test_that("`plot_matrix_heatmap` works", {
 
   # You should be able to manually set the scale without issue
   expect_no_error({
-    plot_2 = plot_matrix_heatmap(matrix_1, min.v = 0.11, max.v = 0.16)
+    plot_2 = plot_simulation_heatmap(matrix_1, min.v = 0.11, max.v = 0.16)
   })
 
 })

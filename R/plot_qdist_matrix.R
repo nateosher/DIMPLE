@@ -9,7 +9,7 @@
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
-plot_qdist <- function(mltplx_experiment, slide_ids, mode = "heatmap", net_threshold = 0.1) {
+plot_qdist_matrix <- function(mltplx_experiment, slide_ids, mode = "heatmap", net_threshold = 0.1) {
   stopifnot("Quantile distances must exist"=!is.null(mltplx_experiment$mltplx_objects[[1]]$quantile_dist))
   if(mode == "heatmap") {
 

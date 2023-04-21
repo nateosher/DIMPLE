@@ -3,11 +3,11 @@ exp <- add_mltplx_metadata(exp,n_patients=10)
 exp <- update_intensity(exp,ps=2,bw=3)
 exp <- update_dist(exp,cor)
 
-test_that("`plot_pairwise_group_heatmap` works", {
+test_that("`plot_dist_regression_heatmap` works", {
   lm_dist_max <- lm_dist(exp, "group", agg_fun = max)
 
   expect_no_warning({
-    plot_1 = plot_pairwise_group_heatmap(lm_dist_max, p_val_col = "p.value")
+    plot_1 = plot_dist_regression_heatmap(lm_dist_max, p_val_col = "p.value")
   })
 
   expect_true(all(
@@ -29,7 +29,7 @@ test_that("`plot_pairwise_group_heatmap` works", {
                "estimate")
 
   expect_no_warning({
-    plot_1 = plot_pairwise_group_heatmap(lm_dist_max, p_val_col = "p.value")
+    plot_1 = plot_dist_regression_heatmap(lm_dist_max, p_val_col = "p.value")
   })
 
   expect_true(all(
@@ -53,14 +53,14 @@ test_that("`plot_pairwise_group_heatmap` works", {
   # I can't figure out how to access the legend settings, but at the very least
   # this should work without errors or warnings
   expect_no_warning({
-    plot_2 = plot_pairwise_group_heatmap(lm_dist_max, limits = c(-0.1, 0.1),
+    plot_2 = plot_dist_regression_heatmap(lm_dist_max, limits = c(-0.1, 0.1),
                                          p_val_col = "p.value")
   })
 })
 
-test_that("`typewise_boxplots` works", {
+test_that("`plot_dist_boxplots` works", {
   expect_no_error({
-    plot_1 = typewise_boxplots(exp, "X1", "X2", group_factor = "group")
+    plot_1 = plot_dist_boxplots(exp, "X1", "X2", grouping_var = "group")
   })
 
   # Slide S4 doesn't have any cells of type 2; so there should only be 19 rows
@@ -70,7 +70,7 @@ test_that("`typewise_boxplots` works", {
   expect_equal(ncol(plot_1$data), 7)
 
   expect_no_error({
-    plot_2 = typewise_boxplots(exp, "X1", "X2", group_factor = "group", agg_fun = max)
+    plot_2 = plot_dist_boxplots(exp, "X1", "X2", grouping_var = "group", agg_fun = max)
   })
 
   # Here there should be 10, since patient 4 has another slide with cells of
@@ -79,11 +79,22 @@ test_that("`typewise_boxplots` works", {
 
   # But still 6 columns
   expect_equal(ncol(plot_2$data), 6)
+
+  expect_error({
+    plot_dist_boxplots(exp %>% (\(x) {
+      x$metadata = NULL
+      x
+    }), "X1", "X2", grouping_var = "group")
+  }, "Patient metadata must exist")
+
+  expect_error({
+    plot_dist_boxplots(exp, "X1", "X2", grouping_var = "nonexistant")
+  }, "Patient metadata must contain grouping variable")
 })
 
-test_that("`plot_quantile_mask` works", {
+test_that("`plot_quantile_intensity_surface` works", {
   expect_no_error({
-    plot_quantile_mask(exp, "X1", tibble(from = c(10, 30, 50, 70),
+    plot_quantile_intensity_surface(exp, "X1", tibble(from = c(10, 30, 50, 70),
                                          to = c(20, 40, 60, 80)),
                        slide_ids = "S4")
   })
@@ -104,29 +115,29 @@ test_that("`patient_boxplots` works", {
   },"Patient metadata must exist")
 })
 
-test_that("`plot_qdist` works", {
+test_that("`plot_qdist_matrix` works", {
   expect_error({
-    plot_qdist(exp, "S5")
+    plot_qdist_matrix(exp, "S5")
   }, "Quantile distances must exist")
 
   exp = add_QuantileDist(exp, cor, "X1",
                          tibble(from = seq(10, 50, 10), to = seq(20, 60, 10)))
   expect_no_error({
-    plot_qdist(exp, "S5")
+    plot_qdist_matrix(exp, "S5")
   })
 
   expect_no_error({
-    plot_qdist(exp, "S5", mode = "network", net_threshold = 0)
+    plot_qdist_matrix(exp, "S5", mode = "network", net_threshold = 0)
   })
 
   expect_error({
-    plot_qdist(exp, "S5", mode = "joel mode")
+    plot_qdist_matrix(exp, "S5", mode = "joel mode")
   }, "Mode must be either heatmap or network")
 })
 
-test_that("`plot_scatter_dist` works", {
+test_that("`plot_dist_scatter` works", {
   expect_no_error({
-    scatter_1 = plot_scatter_dist(exp, "X1", "X2", cont_var = "age")
+    scatter_1 = plot_dist_scatter(exp, "X1", "X2", cont_var = "age")
   })
 
   expect_equal(nrow(scatter_1$data), 19)
@@ -135,7 +146,7 @@ test_that("`plot_scatter_dist` works", {
   exp_no_meta$metadata = NULL
 
   expect_error({
-    plot_scatter_dist(exp_no_meta, "X1", "X2", cont_var = "age")
+    plot_dist_scatter(exp_no_meta, "X1", "X2", cont_var = "age")
   },"Patient metadata must exist")
 })
 
@@ -149,62 +160,42 @@ test_that("`plot_ppp` works", {
   }, "ids not present in given `MltplxExperiment` object")
 })
 
-test_that("`plot_dist.MltplxObject` works", {
+test_that("`plot_dist_matrix.MltplxObject` works", {
   expect_no_error({
-    plot_dist(exp[[1]])
+    plot_dist_matrix(exp[[1]])
   })
 
   expect_no_error({
-    plot_dist(exp[[1]], mode = "network")
+    plot_dist_matrix(exp[[1]], mode = "network")
   })
 
   expect_no_error({
-    plot_dist(exp[[1]], mode = "network", invert_dist = FALSE)
+    plot_dist_matrix(exp[[1]], mode = "network", invert_dist = FALSE)
   })
 
 })
 
-test_that("`plot_dist.MltplxExperiment` works", {
+test_that("`plot_dist_matrix.MltplxExperiment` works", {
   expect_no_error({
-    plot_dist(exp, "S1")
+    plot_dist_matrix(exp, "S1")
   })
 
   expect_error({
-    plot_dist(exp, "nonexistant")
+    plot_dist_matrix(exp, "nonexistant")
   }, "no slide ids passed as argument are present in `MlptlxExperiment` object")
 })
 
-test_that("`plot_intensities` works", {
+test_that("`plot_intensity_surface` works", {
   expect_no_error({
-    plot_intensities(exp, c("S1", "S2"), "X1")
+    plot_intensity_surface(exp, c("S1", "S2"), "X1")
   })
 
   expect_error({
-    plot_intensities(exp, c("S1", "S2"), "nonexistant")
+    plot_intensity_surface(exp, c("S1", "S2"), "nonexistant")
   }, "none of the cell types passed as arguments are present in subset of slides selected")
 
   expect_error({
-    plot_intensities(exp, "nonexistant", "X1")
+    plot_intensity_surface(exp, "nonexistant", "X1")
   }, "none of the slide ids passed as arguments are present in `MltplxExperiment` object")
-
-})
-
-test_that("`group_boxplots` works", {
-  expect_no_error({
-    group_boxplots(exp, "X1", "X2", grouping_var = "group")
-  })
-
-  expect_error({
-    group_boxplots(exp %>% (\(x) {
-      x$metadata = NULL
-      x
-      }), "X1", "X2", grouping_var = "group")
-  }, "Patient metadata must exist")
-
-  expect_error({
-    group_boxplots(exp, "X1", "X2", grouping_var = "nonexistant")
-  }, "Patient metadata must contain grouping variable")
-
-
 
 })

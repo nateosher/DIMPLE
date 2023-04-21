@@ -11,7 +11,7 @@ add_QuantileDist <- function(x,...) UseMethod("add_QuantileDist")
 cell_type_counts <- function(x,...) UseMethod("cell_type_counts")
 
 #'@export
-plot_dist <- function(x,...) UseMethod("plot_dist")
+plot_dist_matrix <- function(x,...) UseMethod("plot_dist_matrix")
 
 #'@export
 as_MltplxExperiment <- function(x,...) UseMethod("as_MltplxExperiment")

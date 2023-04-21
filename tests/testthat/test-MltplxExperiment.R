@@ -271,7 +271,7 @@ test_that("Factor levels are alphabetical in dist_to_df", {
   expect_equal(levels(df$type1),sort(levels(df$type1)))
 })
 
-test_that("`filter_exp` works", {
+test_that("`filter_MltplxExp` works", {
   exp <- build_mltplx_exp(200, n_slides = 20, seed=2025)
   exp <- add_mltplx_metadata(exp,n_patients=10)
   exp <- update_intensity(exp,ps=2,bw=3)
@@ -279,17 +279,17 @@ test_that("`filter_exp` works", {
 
   # Try passing a non-MltplxExperiment Object
   expect_error({
-    filter_exp(exp[[1]], c("S2", "S3"))
+    filter_MltplxExp(exp[[1]], c("S2", "S3"))
   }, "`mltplx_experiment` argument must be of class `MltplxExperiment`")
 
   # Filter such that no slides are included
   expect_warning({
-    filter_exp(exp, c("NONEXISTANT ID"))
+    filter_MltplxExp(exp, c("NONEXISTANT ID"))
   }, "resulting `MltplxExperiment` has no slides")
 
   # Filter to only the second and third slides
   expect_no_error({
-    exp_subset = filter_exp(exp, c("S2", "S3"))
+    exp_subset = filter_MltplxExp(exp, c("S2", "S3"))
   })
 
   expect_equal(length(exp_subset$mltplx_objects), 2)

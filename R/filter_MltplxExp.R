@@ -5,7 +5,7 @@
 #' @param id_list vector of ids to keep in resulting MltplxExperiment object
 #' @return New MltplxExperiment object containing only specified slides
 #' @export
-filter_exp = function(mltplx_experiment, id_list){
+filter_MltplxExp = function(mltplx_experiment, id_list){
   if(class(mltplx_experiment) != "MltplxExperiment")
     stop("`mltplx_experiment` argument must be of class `MltplxExperiment`")
   filtered_exp = mltplx_experiment

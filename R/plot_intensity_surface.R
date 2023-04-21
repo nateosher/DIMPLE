@@ -8,7 +8,7 @@
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
-plot_intensities <- function(mltplx_experiment,slide_ids,types) {
+plot_intensity_surface <- function(mltplx_experiment,slide_ids,types) {
   objs <- filter_mltplx_objects(mltplx_experiment,slide_ids)
 
   all_cell_types = map(objs, ~ .x$mltplx_image$cell_types) %>%

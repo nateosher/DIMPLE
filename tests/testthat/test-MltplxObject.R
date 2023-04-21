@@ -120,15 +120,15 @@ test_that("`MltplxObject` constructor works", {
   ))
 
   expect_no_error({
-    plot_dist(obj_3)
+    plot_dist_matrix(obj_3)
   })
 
   expect_no_error({
-    plot_dist(obj_3, mode = "network")
+    plot_dist_matrix(obj_3, mode = "network")
   })
 
   expect_error({
-    plot_dist(obj_1)
+    plot_dist_matrix(obj_1)
   }, "no distance matrix has been generated for this `MltplxObject`; see `update_object_dist` function")
 
   expect_true(all(

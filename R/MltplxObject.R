@@ -103,7 +103,7 @@ print.MltplxObject = function(mltplx_object, ...){
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
-plot_dist.MltplxObject <- function(mltplx_object, mode = "heatmap",
+plot_dist_matrix.MltplxObject <- function(mltplx_object, mode = "heatmap",
                                    net_threshold = 0, invert_dist = TRUE) {
   if(is.null(mltplx_object$mltplx_dist))
     stop("no distance matrix has been generated for this `MltplxObject`; see `update_object_dist` function")

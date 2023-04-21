@@ -9,7 +9,7 @@
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
-plot_dist.MltplxExperiment <- function(mltplx_experiment, slide_ids, mode = "heatmap",
+plot_dist_matrix.MltplxExperiment <- function(mltplx_experiment, slide_ids, mode = "heatmap",
                                        net_threshold = 0, invert_dist = TRUE) {
     experiment_ids = map_chr(mltplx_experiment$mltplx_objects, ~ .x$slide_id)
     if(!any(slide_ids %in% experiment_ids))
@@ -17,7 +17,7 @@ plot_dist.MltplxExperiment <- function(mltplx_experiment, slide_ids, mode = "hea
 
     filtered_exp <- filter_mltplx_objects(mltplx_experiment,slide_ids)
     for(mltplx_object in filtered_exp) {
-      plot_dist(mltplx_object, mode = mode, net_threshold = net_threshold,
+      plot_dist_matrix(mltplx_object, mode = mode, net_threshold = net_threshold,
                 invert_dist = invert_dist)
     }
 }
