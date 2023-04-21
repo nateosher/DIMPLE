@@ -196,6 +196,8 @@ test_that("`plot_intensity_surface` works", {
 
   expect_error({
     plot_intensity_surface(exp, "nonexistant", "X1")
-  }, "none of the slide ids passed as arguments are present in `MltplxExperiment` object")
+  },
+  "none of the slide ids passed as arguments are present in `MltplxExperiment` object") %>%
+    expect_warning("resulting `MltplxExperiment` has no slides")
 
 })
