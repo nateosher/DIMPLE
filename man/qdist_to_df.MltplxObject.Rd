@@ -4,7 +4,7 @@
 \alias{qdist_to_df.MltplxObject}
 \title{Quantile dist to df}
 \usage{
-\method{qdist_to_df}{MltplxObject}(mltplx_object, reduce_symmetric = FALSE)
+\method{qdist_to_df}{MltplxObject}(mltplx_object, reduce_symmetric = TRUE)
 }
 \arguments{
 \item{reduce_symmetric}{logical, whether to remove equivalent rows}

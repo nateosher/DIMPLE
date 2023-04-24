@@ -103,7 +103,7 @@ print.MltplxObject = function(mltplx_object, ...){
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
-plot_dist.MltplxObject <- function(mltplx_object, mode = "heatmap",
+plot_dist_matrix.MltplxObject <- function(mltplx_object, mode = "heatmap",
                                    net_threshold = 0, invert_dist = TRUE) {
   if(is.null(mltplx_object$mltplx_dist))
     stop("no distance matrix has been generated for this `MltplxObject`; see `update_object_dist` function")
@@ -159,6 +159,70 @@ plot_dist.MltplxObject <- function(mltplx_object, mode = "heatmap",
   }
 }
 
+#' Plots quantile distance matrices for selected slides in a `MltplxExperiment` object
+#' @param mltplx_object `MltplxObject` objects
+#' @param mode String indicating plot type, either "heatmap" or "network"
+#' @param net_threshold When mode is "network", edges below this absolute value are
+#' excluded from the plot
+#' @return ggplot2 object
+#' @importFrom magrittr `%>%`
+#' @import ggplot2
+#' @export
+plot_qdist_matrix.MltplxObject <- function(mltplx_object, mode = "heatmap",
+                                           net_threshold = 0) {
+  stopifnot("Quantile distances must exist"=!is.null(mltplx_object$quantile_dist))
+  if(mode == "heatmap") {
+
+    df <- qdist_to_df(mltplx_object) %>%
+      tidyr::drop_na(qdist)
+
+    p <- df %>%
+      ggplot(aes(type1,type2,fill=qdist)) +
+      geom_tile() +
+      anglex() +
+      viridis::scale_fill_viridis() + facet_wrap(interval~.)+
+      ggtitle(paste0("Distance matrix by quantile of cell type ",
+                     mltplx_object$quantile_dist$mask_type),
+              subtitle = paste0("slide id: ", mltplx_object$slide_id))
+
+    p
+  } else if(mode == "network") {
+      arr <- mltplx_object$quantile_dist$quantile_dist_array
+      intervals <- qdist_to_df(mltplx_object) %>%
+        distinct(interval) %>%
+        pull(interval)
+      gf <- purrr::map_df(1:dim(arr)[3],\(i) {
+        g <- igraph::graph_from_adjacency_matrix(arr[,,i],weighted=TRUE)
+        d <- ggnetwork::ggnetwork(g,layout = igraph::layout_in_circle(g))
+        d$interval <- intervals[i]
+        d
+      })
+      p <- gf %>%
+        dplyr::mutate(sgn = factor(ifelse(sign(weight) < 0,"Negative","Positive"))) %>%
+        dplyr::filter(abs(weight) >= net_threshold) %>%
+        ggplot2::ggplot(aes(x = x, y = y, xend = xend, yend = yend)) +
+        ggnetwork::geom_edges(aes(color=sgn,linewidth=abs(weight))) +
+        ggnetwork::geom_nodes(color="#E58601",size=10) +
+        ggnetwork::geom_nodetext_repel(aes( label = name),
+                                       fontface = "bold",color="#D3DDDC") +
+        theme(legend.position = "none") +
+        theme_minimal() +
+        theme(axis.text = element_blank(),
+              axis.title = element_blank(),
+              panel.background = element_rect(fill = "#24281A"),
+              panel.grid = element_blank()) +
+        guides(linewidth="none",color="none") +
+        ggplot2::scale_color_manual(values=c("Positive"="#46ACC8","Negative"="#B40F20")) +
+        ggtitle(paste0("Distance matrix by quantile of cell type ",
+                       mltplx_object$quantile_dist$mask_type),
+                subtitle = paste0("slide id: ", mltplx_object$slide_id)) +
+        facet_wrap(interval~.)
+      p
+  } else {
+    stop("Mode must be either heatmap or network")
+  }
+}
+
 #' Update the intensities generated for a specific `MltplxObject`
 #' @param mltplx_object object of class `MltplxObject` to be updated
 #' @param ps "Pixel size" of intensity estimations. Results in squares that are
@@ -200,6 +264,42 @@ update_object_dist = function(mltplx_object, dist_metric,
   return(mltplx_object)
 }
 
+#' Plots intensities for selected cell types of `MltplxObject` object.
+#' @param mltplx_object `MltplxObject` object
+#' @param types Vector of cell types whose intensities you'd like to plot
+#' @return NULL
+#' @importFrom magrittr `%>%`
+#' @import ggplot2
+#' @export
+plot_intensity_surface.MltplxObject <- function(mltplx_object,types = NULL) {
+  if(is.null(mltplx_object$mltplx_intensity))
+    stop("intensities have not been generated for this `MltplxObject`")
+
+  all_cell_types = mltplx_object$mltplx_image$cell_types
+
+  if(is.null(types))
+    types = all_cell_types
+
+  intens <- mltplx_object$mltplx_intensity$intensities
+
+  df <- intens %>%
+    tibble::as_tibble() %>%
+    dplyr::select(all_of(types),X,Y) %>%
+    tidyr::pivot_longer(-c(X,Y),names_to = "type",values_to = "intensity") %>%
+    filter(type %in% types)
+
+  df$slide_id <- mltplx_object$slide_id
+
+  df %>%
+    ggplot(aes(X,Y,fill=intensity)) +
+    geom_tile() +
+    facet_wrap(~type) +
+    viridis::scale_fill_viridis() +
+    ggtitle(paste0("Intensity plot for slide id ", mltplx_object$slide_id)) -> p
+
+  p
+}
+
 
 #' Title
 #'
@@ -238,7 +338,7 @@ dist_to_df.MltplxObject <- function(mltplx_object,
 #'
 #' @return tibble with dist information
 #' @export
-qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = FALSE) {
+qdist_to_df.MltplxObject <- function(mltplx_object,reduce_symmetric = TRUE) {
 
   has_quantile_dist = !is.null(mltplx_object$quantile_dist) &&
                         (length(mltplx_object$quantile_dist) > 1 ||

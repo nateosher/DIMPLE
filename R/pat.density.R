@@ -5,7 +5,6 @@
 #' @param sigma function to estimate bandwidth, usually something like bw.diggle
 #'
 #' @return dataframe in which rows are pixels and columns are cell types
-#' @export
 #'
 #' @importFrom magrittr `%>%`
 #' @examples
