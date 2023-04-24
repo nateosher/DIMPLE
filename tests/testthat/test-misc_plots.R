@@ -148,6 +148,11 @@ test_that("`plot_dist_scatter` works", {
   expect_error({
     plot_dist_scatter(exp_no_meta, "X1", "X2", cont_var = "age")
   },"Patient metadata must exist")
+
+  expect_no_error({
+    scatter_2 = plot_dist_scatter(exp, "X1", "X2", cont_var = "age",
+                                  agg_fun = max, smooth = "loess")
+  })
 })
 
 test_that("`plot_ppp` works", {
@@ -186,6 +191,11 @@ test_that("`plot_dist_matrix.MltplxExperiment` works", {
 })
 
 test_that("`plot_intensity_surface` works", {
+  expect_error({
+    plot_intensity_surface(as_MltplxExperiment(exp$mltplx_objects[1:10]))
+  },
+  "intensities have not been generated for this MltplxExperiment")
+
   expect_no_error({
     plot_intensity_surface(exp, c("S1", "S2"), "X1")
   })
