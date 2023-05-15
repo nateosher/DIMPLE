@@ -12,7 +12,7 @@
 #' @importFrom magrittr `%>%`
 #' @importFrom viridis 
 #' @export
-patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",p_val_col = "p.value",mu0=0) {
+patient_boxplots_qdist <- function(mltplx_experiment,t1,t2,grouping_var="Group",p_val_col = "p.value",mu0=0) {
   if(is.null(mltplx_experiment$metadata))
     stop("Patient metadata must exist")
   if(is.null(mltplx_experiment$mltplx_objects[[1]]$quantile_dist))
