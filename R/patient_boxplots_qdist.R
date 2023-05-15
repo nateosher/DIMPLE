@@ -21,7 +21,7 @@ patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",p_val_
     stop("Patient metadata must contain variable")
   
   df <- mltplx_experiment %>%
-    qdist_to_df %>%
+    qdist_to_df(reduce_symmetric = F) %>%
     filter(type1 == t1,
            type2 == t2)
   
