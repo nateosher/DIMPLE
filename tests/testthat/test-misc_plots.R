@@ -211,3 +211,88 @@ test_that("`plot_intensity_surface` works", {
     expect_warning("resulting `MltplxExperiment` has no slides")
 
 })
+
+
+test_that("`plot_qdist_boxplots` works", {
+  expect_error({
+    plot_qdist_boxplots(exp, "X1", "X2", grouping_var = "group")
+  }, "Quantile distances must exist")
+  
+  exp = add_QuantileDist(exp, cor, "X1",
+                         tibble(from = seq(10, 50, 10), to = seq(20, 60, 10)))
+  expect_no_error({
+    plot_1<-plot_qdist_boxplots(exp, "X1", "X2", grouping_var = "group")
+  })
+  
+  
+  expect_equal(nrow(plot_1$data), 95)
+  
+  expect_equal(ncol(plot_1$data), 8)
+  
+  expect_no_error({
+    plot_2 = plot_dist_boxplots(exp, "X1", "X2", grouping_var = "group", agg_fun = max)
+  })
+
+  expect_equal(nrow(plot_2$data), 10)
+  
+  expect_equal(ncol(plot_2$data), 6)
+  
+  expect_error({
+    plot_qdist_boxplots(exp %>% (\(x) {
+      x$metadata = NULL
+      x
+    }), "X1", "X2", grouping_var = "group")
+  }, "Patient metadata must exist")
+  
+  expect_error({
+    plot_qdist_boxplots(exp, "X1", "X2", grouping_var = "nonexistant")
+  }, "Patient metadata must contain grouping variable")
+})
+
+test_that("`plot_qdist_scatter` works", {
+  expect_error({
+    plot_qdist_scatter(exp, "X1", "X2", cont_var = "age")
+  }, "Quantile distances must exist")
+  
+  exp = add_QuantileDist(exp, cor, "X1",
+                         tibble(from = seq(10, 50, 10), to = seq(20, 60, 10)))
+  expect_no_error({
+    plot_1<-plot_qdist_scatter(exp, "X1", "X2", cont_var = "age")
+  })
+  
+  expect_equal(nrow(plot_1$data), 95)
+  expect_equal(ncol(plot_1$data), 8)
+  exp_no_meta = exp
+  exp_no_meta$metadata = NULL
+
+  expect_error({
+    plot_qdist_scatter(exp_no_meta, "X1", "X2", cont_var = "age")
+  },"Patient metadata must exist")
+
+  expect_no_error({
+    scatter_2 = plot_dist_scatter(exp, "X1", "X2", cont_var = "age",
+                                  agg_fun = max, smooth = "loess")
+  })
+})
+
+test_that("`patient_boxplots_qdist` works", {
+  expect_error({
+    patient_boxplots_qdist(exp, "X1", "X2", grouping_var = "group")
+  }, "Quantile distances must exist")
+  
+  exp = add_QuantileDist(exp, cor, "X1",
+                         tibble(from = seq(10, 50, 10), to = seq(20, 60, 10)))
+  expect_no_error({
+    boxplots_1 = patient_boxplots_qdist(exp, "X1", "X2",grouping_var = "group")
+  })
+  
+  expect_equal(nrow(boxplots_1$data), 95)
+  expect_equal(ncol(boxplots_1$data), 19)
+  exp_no_meta = exp
+  exp_no_meta$metadata = NULL
+  
+  expect_error({
+    patient_boxplots_qdist(exp_no_meta, "X1", "X2", grouping_var = "group")
+  },"Patient metadata must exist")
+  
+})
