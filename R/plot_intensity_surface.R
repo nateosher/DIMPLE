@@ -8,7 +8,7 @@
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
-plot_intensity_surface.MltplxExperiment <- function(mltplx_experiment,slide_ids,types) {
+plot_intensity_surface.MltplxExperiment <- function(mltplx_experiment,slide_ids,types,ThreeD=F) {
   if(is.null(mltplx_experiment[[1]]$mltplx_intensity))
     stop("intensities have not been generated for this MltplxExperiment")
 
@@ -28,6 +28,6 @@ plot_intensity_surface.MltplxExperiment <- function(mltplx_experiment,slide_ids,
 
 
   for(slide in filtered_exp$mltplx_objects){
-    print(plot_intensity_surface(slide, types = types))
+    print(plot_intensity_surface(slide, types = types,ThreeD))
   }
 }

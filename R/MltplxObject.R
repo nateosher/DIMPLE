@@ -270,8 +270,9 @@ update_object_dist = function(mltplx_object, dist_metric,
 #' @return NULL
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
+#' @import plotly
 #' @export
-plot_intensity_surface.MltplxObject <- function(mltplx_object,types = NULL) {
+plot_intensity_surface.MltplxObject <- function(mltplx_object,types = NULL,ThreeD=FALSE) {
   if(is.null(mltplx_object$mltplx_intensity))
     stop("intensities have not been generated for this `MltplxObject`")
 
@@ -289,13 +290,25 @@ plot_intensity_surface.MltplxObject <- function(mltplx_object,types = NULL) {
     filter(type %in% types)
 
   df$slide_id <- mltplx_object$slide_id
+  if(ThreeD==TRUE){
+    if(length(types)>2)
+      stop("too many types for 3D plot, please select < 3 types")
+    nr<-length(unique(df$Y))
+    nc<-length(unique(df$X))
+    
+    p<-plot_ly()%>%add_surface(z=matrix(df$intensity[df$type==types[1]],nrow=nr,ncol=nc),opacity=.9,colorscale = list(c(0,1),c("rgb(107,184,255)","rgb(0,90,124)")),colorbar=list(title=types[1]))
+    if(length(types)>1){
+        p<-p%>%add_surface(z=matrix(df$intensity[df$type==types[2]],nrow=nr,ncol=nc),opacity=.9,colorscale = list(c(0,1),c("rgb(255,107,184)","rgb(128,0,64)")),colorbar=list(title=types[2]))
+          }
+    }else{
+    df %>%
+      ggplot(aes(X,Y,fill=intensity)) +
+      geom_tile() +
+      facet_wrap(~type) +
+      viridis::scale_fill_viridis() +
+      ggtitle(paste0("Intensity plot for slide id ", mltplx_object$slide_id)) -> p
+  }
 
-  df %>%
-    ggplot(aes(X,Y,fill=intensity)) +
-    geom_tile() +
-    facet_wrap(~type) +
-    viridis::scale_fill_viridis() +
-    ggtitle(paste0("Intensity plot for slide id ", mltplx_object$slide_id)) -> p
 
   p
 }
