@@ -116,7 +116,7 @@ test_that("`MltplxExperiment` constructor catches malformed objects", {
   expect_error(new_MltplxExperiment(x, y, marks, slide_ids, bw = 30))
 })
 
-test_that("`add_QuantileDist` handles missing types", {
+test_that("`update_qdist` handles missing types", {
   # From Maria's example
   x <- runif(100,-50,50)
   y <- runif(100,-50,50)
@@ -131,7 +131,7 @@ test_that("`add_QuantileDist` handles missing types", {
   q_probs<-cbind.data.frame(from,to)
   #want quantile dist with X3 as mask type but X3 is not in image A
   expect_warning({
-    exp_with_qd = add_QuantileDist(exp,cor,mask_type = "X3",q_probs)
+    exp_with_qd = update_qdist(exp,cor,mask_type = "X3",q_probs)
   })
 
   # Check print generic for MltplxExperiment

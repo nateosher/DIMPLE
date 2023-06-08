@@ -78,7 +78,7 @@ test_that("lm_qdist works ", {
   expect_error(lm_qdist(experiment, "patient_id"),
                "Quantile dist must be created first")
 
-  experiment = add_QuantileDist(experiment,
+  experiment = update_qdist(experiment,
                                 cor,
                                 "Tumor",
                                 tibble(
@@ -137,7 +137,7 @@ test_that("Adjust counts",{
                             ps = 10, bw = 30,
                             dist_metric = cor)
   exp <- update_metadata(exp,metadata)
-  
+
   # check after adjusting for counts
   res1 <- lm_dist(exp,group_factor = "group",adjust_counts = TRUE)
   df <- dist_to_df(exp,reduce_symmetric = TRUE)
@@ -153,7 +153,7 @@ test_that("Adjust counts",{
     ungroup()
   expect_true(isTRUE(all.equal(unname(coef(lm(dist ~ group + Immune + Other,data=df)))[2],
             res1 %>% filter(type1 == "Immune",type2 == "Other") %>% pull(estimate))))
-  
+
   # check after NOT adjusting for counts
   res2 <- lm_dist(exp,group_factor = "group",adjust_counts = FALSE)
   df <- dist_to_df(exp,reduce_symmetric = TRUE)
@@ -166,7 +166,7 @@ test_that("Adjust counts",{
     ungroup()
   expect_true(isTRUE(all.equal(unname(coef(lm(dist ~ group,data=df)))[2],
                                res2 %>% filter(type1 == "Immune",type2 == "Other") %>% pull(estimate))))
-  
+
   expect_false(isTRUE(all.equal(unname(coef(lm(dist ~ group,data=df)))[2],
                                res1 %>% filter(type1 == "Immune",type2 == "Other") %>% pull(estimate))))
 })

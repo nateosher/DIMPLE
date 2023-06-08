@@ -260,7 +260,7 @@ qdist_to_df.MltplxExperiment <- function(mltplx_experiment,reduce_symmetric = FA
 }
 
 #' @export
-add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
+update_qdist.MltplxExperiment <- function(mltplx_experiment,
                                               dist_metric,
                                               mask_type,
                                               q_probs,
@@ -273,7 +273,7 @@ add_QuantileDist.MltplxExperiment <- function(mltplx_experiment,
   progressr::with_progress({
     prog <- progressr::progressor(steps = n_slides)
     mltplx_objects <- furrr::future_map(mltplx_objects, \(obj) {
-                                              obj <- add_QuantileDist(obj,
+                                              obj <- update_qdist(obj,
                                                                dist_metric,
                                                                mask_type,
                                                                q_probs,
