@@ -383,7 +383,7 @@ plot.MltplxObject = function(mltplx_object, ...){
 }
 
 #' @export
-add_QuantileDist.MltplxObject <- function(mltplx_object,
+update_qdist.MltplxObject <- function(mltplx_object,
                                           dist_metric,
                                           mask_type,
                                           q_probs,
