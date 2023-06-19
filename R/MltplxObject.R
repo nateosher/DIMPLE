@@ -185,7 +185,7 @@ plot_qdist_matrix.MltplxObject <- function(mltplx_object, mode = "heatmap",
       ggplot(aes(type1,type2,fill=qdist)) +
       geom_tile() +
       anglex() +
-      viridis::scale_fill_viridis() + facet_wrap(interval~.)+
+      viridis::scale_fill_viridis() + facet_wrap(interval~., nrow = 1)+
       ggtitle(paste0("Distance matrix by quantile of cell type ",
                      mltplx_object$quantile_dist$mask_type),
               subtitle = paste0("slide id: ", mltplx_object$slide_id)) +

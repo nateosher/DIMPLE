@@ -18,7 +18,7 @@ plot_dist_regression_heatmap <- function(df,p_val_col = "p.adj",limits=NULL) {
       scale_x_discrete(drop = FALSE) +
       scale_y_discrete(drop = FALSE) +
       xlab("") + ylab("") +
-      guides(fill = guide_colorbar(title = "Estimate")) +
+      guides(fill = guide_colorbar(title = "Distance")) +
       theme(
         axis.text.x = element_text(face="bold", colour = "black"),
         axis.text.y = element_text(face="bold", colour = "black")
