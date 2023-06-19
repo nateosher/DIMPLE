@@ -56,5 +56,11 @@ plot.MltplxIntensity = function(mltplx_intensity, ...){
     geom_tile() +
     facet_wrap(~type) +
     viridis::scale_fill_viridis() +
-    ggtitle(paste0("Cell intensities"))
+    ggtitle(paste0("Cell intensities")) +
+    xlab("") + ylab("") +
+    guides(fill = guide_colorbar(title = "Intensity")) +
+    theme(
+      axis.text.x = element_text(face="bold", colour = "black"),
+      axis.text.y = element_text(face="bold", colour = "black")
+    )
 }

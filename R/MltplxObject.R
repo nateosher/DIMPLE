@@ -118,7 +118,12 @@ plot_dist_matrix.MltplxObject <- function(mltplx_object, mode = "heatmap",
       anglex() +
       viridis::scale_fill_viridis() +
       xlab("") + ylab("") +
-      ggtitle(paste0("Distance matrix for slide id ", mltplx_object$slide_id))
+      guides(fill = guide_colorbar(title = mltplx_object$mltplx_dist$metric)) +
+      ggtitle(paste0("Distance matrix for slide id ", mltplx_object$slide_id)) +
+      theme(
+        axis.text.x = element_text(face="bold", colour = "black"),
+        axis.text.y = element_text(face="bold", colour = "black")
+      )
 
     print(p)
   } else if(mode == "network") {
@@ -183,7 +188,13 @@ plot_qdist_matrix.MltplxObject <- function(mltplx_object, mode = "heatmap",
       viridis::scale_fill_viridis() + facet_wrap(interval~.)+
       ggtitle(paste0("Distance matrix by quantile of cell type ",
                      mltplx_object$quantile_dist$mask_type),
-              subtitle = paste0("slide id: ", mltplx_object$slide_id))
+              subtitle = paste0("slide id: ", mltplx_object$slide_id)) +
+      xlab("") + ylab("") +
+      guides(fill = guide_colorbar(title = mltplx_object$mltplx_dist$metric)) +
+      theme(
+        axis.text.x = element_text(face="bold", colour = "black"),
+        axis.text.y = element_text(face="bold", colour = "black")
+      )
 
     p
   } else if(mode == "network") {
@@ -295,6 +306,12 @@ plot_intensity_surface.MltplxObject <- function(mltplx_object,types = NULL) {
     geom_tile() +
     facet_wrap(~type) +
     viridis::scale_fill_viridis() +
+    xlab("") + ylab("") +
+    guides(fill = guide_colorbar(title = "Intensity")) +
+    theme(
+      axis.text.x = element_text(face="bold", colour = "black"),
+      axis.text.y = element_text(face="bold", colour = "black")
+    ) +
     ggtitle(paste0("Intensity plot for slide id ", mltplx_object$slide_id)) -> p
 
   p
