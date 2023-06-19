@@ -53,7 +53,7 @@ test_that("`MltplxIntensity` constructor works", {
   ))
 
   expect_equal(plot_1$labels$title, "Cell intensities")
-  expect_equal(plot_1$labels$x, "X")
-  expect_equal(plot_1$labels$y, "Y")
+  expect_equal(plot_1$labels$x, "")
+  expect_equal(plot_1$labels$y, "")
   expect_equal(plot_1$labels$fill, "intensity")
 })
