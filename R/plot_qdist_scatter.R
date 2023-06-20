@@ -26,10 +26,10 @@ plot_qdist_scatter <- function(mltplx_experiment,t1,t2,cont_var="Age",agg_fun=NU
     {
       if(!is.null(agg_fun)) {
         group_by(.,patient_id,type1,type2,interval) %>%
-          mutate(dist = agg_fun(qdist,na.rm=T)) 
+          mutate(qdist = agg_fun(qdist,na.rm=T)) 
       } else .
     } %>%
-    ggplot(aes(!!sym(cont_var),dist)) +
+    ggplot(aes(!!sym(cont_var),qdist)) +
     {if(!is.null(smooth)) geom_smooth(method=smooth,color="black",linetype=2) } +
     geom_point(color=cbfp[1],size=2) +
     facet_wrap(interval~.)
