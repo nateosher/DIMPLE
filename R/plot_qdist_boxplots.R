@@ -27,10 +27,10 @@ plot_qdist_boxplots <- function(mltplx_experiment,
     {
       if(!is.null(agg_fun)) {
         group_by(.,patient_id,type1,type2,!!sym(grouping_var),interval) %>%
-          summarise(dist = agg_fun(qdist,na.rm=T))
+          summarise(qdist = agg_fun(qdist,na.rm=T))
       } else .
     } %>%
-    ggplot(aes(!!sym(grouping_var),dist)) +
+    ggplot(aes(!!sym(grouping_var),qdist)) +
     geom_boxplot() +
     geom_jitter(color=cbfp[1]) +
     facet_wrap(interval~.)
