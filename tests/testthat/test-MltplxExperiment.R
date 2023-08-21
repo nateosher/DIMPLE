@@ -98,22 +98,57 @@ test_that("`MltplxExperiment` constructor (intensities, no dists) works", {
 
 test_that("`MltplxExperiment` constructor catches malformed objects", {
   # length(x) < length(y)
-  expect_error(new_MltplxExperiment(x[1:10], y, marks, slide_ids))
+  expect_error(new_MltplxExperiment(cell_x_values[1:10],
+                                    cell_y_values,
+                                    cell_marks, slide_ids))
 
   # length(x) > length(y)
-  expect_error(new_MltplxExperiment(x, y[1:10], marks, slide_ids))
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values[1:10],
+                                    cell_marks, slide_ids))
 
   # length(marks) != length(x), length(y)
-  expect_error(new_MltplxExperiment(x, y, marks[1:10], slide_ids))
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks[1:10], slide_ids))
 
   # length(slide_ids) != length(x), length(y), marks
-  expect_error(new_MltplxExperiment(x, y, marks, slide_ids[1:10]))
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids[1:10]))
 
   # ps but no bw
-  expect_error(new_MltplxExperiment(x, y, marks, slide_ids, ps = 30))
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids, ps = 30))
 
   # bw but no ps
-  expect_error(new_MltplxExperiment(x, y, marks, slide_ids, bw = 30))
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids, bw = 30))
+
+  # window sizes and window list
+  # They're both empty, but point is both are non-null
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids,
+                                    window_sizes = tibble(
+                                      slide_id = character(),
+                                      min_x = numeric(),
+                                      max_x = numeric(),
+                                      min_y = numeric(),
+                                      max_y = numeric()
+                                    ),
+                                    windows = list()),
+          "pass either `windows` parameter or `window_sizes` but not both")
+
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids,
+                                    windows = list(owin())),
+  paste0("length of `windows` argument must be the same",
+         " as the number of unique slide ids"))
+
 })
 
 test_that("`update_qdist` handles missing types", {
