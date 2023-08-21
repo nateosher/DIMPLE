@@ -32,10 +32,11 @@
 #' @import tidyr
 new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                                 ps = NULL, bw = NULL,
-                                dist_metric = NULL, metadata = NULL){
+                                dist_metric = NULL, metadata = NULL,
+                                windows = NULL){
 
-  mltplx_experiment_check_inputs(x, y, marks, slide_id, ps, bw,window_sizes,
-                                 dist_metric, metadata)
+  mltplx_experiment_check_inputs(x, y, marks, slide_id, ps, bw, window_sizes,
+                                 dist_metric, metadata, windows)
 
   full_tib = tibble(
     x = x,
@@ -44,13 +45,21 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
     slide_id = slide_id
   )
 
-  if(is.null(window_sizes)) {
+  if(is.null(window_sizes) && is.null(windows)) {
     window_sizes <- full_tib %>%
       group_by(slide_id) %>%
       summarise(min_x = min(x),
                 max_x = max(x),
                 min_y = min(y),
                 max_y = max(y))
+  }else if(!is.null(windows)){
+    window_sizes = tibble(
+      slide_id = unique(slide_id),
+      min_x = map_dbl(windows, ~ min(.x$x)),
+      max_x = map_dbl(windows, ~ max(.x$x)),
+      min_y = map_dbl(windows, ~ min(.x$y)),
+      max_y = map_dbl(windows, ~ max(.x$y))
+    )
   }
 
   full_tib <- left_join(full_tib,window_sizes,by = "slide_id")
@@ -71,10 +80,18 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
       select(x,y,marks)
   })
 
+  if(!is.null(windows) && length(dfs) != length(windows)){
+    stop(paste0("length of `windows` argument must ",
+                "be the same as the number of unique slide ids"))
+  }
+
+  if(is.null(windows))
+    windows = rep(list(NULL), length(dfs))
+
   progressr::with_progress({
     prog <- progressr::progressor(steps = length(dfs))
 
-    mltplx_objects <- furrr::future_map(dfs,\(df) {
+    mltplx_objects <- furrr::future_map2(dfs, windows, \(df, window) {
         xrange <- attr(df,"xrange")
         yrange <- attr(df,"yrange")
         slide_id <- attr(df,"slide_id")
@@ -84,6 +101,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                          slide_id,
                          xrange = xrange,
                          yrange = yrange,
+                         window = window,
                          ps = ps,
                          bw = bw,
                          dist_metric = dist_metric,
@@ -117,7 +135,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
 }
 
 mltplx_experiment_check_inputs = function(x, y, marks, slide_id, ps, bw,window_sizes,
-                                          dist_metric, metadata){
+                                          dist_metric, metadata, windows){
 
   if(length(x) != length(y))
     stop("`x` must be the same length as `y`")
@@ -133,6 +151,11 @@ mltplx_experiment_check_inputs = function(x, y, marks, slide_id, ps, bw,window_s
   # TODO: typechecks
   # TODO: refactor into sub-functions that can be called when other
   #       components are added
+
+  if(!is.null(windows) && !is.null(window_sizes)){
+    stop(paste0("pass either `windows` parameter or `window_sizes` ",
+                "but not both"))
+  }
 
   if((is.null(ps) && !is.null(bw)) || (!is.null(ps) && is.null(bw)))
     stop("`ps` and `bw` must both be provided to compute intensities")
@@ -179,24 +202,27 @@ as_MltplxExperiment.list = function(l, ...){
   unique_classes = unlist(list_classes) %>% unique()
   if(any(n_classes > 1) ||
     length(unique_classes) > 1 ||
-    unique_classes[1] != "MltplxObject"){
+    !(unique_classes[1] %in% c("MltplxObject", "ppp"))){
     stop(paste('to convert "list" object to "MltplxObject" object, all',
-               'elements of list must be of class "MltplxObject"'))
+               'elements of list must either be of class "MltplxObject" or ',
+               'ppp'))
+  }
+
+  if(unique_classes[1] == "ppp"){
+    l = l %>%
+      imap(\(p, i){
+        new_MltplxObject(p$x, p$y, p$marks, paste("Slide", i),
+                         window = p$window)
+      })
   }
 
   x = map(l, ~ .x$mltplx_image$ppp$x) %>% unlist()
   y = map(l, ~ .x$mltplx_image$ppp$y) %>% unlist()
   marks = map(l, ~ .x$mltplx_image$ppp$marks) %>% unlist()
   slide_ids = map(l, ~ rep(.x$slide_id, .x$mltplx_image$ppp$n)) %>% unlist()
-  window_sizes = tibble(
-    slide_id = map_chr(l, ~ .x$slide_id),
-    min_x = map_dbl(l, ~ .x$mltplx_image$ppp$window$xrange[1]),
-    max_x = map_dbl(l, ~ .x$mltplx_image$ppp$window$xrange[2]),
-    min_y = map_dbl(l, ~ .x$mltplx_image$ppp$window$yrange[1]),
-    max_y = map_dbl(l, ~ .x$mltplx_image$ppp$window$yrange[2])
-  )
+  windows = map(l, ~ .x$mltplx_image$ppp$window)
   new_MltplxExperiment(x = x, y = y, marks = marks, slide_id = slide_ids,
-                       window_sizes = window_sizes)
+                       windows = windows)
 }
 
 #' @export

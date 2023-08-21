@@ -4,7 +4,7 @@
 \alias{new_MltplxImage}
 \title{Creates new \code{MltplxImage} object.}
 \usage{
-new_MltplxImage(x, y, marks, xrange = NULL, yrange = NULL)
+new_MltplxImage(x, y, marks, xrange = NULL, yrange = NULL, window = NULL)
 }
 \arguments{
 \item{x}{X coordinates of cells}

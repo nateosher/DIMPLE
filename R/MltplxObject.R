@@ -28,7 +28,8 @@
 #' @export
 new_MltplxObject = function(x, y, marks,slide_id, xrange = NULL, yrange = NULL,
                             ps = NULL, bw = NULL,
-                            dist_metric = NULL, .dist_metric_name = NULL){
+                            dist_metric = NULL, .dist_metric_name = NULL,
+                            window = NULL){
 
   if(!is.null(.dist_metric_name)){
     dist_metric_name = .dist_metric_name
@@ -37,7 +38,8 @@ new_MltplxObject = function(x, y, marks,slide_id, xrange = NULL, yrange = NULL,
   }
 
   # Make image
-  mltplx_image = new_MltplxImage(x, y, marks, xrange = xrange, yrange = yrange)
+  mltplx_image = new_MltplxImage(x, y, marks, xrange = xrange,
+                                 yrange = yrange, window = window)
 
 
   # Make intensities, if applicable
