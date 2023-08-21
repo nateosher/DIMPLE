@@ -396,9 +396,11 @@ test_that("`list.as_MltplxExperiment` works", {
   # From list of ppp objects
   expect_no_error({
     mxp_from_ppp_list = map(1:10, \(i){
-          pp = rpoispp(10)
-          marks(pp) = sample(c("Type 1", "Type 2"), pp$n, replace = T)
-          pp
+          spatstat.geom::ppp(
+            x = runif(10),
+            y = runif(10),
+            marks = sample(c("Type 1", "Type 2"), 10, replace = T)
+          )
       }) %>% as_MltplxExperiment()
   })
 
