@@ -20,7 +20,6 @@ MakeDistMat = function(intensity_mat, dist_metric, symmetric=T){
                 intensity_mat[,col_combos[i, 2]])
   })
   dist_mat[col_combos] = dists
-  dist_mat[lower.tri(dist_mat)] = t(dist_mat)[lower.tri(dist_mat)]
   colnames(dist_mat) = colnames(intensity_mat)
   rownames(dist_mat) = colnames(intensity_mat)
   dist_mat

@@ -9,7 +9,7 @@
 #' @importFrom magrittr `%>%`
 #' @importFrom purrr imap
 #' @export
-update_dist = function(mltplx_experiment, dist_metric){
+update_dist = function(mltplx_experiment, dist_metric,...){
   mltplx_objects <- mltplx_experiment$mltplx_objects
   .dist_metric_name = substitute(dist_metric) %>% as.character()
   total_objects = length(mltplx_objects)
@@ -20,7 +20,7 @@ update_dist = function(mltplx_experiment, dist_metric){
     mltplx_objects <- furrr::future_map(mltplx_objects, \(obj){
       obj <- update_object_dist(obj,
                                 dist_metric = dist_metric,
-                                .dist_metric_name = .dist_metric_name)
+                                .dist_metric_name = .dist_metric_name,...)
       prog()
       return(obj)
     })

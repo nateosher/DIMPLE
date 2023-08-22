@@ -28,7 +28,7 @@
 #' @export
 new_MltplxObject = function(x, y, marks,slide_id, xrange = NULL, yrange = NULL,
                             ps = NULL, bw = NULL,
-                            dist_metric = NULL, .dist_metric_name = NULL){
+                            dist_metric = NULL, .dist_metric_name = NULL,...){
 
   if(!is.null(.dist_metric_name)){
     dist_metric_name = .dist_metric_name
@@ -50,7 +50,7 @@ new_MltplxObject = function(x, y, marks,slide_id, xrange = NULL, yrange = NULL,
   # Make distance matrices, if applicable
   if(!is.null(dist_metric)){
     mltplx_dist = new_MltplxDist(mltplx_intensity, dist_metric,
-                                 dist_metric_name)
+                                 dist_metric_name,...)
   }else{
     mltplx_dist = NULL
   }
@@ -104,12 +104,12 @@ print.MltplxObject = function(mltplx_object, ...){
 #' @import ggplot2
 #' @export
 plot_dist_matrix.MltplxObject <- function(mltplx_object, mode = "heatmap",
-                                   net_threshold = 0, invert_dist = TRUE) {
+                                   net_threshold = 0, invert_dist = TRUE, symmetric=T) {
   if(is.null(mltplx_object$mltplx_dist))
     stop("no distance matrix has been generated for this `MltplxObject`; see `update_object_dist` function")
   if(mode == "heatmap") {
     df <- mltplx_object %>%
-      dist_to_df(reduce_symmetric = TRUE) %>%
+      dist_to_df(reduce_symmetric = symmetric) %>%
       tidyr::drop_na(dist)
 
     p <- df %>%
