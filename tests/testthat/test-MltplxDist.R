@@ -57,9 +57,9 @@ test_that("`MltplxDist` constructor works", {
         "Distance metric: kld ",
         "",
         "          Immune     Other     Tumor",
-        "Immune        NA 0.3189505 0.3253299",
-        "Other  0.3226151        NA 0.3635421",
-        "Tumor  0.2988800 0.3487413        NA"
+        "Immune        NA 0.3953645 0.3692495",
+        "Other  0.4109716        NA 0.3887378",
+        "Tumor  0.3790915 0.4127645        NA"
       )
   ))
   
