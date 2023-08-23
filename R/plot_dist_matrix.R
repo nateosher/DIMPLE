@@ -18,7 +18,7 @@ plot_dist_matrix.MltplxExperiment <- function(mltplx_experiment, slide_ids, mode
     filtered_exp <- filter_mltplx_objects(mltplx_experiment,slide_ids)
     for(mltplx_object in filtered_exp) {
       plot_dist_matrix(mltplx_object, mode = mode, net_threshold = net_threshold,
-                invert_dist = invert_dist,...)
+                invert_dist = invert_dist)
     }
 }
 

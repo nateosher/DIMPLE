@@ -6,7 +6,7 @@
 rows represent locations, and values represent smoothed intensities) into
 a distance matrix with specified distance metric.}
 \usage{
-MakeDistMat(intensity_mat, dist_metric)
+MakeDistMat(intensity_mat, dist_metric, symmetric = T)
 }
 \arguments{
 \item{intensity_mat}{Intensity matrix}

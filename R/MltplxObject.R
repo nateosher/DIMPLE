@@ -50,7 +50,7 @@ new_MltplxObject = function(x, y, marks,slide_id, xrange = NULL, yrange = NULL,
   # Make distance matrices, if applicable
   if(!is.null(dist_metric)){
     mltplx_dist = new_MltplxDist(mltplx_intensity, dist_metric,
-                                 dist_metric_name,...)
+                                 dist_metric_name)
   }else{
     mltplx_dist = NULL
   }
@@ -258,7 +258,8 @@ update_object_intensity = function(mltplx_object, ps, bw){
 #' name of the distance metric you use
 #' @export
 update_object_dist = function(mltplx_object, dist_metric,
-                              .dist_metric_name = NULL){
+                              .dist_metric_name = NULL,
+                              symmetric = TRUE){
   if(is.null(mltplx_object$mltplx_intensity))
     stop(paste("you have to generate intensities before",
                 "distance matrices- see `update_intensity` function",
@@ -270,7 +271,7 @@ update_object_dist = function(mltplx_object, dist_metric,
 
   mltplx_object$mltplx_dist = new_MltplxDist(
     mltplx_object$mltplx_intensity, dist_metric,
-    .dist_metric_name
+    .dist_metric_name, symmetric = symmetric
   )
   return(mltplx_object)
 }

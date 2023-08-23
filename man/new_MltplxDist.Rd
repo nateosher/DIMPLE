@@ -4,7 +4,13 @@
 \alias{new_MltplxDist}
 \title{Creates \code{MltplxDist} object.}
 \usage{
-new_MltplxDist(mltplx_intensity, dist_metric, .dist_metric_name)
+new_MltplxDist(
+  mltplx_intensity,
+  dist_metric,
+  .dist_metric_name,
+  symmetric = TRUE,
+  ...
+)
 }
 \arguments{
 \item{mltplx_intensity}{Intensity matrix (i.e. matrix where columns represent cell types,

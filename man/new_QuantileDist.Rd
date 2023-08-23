@@ -9,7 +9,8 @@ new_QuantileDist(
   dist_metric,
   mask_type,
   q_probs,
-  dist_metric_name
+  dist_metric_name,
+  ...
 )
 }
 \arguments{

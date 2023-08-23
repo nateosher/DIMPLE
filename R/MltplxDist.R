@@ -7,9 +7,11 @@
 #' used
 #' @return `MltplxDist` object
 #' @export
-new_MltplxDist = function(mltplx_intensity, dist_metric, .dist_metric_name,...){
+new_MltplxDist = function(mltplx_intensity, dist_metric, .dist_metric_name,
+                          symmetric = TRUE, ...){
   intensities <- mltplx_intensity$intensities
-  distance_matrix = MakeDistMat(intensities[,!(colnames(intensities) %in% c("X","Y"))], dist_metric,...)
+  distance_matrix = MakeDistMat(intensities[,!(colnames(intensities) %in% c("X","Y"))],
+                                dist_metric, symmetric = symmetric)
 
   structure(
     list(

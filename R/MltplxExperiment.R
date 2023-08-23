@@ -87,7 +87,7 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                          ps = ps,
                          bw = bw,
                          dist_metric = dist_metric,
-                         .dist_metric_name = dist_metric_name,...)
+                         .dist_metric_name = dist_metric_name)
         prog()
 
         return(obj)
@@ -264,7 +264,7 @@ update_qdist.MltplxExperiment <- function(mltplx_experiment,
                                               dist_metric,
                                               mask_type,
                                               q_probs,
-                                              .dist_metric_name = NULL,...) {
+                                              .dist_metric_name = NULL) {
   slide_ids <- mltplx_experiment$slide_ids
   n_slides <- length(slide_ids)
 
@@ -277,7 +277,7 @@ update_qdist.MltplxExperiment <- function(mltplx_experiment,
                                                                dist_metric,
                                                                mask_type,
                                                                q_probs,
-                                                               .dist_metric_name,...)
+                                                               .dist_metric_name)
                                               prog()
                                               return(obj)
                                               })

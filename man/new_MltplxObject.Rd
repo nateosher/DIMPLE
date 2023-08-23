@@ -14,7 +14,8 @@ new_MltplxObject(
   ps = NULL,
   bw = NULL,
   dist_metric = NULL,
-  .dist_metric_name = NULL
+  .dist_metric_name = NULL,
+  ...
 )
 }
 \arguments{

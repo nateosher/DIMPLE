@@ -6,10 +6,10 @@
 #' takes in two vectors of equal length and produces a scalar
 #' @return Distance matrix with rows/columns named appropriately
 MakeDistMat = function(intensity_mat, dist_metric, symmetric=T){
-  if(symmetric==F){
-    col_combos = tibble(x1=1:ncol(intensity_mat),x2=1:ncol(intensity_mat)) %>% 
+  if(!symmetric){
+    col_combos = tibble(x1=1:ncol(intensity_mat),x2=1:ncol(intensity_mat)) %>%
       expand(x1, x2) %>%
-      filter(x1!=x2) %>% 
+      filter(x1!=x2) %>%
       as.matrix()
   }else{
     col_combos = ncol(intensity_mat) %>% combn(2) %>% t()

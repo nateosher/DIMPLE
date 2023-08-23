@@ -9,7 +9,8 @@
   slide_ids,
   mode = "heatmap",
   net_threshold = 0,
-  invert_dist = TRUE
+  invert_dist = TRUE,
+  ...
 )
 }
 \arguments{
