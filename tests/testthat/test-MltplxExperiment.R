@@ -447,5 +447,68 @@ test_that("`list.as_MltplxExperiment` works", {
       c("Type 1", "Type 2")
   ))
 
-})
+  heterogeneous_list = list(
+    new_MltplxObject(
+      x = runif(100, 0, 100),
+      y = runif(100, 0, 100),
+      marks = sample(c("Type 1", "Type 2"), 100, replace = T),
+      slide_id = "Slide 1"
+    ) %>%
+      update_object_intensity(ps = 10, bw = 10),
+    new_MltplxObject(
+      x = runif(100, 0, 100),
+      y = runif(100, 0, 100),
+      marks = sample(c("Type 1", "Type 2"), 100, replace = T),
+      slide_id = "Slide 2"
+    ) %>%
+      update_object_intensity(ps = 20, bw = 10)
+  )
 
+  expect_warning(as_MltplxExperiment(heterogeneous_list),
+      "`MltplxObjects` have different pixel sizes;")
+
+  heterogeneous_list[[1]] = heterogeneous_list[[1]] %>%
+    update_object_intensity(ps = 10, bw = 10)
+
+  heterogeneous_list[[2]] = heterogeneous_list[[2]] %>%
+    update_object_intensity(ps = 10, bw = 20)
+
+  expect_warning(as_MltplxExperiment(heterogeneous_list),
+                 "`MltplxObjects` have different bandwidths;")
+
+  heterogeneous_list[[1]] = heterogeneous_list[[1]] %>%
+    update_object_intensity(ps = 10, bw = 10) %>%
+    update_object_dist(jsd)
+
+  heterogeneous_list[[2]] = heterogeneous_list[[2]] %>%
+    update_object_intensity(ps = 10, bw = 10) %>%
+    update_object_dist(cor)
+
+  expect_warning(as_MltplxExperiment(heterogeneous_list),
+                 "`MltplxObjects` have different distance metrics;")
+
+  expect_no_error({
+    working_conversion = new_MltplxExperiment(x = cell_x_values,
+                                           y = cell_y_values,
+                                           marks = factor(cell_marks),
+                                           slide_id = slide_ids) %>%
+      update_intensity(ps = 10, bw = 10) %>%
+      update_dist(cor) %>%
+      (\(l){
+        l$mltplx_objects
+      }) %>%
+      as_MltplxExperiment()
+  })
+
+  expect_true(all(
+    (working_conversion %>% print() %>% capture.output()) ==
+      c(
+        "MltplxExperiment with 10 slides",
+        "Intensities generated with pixel size 10 and bandwidth 10 ",
+        "Distance matrices generated with cor ",
+        "No attached metadata"
+      )
+  ))
+
+
+})

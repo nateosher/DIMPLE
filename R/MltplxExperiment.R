@@ -226,10 +226,8 @@ as_MltplxExperiment.list = function(l, ...){
     warning(paste0("`MltplxObjects` have different pixel sizes; ",
                    "this information will be removed in the resulting ",
                    "`MltplxExperiment` object"))
-  }else{
-    pixel_size = ifelse(is.na(unique_pixel_sizes[1]),
-                        NULL,
-                        unique_pixel_sizes[1])
+  }else if(!is.na(unique_pixel_sizes[1])){
+    pixel_size = unique_pixel_sizes[1]
   }
 
   bandwidth = NULL
@@ -241,10 +239,8 @@ as_MltplxExperiment.list = function(l, ...){
     warning(paste0("`MltplxObjects` have different bandwidths; ",
                    "this information will be removed in the resulting ",
                    "`MltplxExperiment` object"))
-  }else{
-    bandwidth = ifelse(is.na(unique_bws[1]),
-                        NULL,
-                        unique_bws[1])
+  }else if(!is.na(unique_bws[1])){
+    bandwidth = unique_bws[1]
   }
 
   dist_metric = NULL
@@ -257,10 +253,8 @@ as_MltplxExperiment.list = function(l, ...){
     warning(paste0("`MltplxObjects` have different distance metrics; ",
                    "this information will be removed in the resulting ",
                    "`MltplxExperiment` object"))
-  }else{
-    dist_metric = ifelse(is.na(unique_dist_metrics[1]),
-                       NULL,
-                       unique_dist_metrics[1])
+  }else if(!is.na(unique_dist_metrics[1])){
+    dist_metric = unique_dist_metrics[1]
   }
 
   if(any(is.null(c(pixel_size, bandwidth, dist_metric)))){
