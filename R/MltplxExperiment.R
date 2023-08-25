@@ -210,19 +210,76 @@ as_MltplxExperiment.list = function(l, ...){
 
   if(unique_classes[1] == "ppp"){
     l = l %>%
-      imap(\(p, i){
+      furrr::future_imap(\(p, i){
         new_MltplxObject(p$x, p$y, p$marks, paste("Slide", i),
                          window = p$window)
       })
   }
 
-  x = map(l, ~ .x$mltplx_image$ppp$x) %>% unlist()
-  y = map(l, ~ .x$mltplx_image$ppp$y) %>% unlist()
-  marks = map(l, ~ .x$mltplx_image$ppp$marks) %>% unlist()
-  slide_ids = map(l, ~ rep(.x$slide_id, .x$mltplx_image$ppp$n)) %>% unlist()
-  windows = map(l, ~ .x$mltplx_image$ppp$window)
-  new_MltplxExperiment(x = x, y = y, marks = marks, slide_id = slide_ids,
-                       windows = windows)
+  # Check if list has smoothing/dist mats
+  pixel_size = NULL
+  unique_pixel_sizes = map_dbl(l, ~ ifelse(is.null(.x$mltplx_intensity$ps),
+                                           NA,
+                                           .x$mltplx_intensity$ps)) %>%
+    unique()
+  if(length(unique_pixel_sizes) > 1){
+    warning(paste0("`MltplxObjects` have different pixel sizes; ",
+                   "this information will be removed in the resulting ",
+                   "`MltplxExperiment` object"))
+  }else{
+    pixel_size = ifelse(is.na(unique_pixel_sizes[1]),
+                        NULL,
+                        unique_pixel_sizes[1])
+  }
+
+  bandwidth = NULL
+  unique_bws = map_dbl(l, ~ ifelse(is.null(.x$mltplx_intensity$bw),
+                                   NA,
+                                   .x$mltplx_intensity$bw)) %>%
+    unique()
+  if(length(unique_bws) > 1){
+    warning(paste0("`MltplxObjects` have different bandwidths; ",
+                   "this information will be removed in the resulting ",
+                   "`MltplxExperiment` object"))
+  }else{
+    bandwidth = ifelse(is.na(unique_bws[1]),
+                        NULL,
+                        unique_bws[1])
+  }
+
+  dist_metric = NULL
+
+  unique_dist_metrics = map_chr(l, ~ ifelse(is.null(.x$mltplx_dist$metric),
+                                            NA,
+                                            .x$mltplx_dist$metric)) %>%
+    unique()
+  if(length(unique_dist_metrics) > 1){
+    warning(paste0("`MltplxObjects` have different distance metrics; ",
+                   "this information will be removed in the resulting ",
+                   "`MltplxExperiment` object"))
+  }else{
+    dist_metric = ifelse(is.na(unique_dist_metrics[1]),
+                       NULL,
+                       unique_dist_metrics[1])
+  }
+
+  if(any(is.null(c(pixel_size, bandwidth, dist_metric)))){
+    pixel_size = NULL
+    bandwidth = NULL
+    dist_metric = NULL
+  }
+
+  structure(
+    list(
+      mltplx_objects = l,
+      ps = pixel_size,
+      bw = bandwidth,
+      dist_metric_name = dist_metric,
+      metadata = NULL,
+      slide_ids = map_chr(l, ~ .x$slide_id)
+    ),
+    class = "MltplxExperiment"
+  )
 }
 
 #' @export
