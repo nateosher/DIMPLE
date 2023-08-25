@@ -10,7 +10,7 @@
 #' @import ggplot2
 #' @export
 plot_dist_matrix.MltplxExperiment <- function(mltplx_experiment, slide_ids, mode = "heatmap",
-                                       net_threshold = 0, invert_dist = TRUE,...) {
+                                       net_threshold = 0, invert_dist = TRUE) {
     experiment_ids = map_chr(mltplx_experiment$mltplx_objects, ~ .x$slide_id)
     if(!any(slide_ids %in% experiment_ids))
       stop("no slide ids passed as argument are present in `MlptlxExperiment` object")

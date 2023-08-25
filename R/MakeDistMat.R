@@ -7,9 +7,9 @@
 #' @return Distance matrix with rows/columns named appropriately
 MakeDistMat = function(intensity_mat, dist_metric, symmetric=T){
   if(!symmetric){
-    col_combos = tibble(x1=1:ncol(intensity_mat),x2=1:ncol(intensity_mat)) %>%
-      expand(x1, x2) %>%
-      filter(x1!=x2) %>%
+    col_combos = tibble::tibble(x1=1:ncol(intensity_mat),x2=1:ncol(intensity_mat)) %>%
+      tidyr::expand(x1, x2) %>%
+      dplyr::filter(x1!=x2) %>%
       as.matrix()
   }else{
     col_combos = ncol(intensity_mat) %>% combn(2) %>% t()

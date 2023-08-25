@@ -11,7 +11,7 @@ new_QuantileDist <- function(mltplx_intensity,
                              dist_metric,
                              mask_type,
                              q_probs, # must be a dataframe of quantile probs with columns "from" and "to" and probs as e.g. 5 instead of 0.05
-                             dist_metric_name,...) {
+                             dist_metric_name) {
   intensities <- mltplx_intensity$intensities %>%
     as.data.frame()
 

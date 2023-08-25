@@ -32,7 +32,8 @@
 #' @import tidyr
 new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                                 ps = NULL, bw = NULL,
-                                dist_metric = NULL, metadata = NULL){
+                                dist_metric = NULL, metadata = NULL,
+                                symmetric = TRUE){
 
   mltplx_experiment_check_inputs(x, y, marks, slide_id, ps, bw,window_sizes,
                                  dist_metric, metadata)
@@ -87,7 +88,8 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                          ps = ps,
                          bw = bw,
                          dist_metric = dist_metric,
-                         .dist_metric_name = dist_metric_name)
+                         .dist_metric_name = dist_metric_name,
+                         symmetric = symmetric)
         prog()
 
         return(obj)

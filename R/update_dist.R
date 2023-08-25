@@ -10,7 +10,7 @@
 #' @importFrom purrr imap
 #' @export
 update_dist = function(mltplx_experiment, dist_metric,
-                       symmetric = TRUE, ...){
+                       symmetric = TRUE){
   mltplx_objects <- mltplx_experiment$mltplx_objects
   .dist_metric_name = substitute(dist_metric) %>% as.character()
   total_objects = length(mltplx_objects)
