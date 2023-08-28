@@ -23,6 +23,9 @@
 #' @param metadata Optional: patient/slide level data. Must include *one* row
 #' per unique slide id, and a column `slide_id` indicating the slide to which each row corresponds
 #' @param window_sizes dataframe with columns `slide_id`, `min_x`, `max_x`, `min_y` and `max_y` indicating the window dimensions for each slide
+#' @param windows Optional: list of `owin` objects representing the windows of each
+#' biopsy. Windows will be assigned to slides in the order that they're passed
+#' in accordance with how the slide IDs are ordered.
 #' @return `MltplxExperiment` object.
 #' @export
 #' @importFrom tibble tibble

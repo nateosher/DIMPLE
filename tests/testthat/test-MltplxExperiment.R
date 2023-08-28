@@ -149,6 +149,38 @@ test_that("`MltplxExperiment` constructor catches malformed objects", {
   paste0("length of `windows` argument must be the same",
          " as the number of unique slide ids"))
 
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids,
+                                    windows = list(owin())),
+               paste0("length of `windows` argument must be the same",
+                      " as the number of unique slide ids"))
+
+})
+
+test_that("`window` parameter works", {
+  expect_no_error({
+    mxp_custom_windows = new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids,
+                                    windows = rep(list(owin(c(0, 600),
+                                                            c(0, 600))),
+                                                  10))
+    })
+
+  expect_true(all(
+      mxp_custom_windows[[1]]$mltplx_image$ppp$window$xrange == c(0, 600)
+    )
+  )
+  expect_true(all(
+      mxp_custom_windows[[1]]$mltplx_image$ppp$window$yrange == c(0, 600)
+    )
+  )
+  print_output = capture.output(print(mxp_custom_windows))
+  expect_equal(print_output[1], "MltplxExperiment with 10 slides")
+  expect_equal(print_output[2], "No intensities generated")
+  expect_equal(print_output[3], "No distance matrices generated")
+  expect_equal(print_output[4], "No attached metadata")
 })
 
 test_that("`update_qdist` handles missing types", {
