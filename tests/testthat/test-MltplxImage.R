@@ -79,3 +79,19 @@ test_that("`MltplxImage` conversion functions work", {
     colnames(tib) == c("x", "y", "Cell Type")
   ))
 })
+
+test_that("`MltplxImage` catches malformed input", {
+  expect_error({
+    new_MltplxImage(slide_tibble %>%
+                        filter(id == "Slide 1") %>%
+                        pull(x),
+                      slide_tibble %>%
+                        filter(id == "Slide 1") %>%
+                        pull(y),
+                      slide_tibble %>%
+                        filter(id == "Slide 1") %>%
+                        pull(marks),
+                      window = 7)
+  },
+  "`window` argument must be of class `owin` from `spatstat.geom`")
+})
