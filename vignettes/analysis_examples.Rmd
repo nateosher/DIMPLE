@@ -43,14 +43,13 @@ mltplx_experiment = new_MltplxExperiment(x = cell_x_values,
                                   marks = factor(cell_marks),
                                   slide_id = slide_ids,
                                   ps = 30, bw = 40,
-                                  dist_metric = cor,
+                                  dist_metric = jsd,
                                   metadata = metadata)
 q_probs <- tibble(from=c(0,34,67),to=c(33,66,100))
 mltplx_experiment <- update_qdist(mltplx_experiment,
-                                  \(x,y) suppressWarnings(cor(x,y)),
+                                  jsd,
                                   "Tumor",
-                                  q_probs,
-                                  .dist_metric_name = "cor")
+                                  q_probs)
 
 mltplx_experiment
 ```
@@ -69,7 +68,7 @@ mltplx_experiment %>%
 
 ```{r}
 mltplx_experiment %>%
-  patient_boxplots(t1="Tumor",t2="Immune",grouping_var = "group")
+  patient_boxplots(t1="Tumor",t2="Immune",grouping_var = "group",p_val_col = "p.adj")
 ```
 
 ```{r}
