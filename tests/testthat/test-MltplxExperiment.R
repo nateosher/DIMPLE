@@ -149,13 +149,6 @@ test_that("`MltplxExperiment` constructor catches malformed objects", {
   paste0("length of `windows` argument must be the same",
          " as the number of unique slide ids"))
 
-  expect_error(new_MltplxExperiment(cell_x_values,
-                                    cell_y_values,
-                                    cell_marks, slide_ids,
-                                    windows = list(owin())),
-               paste0("length of `windows` argument must be the same",
-                      " as the number of unique slide ids"))
-
 })
 
 test_that("`window` parameter works", {
@@ -516,8 +509,16 @@ test_that("`list.as_MltplxExperiment` works", {
     update_object_intensity(ps = 10, bw = 10) %>%
     update_object_dist(cor)
 
-  expect_warning(as_MltplxExperiment(heterogeneous_list),
-                 "`MltplxObjects` have different distance metrics;")
+  expect_warning({
+    from_list_no_dists = as_MltplxExperiment(heterogeneous_list)
+  }, "`MltplxObjects` have different distance metrics;")
+
+  # Should still have intensities though
+  expect_equal(from_list_no_dists$ps, 10)
+  expect_equal(from_list_no_dists$bw, 10)
+  expect_true(!is.null(from_list_no_dists[[1]]$mltplx_intensity))
+
+
 
   expect_no_error({
     working_conversion = new_MltplxExperiment(x = cell_x_values,

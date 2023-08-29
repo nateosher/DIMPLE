@@ -256,15 +256,35 @@ as_MltplxExperiment.list = function(l, ...){
     warning(paste0("`MltplxObjects` have different distance metrics; ",
                    "this information will be removed in the resulting ",
                    "`MltplxExperiment` object"))
+
+    l = map(l, \(mx_obj){
+      mx_obj$mltplx_dist = NULL
+      mx_obj
+    })
   }else if(!is.na(unique_dist_metrics[1])){
     dist_metric = unique_dist_metrics[1]
   }
 
-  if(any(is.null(c(pixel_size, bandwidth, dist_metric)))){
+  # If the pixel sizes or bandwidths are different, need to nullify both
+  if(any(is.null(c(pixel_size, bandwidth)))){
     pixel_size = NULL
     bandwidth = NULL
-    dist_metric = NULL
+
+    l = map(l, \(mx_obj){
+      mx_obj$mltplx_intensity = NULL
+      mx_obj
+    })
+    # If same distance metric was used on different grid sizes/bandwidths,
+    # need to nullify this as well
+    if(!is.null(dist_metric)){
+      warning(paste0("also removing distance matrices"))
+      l = map(l, \(mx_obj){
+        mx_obj$mltplx_dist = NULL
+        mx_obj
+      })
+    }
   }
+
 
   structure(
     list(

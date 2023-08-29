@@ -5,7 +5,8 @@
 #' @param xrange vector of size 2 with range of x-coordinates. If NULL, will default to c(min(x),max(x))
 #' @param yrange vector of size 2 with range of y-coordinates. If NULL, will default to c(min(y),max(y))
 #' @param marks Cell types
-#'
+#' @param window Optional; object of class `owin` from spatstat.geom
+#' representing window of point process
 #' @return `MltplxImage` object
 #' @importFrom spatstat.geom ppp owin as.ppp
 #' @export
