@@ -1,9 +1,4 @@
-#' GGplot helper to color heatmap tiles by whether or not they are significant according to an adjusted p-value
-#'
-#' @param alpha Significance level
-#'
-#' @return
-#' @export
+#' ggplot helper to color heatmap tiles by whether or not they are significant according to an adjusted p-value
 sig_stars <- function(alpha=0.05,p_values="p.adj",color="white") {
   list(
       geom_point(aes(shape=ifelse(!!sym(p_values) < alpha, "dot", "no_dot"),

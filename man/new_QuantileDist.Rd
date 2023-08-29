@@ -26,6 +26,9 @@ that these ranges \emph{can} overlap.}
 \item{dist_metric_name}{The distance metric you want to use to compute
 distances between distributions.}
 }
+\value{
+object of type \code{QuantileDist}
+}
 \description{
 Creates a new QuantileDist object from an intensity.
 }

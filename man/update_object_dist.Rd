@@ -15,6 +15,9 @@ in two vectors of the same length and produces a scalar}
 \item{.dist_metric_name}{Optional; you can use this argument to specify the
 name of the distance metric you use}
 }
+\value{
+updated \code{MltplxObject} object
+}
 \description{
 Update the distance matrices generated for a specific \code{MltplxObject}
 }

@@ -7,6 +7,7 @@
 #' that these ranges *can* overlap.
 #' @param dist_metric_name The distance metric you want to use to compute
 #' distances between distributions.
+#' @return object of type `QuantileDist`
 new_QuantileDist <- function(mltplx_intensity,
                              dist_metric,
                              mask_type,

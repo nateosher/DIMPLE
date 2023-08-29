@@ -58,3 +58,47 @@ you use something specific, you can pass this name as a string using}
 \description{
 Creates new \code{MltplxObject} object.
 }
+\examples{
+library(dplyr)
+set.seed(1234567)
+cell_x_values = runif(3000, 0, 600)
+cell_y_values = runif(3000, 0, 600)
+cell_marks = sample(c("Tumor", "Immune", "Other"), 3000, replace = TRUE)
+slide_ids = rep(paste("Slide", 1:10), each = 300)
+raw_data_tibble = tibble(
+  x = cell_x_values,
+  y = cell_y_values,
+  marks = cell_marks,
+  id = slide_ids
+)
+# Construct `MltplxObject`
+ obj_1 = new_MltplxObject(
+   x = raw_data_tibble \%>\% filter(id == "Slide 1") \%>\% pull(x),
+   y = raw_data_tibble \%>\% filter(id == "Slide 1") \%>\% pull(y),
+   marks = raw_data_tibble \%>\% filter(id == "Slide 1") \%>\% pull(marks),
+   slide_id = "Slide 1"
+)
+print(obj_1)
+
+# Construct `MltplxObject` with intensities
+ obj_2 = new_MltplxObject(
+   x = raw_data_tibble \%>\% filter(id == "Slide 1") \%>\% pull(x),
+   y = raw_data_tibble \%>\% filter(id == "Slide 1") \%>\% pull(y),
+   marks = raw_data_tibble \%>\% filter(id == "Slide 1") \%>\% pull(marks),
+   slide_id = "Slide 1",
+   ps = 10, bw = 30
+)
+print(obj_2)
+
+# Construct `MltplxObject` with intensities + dist matrices
+ obj_3 = new_MltplxObject(
+   x = raw_data_tibble \%>\% filter(id == "Slide 1") \%>\% pull(x),
+   y = raw_data_tibble \%>\% filter(id == "Slide 1") \%>\% pull(y),
+   marks = raw_data_tibble \%>\% filter(id == "Slide 1") \%>\% pull(marks),
+   slide_id = "Slide 1",
+   ps = 10, bw = 30,
+   dist_metric = cor
+)
+print(obj_3)
+
+}

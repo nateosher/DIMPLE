@@ -7,6 +7,8 @@
 plot_dist_boxplots(mltplx_experiment, t1, t2, grouping_var, agg_fun = NULL)
 }
 \arguments{
+\item{mltplx_experiment}{\code{MltplxExperiment} object}
+
 \item{t1}{cell type 1}
 
 \item{t2}{cell type 2}

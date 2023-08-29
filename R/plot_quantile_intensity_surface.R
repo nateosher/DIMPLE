@@ -12,7 +12,6 @@
 #' @importFrom fuzzyjoin fuzzy_join
 #' @import ggplot2
 #' @export
-
 plot_quantile_intensity_surface <- function(mltplx_experiment,mask_type,q_probs,slide_ids) {
   objs <- filter_mltplx_objects(mltplx_experiment,slide_ids)
 

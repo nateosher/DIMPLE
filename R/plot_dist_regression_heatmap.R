@@ -1,7 +1,8 @@
 #' Pairwise comparison between types across groups
 #'
 #' @param df tibble. a result of a multiplex analysis, eg, lm_dist
-#'
+#' @param p_val_col name of column with p-values
+#' @param limits range of values for color scale
 #' @return ggplot heatmap
 #' @export
 plot_dist_regression_heatmap <- function(df,p_val_col = "p.adj",limits=NULL) {
