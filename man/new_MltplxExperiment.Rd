@@ -17,7 +17,8 @@ new_MltplxExperiment(
   ps = NULL,
   bw = NULL,
   dist_metric = NULL,
-  metadata = NULL
+  metadata = NULL,
+  windows = NULL
 )
 }
 \arguments{

@@ -11,6 +11,7 @@ new_MltplxIntensity = function(mltplx_image, ps, bw){
   intensity_matrix = intensity_object$dens %>%
     mutate(X = intensity_object$X,
            Y = intensity_object$Y) %>%
+    drop_na() %>% # this handles holes
     as.matrix()
 
 
