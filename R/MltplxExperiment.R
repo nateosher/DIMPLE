@@ -1,4 +1,6 @@
-#' Creates a new `MltplxExperiment` object. This class represents a collection
+#' Creates a new `MltplxExperiment` object.
+#'
+#' @description This class represents a collection
 #' of multiplex images, which may or may not be from distinct patients. In
 #' addition to storing the images themselves, this class can store estimates
 #' of the intensities of various point types, distances between those
@@ -33,6 +35,51 @@
 #' @import dplyr
 #' @import purrr
 #' @import tidyr
+#' @examples
+#' set.seed(24601)
+#' cell_x_values = runif(3000, 0, 600)
+#' cell_y_values = runif(3000, 0, 600)
+#' cell_marks = sample(c("Tumor", "Immune", "Other"), 3000, replace = TRUE)
+#' slide_ids = rep(paste("Slide", 1:10), each = 300)
+#'
+#' # Create multiplex experiment object
+#' multiplex_experiment = new_MltplxExperiment(x = cell_x_values,
+#'                              y = cell_y_values,
+#'                              marks = factor(cell_marks),
+#'                              slide_id = slide_ids)
+#'
+#' # Plot first slide
+#' plot(multiplex_experiment[[1]])
+#'
+#' # Update intensities
+#' multiplex_experiment = multiplex_experiment %>%
+#'                         update_intensity(ps = 10, bw = 30)
+#'
+#' # Plot intensity surfaces of tumor cells and immune cells for slide
+#' # 1 only
+#' plot_intensity_surface(multiplex_experiment,
+#' slide_ids = c("Slide 1"), types = c("Tumor", "Immune"))
+#'
+#' # Compute distances between intensities
+#' multiplex_experiment = multiplex_experiment %>%
+#'                         update_dist(jsd)
+#'
+#' # Plot resulting distances between cell types
+#' plot_dist_matrix(multiplex_experiment, slide_ids = c("Slide 1"))
+#'
+#' # Can also be created from a list of `ppp` objects using
+#' `as_MltplxExperiment` function
+#' require(spatstat)
+#' mxp_from_ppp_list = map(1:10, \(i){
+#' spatstat.geom::ppp(
+#'   x = runif(10),
+#'   y = runif(10),
+#'   marks = sample(c("Type 1", "Type 2"), 10, replace = T)
+#' )
+#' }) %>%
+#' as_MltplxExperiment()
+#'
+#' plot(mxp_from_ppp_list[[1]])
 new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                                 ps = NULL, bw = NULL,
                                 dist_metric = NULL, metadata = NULL,
