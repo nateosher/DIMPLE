@@ -4,7 +4,7 @@
 \alias{new_MltplxImage}
 \title{Creates new \code{MltplxImage} object.}
 \usage{
-new_MltplxImage(x, y, marks, xrange = NULL, yrange = NULL)
+new_MltplxImage(x, y, marks, xrange = NULL, yrange = NULL, window = NULL)
 }
 \arguments{
 \item{x}{X coordinates of cells}
@@ -16,6 +16,9 @@ new_MltplxImage(x, y, marks, xrange = NULL, yrange = NULL)
 \item{xrange}{vector of size 2 with range of x-coordinates. If NULL, will default to c(min(x),max(x))}
 
 \item{yrange}{vector of size 2 with range of y-coordinates. If NULL, will default to c(min(y),max(y))}
+
+\item{window}{Optional; object of class \code{owin} from spatstat.geom
+representing window of point process}
 }
 \value{
 \code{MltplxImage} object

@@ -2,11 +2,7 @@
 % Please edit documentation in R/MltplxExperiment.R
 \name{new_MltplxExperiment}
 \alias{new_MltplxExperiment}
-\title{Creates a new \code{MltplxExperiment} object. This class represents a collection
-of multiplex images, which may or may not be from distinct patients. In
-addition to storing the images themselves, this class can store estimates
-of the intensities of various point types, distances between those
-intensities, and metadata related to the patients that the slides belong to.}
+\title{Create a new MltplxExperiment object}
 \usage{
 new_MltplxExperiment(
   x,
@@ -17,7 +13,9 @@ new_MltplxExperiment(
   ps = NULL,
   bw = NULL,
   dist_metric = NULL,
-  metadata = NULL
+  metadata = NULL,
+  symmetric = TRUE,
+  windows = NULL
 )
 }
 \arguments{
@@ -48,14 +46,74 @@ and returns a scalar.}
 
 \item{metadata}{Optional: patient/slide level data. Must include \emph{one} row
 per unique slide id, and a column \code{slide_id} indicating the slide to which each row corresponds}
+
+\item{windows}{Optional: list of \code{owin} objects representing the windows of each
+biopsy. Windows will be assigned to slides in the order that they're passed
+in accordance with how the slide IDs are ordered.}
 }
 \value{
 \code{MltplxExperiment} object.
 }
 \description{
-Creates a new \code{MltplxExperiment} object. This class represents a collection
+This class represents a collection
 of multiplex images, which may or may not be from distinct patients. In
 addition to storing the images themselves, this class can store estimates
 of the intensities of various point types, distances between those
 intensities, and metadata related to the patients that the slides belong to.
+}
+\examples{
+cell_x_values = runif(3000, 0, 600)
+cell_y_values = runif(3000, 0, 600)
+cell_marks = sample(c("Tumor", "Immune", "Other"), 3000, replace = TRUE)
+slide_ids = rep(paste("Slide", 1:10), each = 300)
+
+mltplx_exp = new_MltplxExperiment(x = cell_x_values,
+                                  y = cell_y_values,
+                                  marks = factor(cell_marks),
+                                  slide_id = slide_ids)
+print(mltplx_exp)
+
+# Create an experiment with intensities
+mltplx_exp_with_intensities = new_MltplxExperiment(x = cell_x_values,
+                                  y = cell_y_values,
+                                  marks = factor(cell_marks),
+                                  slide_id = slide_ids,
+                                  ps = 30, bw = 40)
+print(mltplx_exp_with_intensities)
+
+# Create an experiment with intensities and distance matrices
+mltplx_exp_with_dist = new_MltplxExperiment(x = cell_x_values,
+                                  y = cell_y_values,
+                                  marks = factor(cell_marks),
+                                  slide_id = slide_ids,
+                                  ps = 30, bw = 40,
+                                  dist_metric = cor)
+print(mltplx_exp_with_dist)
+
+# Create an experiment with intensities, distance matrices and patient metadata
+set.seed(1234)
+slides <- unique(slide_ids)
+n_slides <- length(slides)
+n_patients <- 4
+n_groups <- 2
+patient_ids <- rep_len(paste0("P",1:n_patients),n_slides)
+
+metadata <- tibble::tibble(slide_id=slides,
+                   patient_id=patient_ids)
+
+groups <- sample(rep_len(sample(paste0("G",1:n_groups)),n_patients))
+
+ages <- runif(n_patients,min=0,max=100)
+
+gp_tb <- tibble::tibble(patient_id=unique(patient_ids),group=groups,age=ages)
+metadata <- dplyr::left_join(metadata,gp_tb,by = "patient_id")
+print(metadata)
+mltplx_exp_with_pts = new_MltplxExperiment(x = cell_x_values,
+                                  y = cell_y_values,
+                                  marks = factor(cell_marks),
+                                  slide_id = slide_ids,
+                                  ps = 30, bw = 40,
+                                  dist_metric = cor,
+                                  metadata = metadata)
+print(mltplx_exp_with_pts)
 }

@@ -9,7 +9,7 @@
   mode = "heatmap",
   net_threshold = 0,
   invert_dist = TRUE,
-  symmetric = T
+  symmetric = TRUE
 )
 }
 \arguments{

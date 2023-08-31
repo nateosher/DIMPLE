@@ -1,4 +1,4 @@
-#' Create kernel density from multitype point pattern
+#' Create smoothed kernel density from multitype point pattern
 #'
 #' @param pat spatstat point pattern
 #' @param eps pixel size (won't be exactly this size)
@@ -7,7 +7,6 @@
 #' @return dataframe in which rows are pixels and columns are cell types
 #'
 #' @importFrom magrittr `%>%`
-#' @examples
 pat.density = function(pat,eps,sigma,...) {
   split.pat = spatstat.geom::split.ppp(pat)
   dens.split = lapply(split.pat,function(pp) {

@@ -192,7 +192,11 @@ test_that("`plot_dist_matrix.MltplxExperiment` works", {
 
 test_that("`plot_intensity_surface` works", {
   expect_error({
-    plot_intensity_surface(as_MltplxExperiment(exp$mltplx_objects[1:10]))
+    plot_intensity_surface(map(exp$mltplx_objects[1:10],
+                               ~ .x$mltplx_image$ppp) %>%
+                             as_MltplxExperiment(),
+                           map_chr(exp$mltplx_objects[1:10], ~ .x$slide_id),
+                           "X1")
   },
   "intensities have not been generated for this MltplxExperiment")
 

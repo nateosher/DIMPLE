@@ -33,7 +33,3 @@ check_metadata <- function(mltplx_objects,metadata) {
                           )
             )
 }
-
-
-s1 = "testing testing \
-        123"

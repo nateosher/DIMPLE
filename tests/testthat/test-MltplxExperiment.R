@@ -98,22 +98,82 @@ test_that("`MltplxExperiment` constructor (intensities, no dists) works", {
 
 test_that("`MltplxExperiment` constructor catches malformed objects", {
   # length(x) < length(y)
-  expect_error(new_MltplxExperiment(x[1:10], y, marks, slide_ids))
+  expect_error(new_MltplxExperiment(cell_x_values[1:10],
+                                    cell_y_values,
+                                    cell_marks, slide_ids))
 
   # length(x) > length(y)
-  expect_error(new_MltplxExperiment(x, y[1:10], marks, slide_ids))
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values[1:10],
+                                    cell_marks, slide_ids))
 
   # length(marks) != length(x), length(y)
-  expect_error(new_MltplxExperiment(x, y, marks[1:10], slide_ids))
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks[1:10], slide_ids))
 
   # length(slide_ids) != length(x), length(y), marks
-  expect_error(new_MltplxExperiment(x, y, marks, slide_ids[1:10]))
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids[1:10]))
 
   # ps but no bw
-  expect_error(new_MltplxExperiment(x, y, marks, slide_ids, ps = 30))
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids, ps = 30))
 
   # bw but no ps
-  expect_error(new_MltplxExperiment(x, y, marks, slide_ids, bw = 30))
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids, bw = 30))
+
+  # window sizes and window list
+  # They're both empty, but point is both are non-null
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids,
+                                    window_sizes = tibble(
+                                      slide_id = character(),
+                                      min_x = numeric(),
+                                      max_x = numeric(),
+                                      min_y = numeric(),
+                                      max_y = numeric()
+                                    ),
+                                    windows = list()),
+          "pass either `windows` parameter or `window_sizes` but not both")
+
+  expect_error(new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids,
+                                    windows = list(owin())),
+  paste0("length of `windows` argument must be the same",
+         " as the number of unique slide ids"))
+
+})
+
+test_that("`window` parameter works", {
+  expect_no_error({
+    mxp_custom_windows = new_MltplxExperiment(cell_x_values,
+                                    cell_y_values,
+                                    cell_marks, slide_ids,
+                                    windows = rep(list(owin(c(0, 600),
+                                                            c(0, 600))),
+                                                  10))
+    })
+
+  expect_true(all(
+      mxp_custom_windows[[1]]$mltplx_image$ppp$window$xrange == c(0, 600)
+    )
+  )
+  expect_true(all(
+      mxp_custom_windows[[1]]$mltplx_image$ppp$window$yrange == c(0, 600)
+    )
+  )
+  print_output = capture.output(print(mxp_custom_windows))
+  expect_equal(print_output[1], "MltplxExperiment with 10 slides")
+  expect_equal(print_output[2], "No intensities generated")
+  expect_equal(print_output[3], "No distance matrices generated")
+  expect_equal(print_output[4], "No attached metadata")
 })
 
 test_that("`update_qdist` handles missing types", {
@@ -339,6 +399,7 @@ test_that("`as_tibble` works", {
 })
 
 test_that("`list.as_MltplxExperiment` works", {
+  # From list of MltplxObjects
   set.seed(24601)
   obj_list = map(1:3, \(i){
     SimulateGrid(
@@ -385,8 +446,100 @@ test_that("`list.as_MltplxExperiment` works", {
   ))
 
   expect_error(as_MltplxExperiment(list(1, 2)),
-    paste('to convert "list" object to "MltplxObject" object,',
-          'all elements of list must be of class "MltplxObject"')
+     paste('to convert "list" object to "MltplxObject" object, all',
+           'elements of list must either be of class "MltplxObject" or ',
+           'ppp')
   )
+
+  # From list of ppp objects
+  expect_no_error({
+    mxp_from_ppp_list = map(1:10, \(i){
+          spatstat.geom::ppp(
+            x = runif(10),
+            y = runif(10),
+            marks = sample(c("Type 1", "Type 2"), 10, replace = T)
+          )
+      }) %>% as_MltplxExperiment()
+  })
+
+  expect_equal(mxp_from_ppp_list$mltplx_objects[[1]]$slide_id,
+               "Slide 1")
+
+  expect_true(all(
+    mxp_from_ppp_list$mltplx_objects[[1]]$mltplx_image$cell_types %in%
+      c("Type 1", "Type 2")
+  ))
+
+  heterogeneous_list = list(
+    new_MltplxObject(
+      x = runif(100, 0, 100),
+      y = runif(100, 0, 100),
+      marks = sample(c("Type 1", "Type 2"), 100, replace = T),
+      slide_id = "Slide 1"
+    ) %>%
+      update_object_intensity(ps = 10, bw = 10),
+    new_MltplxObject(
+      x = runif(100, 0, 100),
+      y = runif(100, 0, 100),
+      marks = sample(c("Type 1", "Type 2"), 100, replace = T),
+      slide_id = "Slide 2"
+    ) %>%
+      update_object_intensity(ps = 20, bw = 10)
+  )
+
+  expect_warning(as_MltplxExperiment(heterogeneous_list),
+      "`MltplxObjects` have different pixel sizes;")
+
+  heterogeneous_list[[1]] = heterogeneous_list[[1]] %>%
+    update_object_intensity(ps = 10, bw = 10)
+
+  heterogeneous_list[[2]] = heterogeneous_list[[2]] %>%
+    update_object_intensity(ps = 10, bw = 20)
+
+  expect_warning(as_MltplxExperiment(heterogeneous_list),
+                 "`MltplxObjects` have different bandwidths;")
+
+  heterogeneous_list[[1]] = heterogeneous_list[[1]] %>%
+    update_object_intensity(ps = 10, bw = 10) %>%
+    update_object_dist(jsd)
+
+  heterogeneous_list[[2]] = heterogeneous_list[[2]] %>%
+    update_object_intensity(ps = 10, bw = 10) %>%
+    update_object_dist(cor)
+
+  expect_warning({
+    from_list_no_dists = as_MltplxExperiment(heterogeneous_list)
+  }, "`MltplxObjects` have different distance metrics;")
+
+  # Should still have intensities though
+  expect_equal(from_list_no_dists$ps, 10)
+  expect_equal(from_list_no_dists$bw, 10)
+  expect_true(!is.null(from_list_no_dists[[1]]$mltplx_intensity))
+
+
+
+  expect_no_error({
+    working_conversion = new_MltplxExperiment(x = cell_x_values,
+                                           y = cell_y_values,
+                                           marks = factor(cell_marks),
+                                           slide_id = slide_ids) %>%
+      update_intensity(ps = 10, bw = 10) %>%
+      update_dist(cor) %>%
+      (\(l){
+        l$mltplx_objects
+      }) %>%
+      as_MltplxExperiment()
+  })
+
+  expect_true(all(
+    (working_conversion %>% print() %>% capture.output()) ==
+      c(
+        "MltplxExperiment with 10 slides",
+        "Intensities generated with pixel size 10 and bandwidth 10 ",
+        "Distance matrices generated with cor ",
+        "No attached metadata"
+      )
+  ))
+
 
 })

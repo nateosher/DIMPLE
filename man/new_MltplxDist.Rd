@@ -8,8 +8,7 @@ new_MltplxDist(
   mltplx_intensity,
   dist_metric,
   .dist_metric_name,
-  symmetric = TRUE,
-  ...
+  symmetric = TRUE
 )
 }
 \arguments{

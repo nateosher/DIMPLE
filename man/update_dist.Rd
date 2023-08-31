@@ -5,7 +5,7 @@
 \title{Update the estimated distances between intensities for all cell types of
 all slides of a \code{MltplxExperiment} object, or creates them if there are none.}
 \usage{
-update_dist(mltplx_experiment, dist_metric, symmetric = TRUE, ...)
+update_dist(mltplx_experiment, dist_metric, symmetric = TRUE)
 }
 \arguments{
 \item{mltplx_experiment}{The \code{MltplxExperiment} object whose distance

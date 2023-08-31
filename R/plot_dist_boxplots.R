@@ -1,6 +1,6 @@
 #' Plot boxplots of dist between two groups for a combination of cell types
 #'
-#' @param mltplx_experiment
+#' @param mltplx_experiment `MltplxExperiment` object
 #' @param t1 cell type 1
 #' @param t2 cell type 2
 #' @param grouping_var string, name of metadata column

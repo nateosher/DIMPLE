@@ -2,10 +2,10 @@
 % Please edit documentation in R/anglex.R
 \name{anglex}
 \alias{anglex}
-\title{GGplot helper to angle x-axis labels 45 degrees}
+\title{ggplot helper to angle x-axis labels 45 degrees}
 \usage{
 anglex()
 }
 \description{
-GGplot helper to angle x-axis labels 45 degrees
+ggplot helper to angle x-axis labels 45 degrees
 }

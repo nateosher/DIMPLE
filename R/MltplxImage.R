@@ -5,36 +5,44 @@
 #' @param xrange vector of size 2 with range of x-coordinates. If NULL, will default to c(min(x),max(x))
 #' @param yrange vector of size 2 with range of y-coordinates. If NULL, will default to c(min(y),max(y))
 #' @param marks Cell types
-#'
+#' @param window Optional; object of class `owin` from spatstat.geom
+#' representing window of point process
 #' @return `MltplxImage` object
 #' @importFrom spatstat.geom ppp owin as.ppp
 #' @export
-new_MltplxImage = function(x, y, marks, xrange = NULL, yrange = NULL){
-  if(!is.null(xrange)){
-    if(length(x) > 0){
-      stopifnot("X-coordinates of cells must be within xrange!"=all(
-          xrange[1] <= min(x), max(x) <= xrange[2]
+new_MltplxImage = function(x, y, marks, xrange = NULL, yrange = NULL,
+                           window = NULL){
+  if(is.null(window)){
+    if(!is.null(xrange)){
+      if(length(x) > 0){
+        stopifnot("X-coordinates of cells must be within xrange!"=all(
+            xrange[1] <= min(x), max(x) <= xrange[2]
+          )
         )
-      )
+      }
+    }else{
+      xrange <- c(min(x),max(x))
     }
-  }else{
-    xrange <- c(min(x),max(x))
-  }
 
-  if(!is.null(yrange)){
-    if(length(y) > 0){
-      stopifnot("Y-coordinates of cells must be within yrange!"=all(
-          yrange[1] <= min(y), max(y) <= yrange[2]
+    if(!is.null(yrange)){
+      if(length(y) > 0){
+        stopifnot("Y-coordinates of cells must be within yrange!"=all(
+            yrange[1] <= min(y), max(y) <= yrange[2]
+          )
         )
-      )
+      }
+    }else{
+      yrange <- c(min(y),max(y))
     }
+    window = owin(xrange, yrange)
   }else{
-    yrange <- c(min(y),max(y))
+    if(class(window) != "owin")
+      stop("`window` argument must be of class `owin` from `spatstat.geom`")
   }
 
 
   ppp = ppp(x = x, y = y, marks = factor(marks),
-            window = owin(xrange,yrange))
+            window = window)
 
   structure(
     list(
