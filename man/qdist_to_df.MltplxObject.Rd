@@ -2,16 +2,18 @@
 % Please edit documentation in R/MltplxObject.R
 \name{qdist_to_df.MltplxObject}
 \alias{qdist_to_df.MltplxObject}
-\title{Quantile dist to df}
+\title{Quantile distance matrix to dataframe}
 \usage{
 \method{qdist_to_df}{MltplxObject}(mltplx_object, reduce_symmetric = TRUE)
 }
 \arguments{
+\item{mltplx_object}{object of type \code{MltplxObject}}
+
 \item{reduce_symmetric}{logical, whether to remove equivalent rows}
 }
 \value{
 tibble with dist information
 }
 \description{
-Quantile dist to df
+Quantile distance matrix to dataframe
 }

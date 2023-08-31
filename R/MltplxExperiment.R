@@ -1,4 +1,6 @@
-#' Creates a new `MltplxExperiment` object. This class represents a collection
+#' Create a new MltplxExperiment object
+#' 
+#' This class represents a collection
 #' of multiplex images, which may or may not be from distinct patients. In
 #' addition to storing the images themselves, this class can store estimates
 #' of the intensities of various point types, distances between those
@@ -33,6 +35,61 @@
 #' @import dplyr
 #' @import purrr
 #' @import tidyr
+#' @examples
+#' cell_x_values = runif(3000, 0, 600)
+#' cell_y_values = runif(3000, 0, 600)
+#' cell_marks = sample(c("Tumor", "Immune", "Other"), 3000, replace = TRUE)
+#' slide_ids = rep(paste("Slide", 1:10), each = 300)
+#' 
+#' mltplx_exp = new_MltplxExperiment(x = cell_x_values,
+#'                                   y = cell_y_values,
+#'                                   marks = factor(cell_marks),
+#'                                   slide_id = slide_ids)
+#' print(mltplx_exp)
+#' 
+#' # Create an experiment with intensities
+#' mltplx_exp_with_intensities = new_MltplxExperiment(x = cell_x_values,
+#'                                   y = cell_y_values,
+#'                                   marks = factor(cell_marks),
+#'                                   slide_id = slide_ids,
+#'                                   ps = 30, bw = 40)
+#' print(mltplx_exp_with_intensities)
+#' 
+#' # Create an experiment with intensities and distance matrices
+#' mltplx_exp_with_dist = new_MltplxExperiment(x = cell_x_values,
+#'                                   y = cell_y_values,
+#'                                   marks = factor(cell_marks),
+#'                                   slide_id = slide_ids,
+#'                                   ps = 30, bw = 40,
+#'                                   dist_metric = cor)
+#' print(mltplx_exp_with_dist)
+#' 
+#' # Create an experiment with intensities, distance matrices and patient metadata
+#' set.seed(1234)
+#' slides <- unique(slide_ids)
+#' n_slides <- length(slides)
+#' n_patients <- 4
+#' n_groups <- 2
+#' patient_ids <- rep_len(paste0("P",1:n_patients),n_slides)
+#'
+#' metadata <- tibble::tibble(slide_id=slides,
+#'                    patient_id=patient_ids)
+#'
+#' groups <- sample(rep_len(sample(paste0("G",1:n_groups)),n_patients))
+#'
+#' ages <- runif(n_patients,min=0,max=100)
+#'
+#' gp_tb <- tibble::tibble(patient_id=unique(patient_ids),group=groups,age=ages)
+#' metadata <- dplyr::left_join(metadata,gp_tb,by = "patient_id")
+#' print(metadata)
+#' mltplx_exp_with_pts = new_MltplxExperiment(x = cell_x_values,
+#'                                   y = cell_y_values,
+#'                                   marks = factor(cell_marks),
+#'                                   slide_id = slide_ids,
+#'                                   ps = 30, bw = 40,
+#'                                   dist_metric = cor,
+#'                                   metadata = metadata)
+#' print(mltplx_exp_with_pts)
 new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                                 ps = NULL, bw = NULL,
                                 dist_metric = NULL, metadata = NULL,
@@ -309,6 +366,12 @@ as_MltplxExperiment.list = function(l, ...){
   return(mltplx_experiment$mltplx_objects[i])
 }
 
+#' Convert distance matrix to dataframe
+#'
+#' @param mltplx_experiment object of type `MltplxExperiment`
+#' @param reduce_symmetric logical, whether to remove equivalent rows
+#'
+#' @return tibble with dist information
 #' @export
 dist_to_df.MltplxExperiment <- function(mltplx_experiment,reduce_symmetric = FALSE) {
   if(is.null(mltplx_experiment$metadata))
@@ -344,6 +407,12 @@ as_tibble.MltplxExperiment <- function(mltplx_experiment) {
   }
 }
 
+#' Convert quantile distance matrix to dataframe
+#'
+#' @param mltplx_experiment object of type `MltplxExperiment`
+#' @param reduce_symmetric logical, whether to remove equivalent rows
+#'
+#' @return tibble with dist information
 #' @export
 qdist_to_df.MltplxExperiment <- function(mltplx_experiment,reduce_symmetric = FALSE) {
   if(is.null(mltplx_experiment$metadata))
@@ -359,6 +428,17 @@ qdist_to_df.MltplxExperiment <- function(mltplx_experiment,reduce_symmetric = FA
            type2 = factor(type2,levels = sort(levels(.$type2))))
 }
 
+#' Update the quantile distance matrices generated for a `MltplxExperiment`
+#' @param mltplx_experiment object of class `MltplxObject` to be updated
+#' @param dist_metric distance metric to be used; can be any function that takes
+#' in two vectors of the same length and produces a scalar
+#' @param mask_type Name of cell type you want to make a QuantileDist of
+#' @param q_probs Data frame with columns "from" and "to" with quantile ranges
+#' as percentage points, i.e. 25 for first quartile, 50 for median, etc. Note
+#' that these ranges *can* overlap.
+#' @param .dist_metric_name The distance metric you want to use to compute
+#' distances between distributions.
+#' @return updated `MltplxExperiment` object
 #' @export
 update_qdist.MltplxExperiment <- function(mltplx_experiment,
                                               dist_metric,
@@ -390,7 +470,10 @@ update_qdist.MltplxExperiment <- function(mltplx_experiment,
   mltplx_experiment
 }
 
-#'@export
+#' Get count of cell types in `MltplxExperiment`
+#' @param mltplx_object `MltplxExperiment`
+#' @return dataframe of cell type counts in boject
+#' @export
 cell_type_counts.MltplxExperiment <- function(mltplx_experiment) {
   map_df(mltplx_experiment$mltplx_objects,cell_type_counts)
 }
