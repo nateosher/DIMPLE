@@ -1,7 +1,5 @@
 ---
-title: "Quantile Dists"
-author: "Joel Eliason"
-date: "2023-02-13"
+title: "Example Analysis Workflow"
 output: html_document
 ---
 
@@ -11,6 +9,11 @@ knitr::opts_chunk$set(echo = TRUE)
 library(DIMPLE)
 library(tidyverse)
 ```
+
+## Setting up the data
+
+In this vignette, we will show an example of an analysis workflow that could be performed using the `DIMPLE` package.
+We will be using a simulated point pattern dataset, along with simulated patient metadata that has a continuous `age` covariate and categorical `group` covariate. We will demonstrate how to analyze this data using the JSD distance metric. The below steps for seting up the `MltplxExperiment` object are similar to those performed in other vignettes, so we won't explain this process again here. 
 
 ```{r}
 # Create an experiment with intensities, distance matrices and patient metadata
@@ -45,6 +48,12 @@ mltplx_experiment = new_MltplxExperiment(x = cell_x_values,
                                   ps = 30, bw = 40,
                                   dist_metric = jsd,
                                   metadata = metadata)
+
+```
+
+Next we can add information on how the JSD between cell types changes in different areas of higher and lower tumor density, by using the `update_qdist` function. This function takes in the `MltplxExperiment` object, the distance metric of choice, a cell type by which the image is partitioned on (by the density of that cell type), as well as the quantiles that the mask density should be partitioned into.
+
+```{r}
 q_probs <- tibble(from=c(0,34,67),to=c(33,66,100))
 mltplx_experiment <- update_qdist(mltplx_experiment,
                                   jsd,
@@ -54,10 +63,16 @@ mltplx_experiment <- update_qdist(mltplx_experiment,
 mltplx_experiment
 ```
 
+## Analysis
+
+Now we can start our analyses! First, we can simply plot some of the point pattern datasets, using `plot_ppp`.
+
 ```{r}
 mltplx_experiment %>%
   plot_ppp(slide_ids = c("Slide 12","Slide 13"))
 ```
+
+We can also plot the smoothed intensity surfaces, using `plot_intensity_surface`.
 
 ```{r}
 mltplx_experiment %>%
@@ -66,11 +81,14 @@ mltplx_experiment %>%
 
 ```
 
+If the `MltplxExperiment` has distance matrices calculated, as well as multiple images per patient, we can look at how the distance between two cell types is distributed within each patient using `patient_boxplots`. This function also tests that the mean of the distribution for each patient is significantly different than a value `mu0` (default zero).
+
 ```{r}
 mltplx_experiment %>%
   patient_boxplots(t1="Tumor",t2="Immune",grouping_var = "group",p_val_col = "p.adj")
 ```
 
+We can also look at the distribution of the distance between two cell types, but now stratified into patient groups (rather than individual patients), by using the `plot_dist_boxplots` function. The image-level data is aggregated into patient-level data by a function `agg_fun`.
 ```{r}
 mltplx_experiment %>%
   plot_dist_boxplots(t1 = "Stroma",
@@ -78,6 +96,8 @@ mltplx_experiment %>%
                     grouping_var = "group",
                     agg_fun = median)
 ```
+
+If we instead want to look at how the distance between two cell types changes along a continuous variable, we can use the `plot_dist_scatter` function. The image-level data is again aggregated into patient-level data by a function `agg_fun`. Furthermore, we can plot a line of best fit using the argument `smooth`.
 
 ```{r}
 mltplx_experiment %>%
@@ -88,15 +108,21 @@ mltplx_experiment %>%
                     smooth = "lm")
 ```
 
+We can plot all of the distances between all pairs of cell types using the `plot_dist_matrix` function, which can be plotted as a network:
+
 ```{r}
 mltplx_experiment %>%
   plot_dist_matrix(slide_ids = c("Slide 1", "Slide 2","Slide 3"),mode="network")
 ```
 
+or a heatmap:
+
 ```{r}
 mltplx_experiment %>%
   plot_dist_matrix(slide_ids = c("Slide 1", "Slide 2","Slide 3"),mode="heatmap")
 ```
+
+Lastly, we can test for differences between distances in both patient groups for each cell type by using `lm_dist`. This function also allows us to adjust for patient-level variables, such as `age` in our example. The output from `lm_dist` can then be plotted with `plot_dist_regression_heatmap`.
 
 ```{r}
 mltplx_experiment %>%
@@ -107,6 +133,8 @@ mltplx_experiment %>%
 
 
 ## Quantile-based analyses
+
+The same sorts of analyses and plots can be generated for quantile-level analysis as well.
 
 ```{r}
 mltplx_experiment %>%
