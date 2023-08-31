@@ -17,6 +17,9 @@ smoothing of the values assigned to each square of the intensity
 estimations. Larger values result in "smoother" intensities, while smaller
 values result in "coarser" estimations.}
 }
+\value{
+updated \code{MltplxObject} object
+}
 \description{
 Update the intensities generated for a specific \code{MltplxObject}
 }

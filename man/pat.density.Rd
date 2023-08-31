@@ -2,7 +2,7 @@
 % Please edit documentation in R/pat.density.R
 \name{pat.density}
 \alias{pat.density}
-\title{Create kernel density from multitype point pattern}
+\title{Create smoothed kernel density from multitype point pattern}
 \usage{
 pat.density(pat, eps, sigma, ...)
 }
@@ -17,5 +17,5 @@ pat.density(pat, eps, sigma, ...)
 dataframe in which rows are pixels and columns are cell types
 }
 \description{
-Create kernel density from multitype point pattern
+Create smoothed kernel density from multitype point pattern
 }

@@ -28,6 +28,49 @@
 #' representing window of point process
 #' @return `MltplxObject` object
 #' @export
+#' @examples
+#' library(dplyr)
+#' set.seed(1234567)
+#' cell_x_values = runif(3000, 0, 600)
+#' cell_y_values = runif(3000, 0, 600)
+#' cell_marks = sample(c("Tumor", "Immune", "Other"), 3000, replace = TRUE)
+#' slide_ids = rep(paste("Slide", 1:10), each = 300)
+#' raw_data_tibble = tibble(
+#'   x = cell_x_values,
+#'   y = cell_y_values,
+#'   marks = cell_marks,
+#'   id = slide_ids
+#' )
+#' # Construct `MltplxObject`
+#'  obj_1 = new_MltplxObject(
+#'    x = raw_data_tibble %>% filter(id == "Slide 1") %>% pull(x),
+#'    y = raw_data_tibble %>% filter(id == "Slide 1") %>% pull(y),
+#'    marks = raw_data_tibble %>% filter(id == "Slide 1") %>% pull(marks),
+#'    slide_id = "Slide 1"
+#' )
+#' print(obj_1)
+#' 
+#' # Construct `MltplxObject` with intensities
+#'  obj_2 = new_MltplxObject(
+#'    x = raw_data_tibble %>% filter(id == "Slide 1") %>% pull(x),
+#'    y = raw_data_tibble %>% filter(id == "Slide 1") %>% pull(y),
+#'    marks = raw_data_tibble %>% filter(id == "Slide 1") %>% pull(marks),
+#'    slide_id = "Slide 1",
+#'    ps = 10, bw = 30
+#' )
+#' print(obj_2)
+#'
+#' # Construct `MltplxObject` with intensities + dist matrices
+#'  obj_3 = new_MltplxObject(
+#'    x = raw_data_tibble %>% filter(id == "Slide 1") %>% pull(x),
+#'    y = raw_data_tibble %>% filter(id == "Slide 1") %>% pull(y),
+#'    marks = raw_data_tibble %>% filter(id == "Slide 1") %>% pull(marks),
+#'    slide_id = "Slide 1",
+#'    ps = 10, bw = 30,
+#'    dist_metric = cor
+#' )
+#' print(obj_3)
+#' 
 new_MltplxObject = function(x, y, marks,slide_id, xrange = NULL, yrange = NULL,
                             ps = NULL, bw = NULL,
                             dist_metric = NULL, .dist_metric_name = NULL,
@@ -246,6 +289,7 @@ plot_qdist_matrix.MltplxObject <- function(mltplx_object, mode = "heatmap",
 #' smoothing of the values assigned to each square of the intensity
 #' estimations. Larger values result in "smoother" intensities, while smaller
 #' values result in "coarser" estimations.
+#' @return updated `MltplxObject` object
 #' @export
 update_object_intensity = function(mltplx_object, ps, bw){
   mltplx_object$mltplx_intensity = new_MltplxIntensity(
@@ -260,6 +304,7 @@ update_object_intensity = function(mltplx_object, ps, bw){
 #' in two vectors of the same length and produces a scalar
 #' @param .dist_metric_name Optional; you can use this argument to specify the
 #' name of the distance metric you use
+#' @return updated `MltplxObject` object
 #' @export
 update_object_dist = function(mltplx_object, dist_metric,
                               .dist_metric_name = NULL){
@@ -322,9 +367,9 @@ plot_intensity_surface.MltplxObject <- function(mltplx_object,types = NULL) {
 }
 
 
-#' Title
+#' Convert distance matrix to dataframe
 #'
-#' @param mltplx_object
+#' @param mltplx_object object of type `MltplxObject`
 #' @param reduce_symmetric logical, whether to remove equivalent rows
 #'
 #' @return tibble with dist information
@@ -352,9 +397,9 @@ dist_to_df.MltplxObject <- function(mltplx_object,
   }
 }
 
-#' Quantile dist to df
+#' Quantile distance matrix to dataframe
 #'
-#' @param mltplx_object
+#' @param mltplx_object object of type `MltplxObject`
 #' @param reduce_symmetric logical, whether to remove equivalent rows
 #'
 #' @return tibble with dist information
@@ -403,6 +448,17 @@ plot.MltplxObject = function(mltplx_object, ...){
   plot(mltplx_object$mltplx_image, id = mltplx_object$slide_id)
 }
 
+#' Update the quantile distance matrices generated for a specific `MltplxObject`
+#' @param mltplx_object object of class `MltplxObject` to be updated
+#' @param dist_metric distance metric to be used; can be any function that takes
+#' in two vectors of the same length and produces a scalar
+#' @param mask_type Name of cell type you want to make a QuantileDist of
+#' @param q_probs Data frame with columns "from" and "to" with quantile ranges
+#' as percentage points, i.e. 25 for first quartile, 50 for median, etc. Note
+#' that these ranges *can* overlap.
+#' @param .dist_metric_name The distance metric you want to use to compute
+#' distances between distributions.
+#' @return updated `MltplxObject` object
 #' @export
 update_qdist.MltplxObject <- function(mltplx_object,
                                           dist_metric,
@@ -436,7 +492,10 @@ update_qdist.MltplxObject <- function(mltplx_object,
   mltplx_object
 }
 
-#'@export
+#' Get count of cell types in `MltplxObject`
+#' @param mltplx_object `MltplxObject`
+#' @return dataframe of cell type counts in boject
+#' @export
 cell_type_counts.MltplxObject <- function(mltplx_object) {
   mltplx_object$mltplx_image$ppp$marks %>%
     table() %>%

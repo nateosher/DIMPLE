@@ -2,13 +2,10 @@
 % Please edit documentation in R/sig_stars.R
 \name{sig_stars}
 \alias{sig_stars}
-\title{GGplot helper to color heatmap tiles by whether or not they are significant according to an adjusted p-value}
+\title{ggplot helper to color heatmap tiles by whether or not they are significant according to an adjusted p-value}
 \usage{
 sig_stars(alpha = 0.05, p_values = "p.adj", color = "white")
 }
-\arguments{
-\item{alpha}{Significance level}
-}
 \description{
-GGplot helper to color heatmap tiles by whether or not they are significant according to an adjusted p-value
+ggplot helper to color heatmap tiles by whether or not they are significant according to an adjusted p-value
 }

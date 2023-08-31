@@ -8,6 +8,10 @@ plot_dist_regression_heatmap(df, p_val_col = "p.adj", limits = NULL)
 }
 \arguments{
 \item{df}{tibble. a result of a multiplex analysis, eg, lm_dist}
+
+\item{p_val_col}{name of column with p-values}
+
+\item{limits}{range of values for color scale}
 }
 \value{
 ggplot heatmap
