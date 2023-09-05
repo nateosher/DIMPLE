@@ -14,6 +14,7 @@ new_MltplxExperiment(
   bw = NULL,
   dist_metric = NULL,
   metadata = NULL,
+  symmetric = TRUE,
   windows = NULL
 )
 }
@@ -45,6 +46,10 @@ and returns a scalar.}
 
 \item{metadata}{Optional: patient/slide level data. Must include \emph{one} row
 per unique slide id, and a column \code{slide_id} indicating the slide to which each row corresponds}
+
+\item{windows}{Optional: list of \code{owin} objects representing the windows of each
+biopsy. Windows will be assigned to slides in the order that they're passed
+in accordance with how the slide IDs are ordered.}
 }
 \value{
 \code{MltplxExperiment} object.

@@ -4,7 +4,12 @@
 \alias{update_object_dist}
 \title{Update the distance matrices generated for a specific \code{MltplxObject}}
 \usage{
-update_object_dist(mltplx_object, dist_metric, .dist_metric_name = NULL)
+update_object_dist(
+  mltplx_object,
+  dist_metric,
+  .dist_metric_name = NULL,
+  symmetric = TRUE
+)
 }
 \arguments{
 \item{mltplx_object}{object of class \code{MltplxObject} to be updated}

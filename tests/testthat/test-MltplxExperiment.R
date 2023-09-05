@@ -286,24 +286,22 @@ test_that("Window size parameter works", {
   window_sizes3 <- mutate(window_sizes,
                          max_x = max_x - 25)
 
-  # For some reason this test started breaking, because purrr
-  # returns something that `expect_error` doesn't recognize as an
-  # error, though it clearly is, and clearly for the reason we want.
-  # Maybe a tidyverse update?
-  # expect_error({
-  #   intentional_error <- tryCatch({
-  #     new_MltplxExperiment(x = cell_x_values,
-  #                                      y = cell_y_values,
-  #                                      window_sizes = window_sizes3,
-  #                                      marks = factor(cell_marks),
-  #                                      slide_id = slide_ids)
-  #     },
-  #   error = function(e){
-  #     return(e)
-  #   })
-  #   if(class(intentional_error)[1] == "purrr_error_indexed")
-  #     stop("test passed")
-  # })
+  # There must have been a change in error propogation, because
+  # while this clearly produces the intended error
+  # (`X-coordinates of cells must be within xrange`) it for some reason
+  # does not register as an error
+  expect_equal({
+    tryCatch({
+      mltplx_exp <- new_MltplxExperiment(x = cell_x_values,
+                                         y = cell_y_values,
+                                         window_sizes = window_sizes3,
+                                         marks = factor(cell_marks),
+                                         slide_id = slide_ids)
+    },
+    error = function(e){
+      e$parent$message
+    })
+  }, "X-coordinates of cells must be within xrange!")
 
   # no error, no window_sizes given
   mltplx_exp <- new_MltplxExperiment(x = cell_x_values,

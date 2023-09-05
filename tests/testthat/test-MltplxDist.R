@@ -36,10 +36,10 @@ test_that("`MltplxDist` constructor works", {
     c("MltplxDist object with 3 cell types",
       "Distance metric: jsd ",
       "",
-      "          Immune     Other     Tumor",
-      "Immune        NA 0.2980129 0.2890112",
-      "Other  0.2980129        NA 0.2979084",
-      "Tumor  0.2890112 0.2979084        NA"
+      "       Immune     Other     Tumor",
+      "Immune     NA 0.2980129 0.2890112",
+      "Other      NA        NA 0.2979084",
+      "Tumor      NA        NA        NA"
       )
   ))
 
@@ -48,4 +48,20 @@ test_that("`MltplxDist` constructor works", {
     dist_1$cell_types ==
     c("Immune", "Other", "Tumor")
   ))
+
+  dist_2 = new_MltplxDist(intensity_1, kld, .dist_metric_name = "kld",
+                          symmetric=F)
+
+  expect_true(all(
+    dist_2 %>% print() %>% capture.output() ==
+      c("MltplxDist object with 3 cell types",
+        "Distance metric: kld ",
+        "",
+        "          Immune     Other     Tumor",
+        "Immune        NA 0.3953645 0.3692495",
+        "Other  0.4109716        NA 0.3887378",
+        "Tumor  0.3790915 0.4127645        NA"
+      )
+  ))
+
 })

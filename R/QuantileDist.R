@@ -15,7 +15,7 @@ new_QuantileDist <- function(mltplx_intensity,
                              dist_metric_name) {
   intensities <- mltplx_intensity$intensities %>%
     as.data.frame()
-  
+
   out_qfac <- calc_qfac(q_probs,intensities,mask_type)
   joined_q <- out_qfac$joined_q
   q <- out_qfac$q
@@ -61,7 +61,7 @@ new_QuantileDist <- function(mltplx_intensity,
 #' @importFrom fuzzyjoin fuzzy_join
 calc_qfac <- function(q_probs,intensities,mask_type) {
   mask_intensities <- intensities %>% pull(!!sym(mask_type))
-  
+
   q <- q_probs %>%
     pmap_dfr(\(from,to) {
       as.vector(quantile(mask_intensities,probs=c(from,to)/100)) -> x
@@ -71,7 +71,7 @@ calc_qfac <- function(q_probs,intensities,mask_type) {
     }) %>%
     mutate(q_fac = factor(1:nrow(.)))
   q$q2[length(q$q2)]<-(q$q2[length(q$q2)]+.Machine$double.eps)
-  
+
   joined_q <- intensities %>%
     fuzzyjoin::fuzzy_join(q,
                           by = setNames(c("q1","q2"),c(mask_type,mask_type)),

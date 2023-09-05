@@ -1,5 +1,5 @@
 #' Create a new MltplxExperiment object
-#' 
+#'
 #' This class represents a collection
 #' of multiplex images, which may or may not be from distinct patients. In
 #' addition to storing the images themselves, this class can store estimates
@@ -40,13 +40,13 @@
 #' cell_y_values = runif(3000, 0, 600)
 #' cell_marks = sample(c("Tumor", "Immune", "Other"), 3000, replace = TRUE)
 #' slide_ids = rep(paste("Slide", 1:10), each = 300)
-#' 
+#'
 #' mltplx_exp = new_MltplxExperiment(x = cell_x_values,
 #'                                   y = cell_y_values,
 #'                                   marks = factor(cell_marks),
 #'                                   slide_id = slide_ids)
 #' print(mltplx_exp)
-#' 
+#'
 #' # Create an experiment with intensities
 #' mltplx_exp_with_intensities = new_MltplxExperiment(x = cell_x_values,
 #'                                   y = cell_y_values,
@@ -54,7 +54,7 @@
 #'                                   slide_id = slide_ids,
 #'                                   ps = 30, bw = 40)
 #' print(mltplx_exp_with_intensities)
-#' 
+#'
 #' # Create an experiment with intensities and distance matrices
 #' mltplx_exp_with_dist = new_MltplxExperiment(x = cell_x_values,
 #'                                   y = cell_y_values,
@@ -63,7 +63,7 @@
 #'                                   ps = 30, bw = 40,
 #'                                   dist_metric = cor)
 #' print(mltplx_exp_with_dist)
-#' 
+#'
 #' # Create an experiment with intensities, distance matrices and patient metadata
 #' set.seed(1234)
 #' slides <- unique(slide_ids)
@@ -93,6 +93,7 @@
 new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                                 ps = NULL, bw = NULL,
                                 dist_metric = NULL, metadata = NULL,
+                                symmetric = TRUE,
                                 windows = NULL){
 
   mltplx_experiment_check_inputs(x, y, marks, slide_id, ps, bw, window_sizes,
@@ -165,7 +166,8 @@ new_MltplxExperiment = function(x, y, marks, slide_id, window_sizes = NULL,
                          ps = ps,
                          bw = bw,
                          dist_metric = dist_metric,
-                         .dist_metric_name = dist_metric_name)
+                         .dist_metric_name = dist_metric_name,
+                         symmetric = symmetric)
         prog()
 
         return(obj)

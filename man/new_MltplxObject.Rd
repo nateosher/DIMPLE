@@ -15,6 +15,7 @@ new_MltplxObject(
   bw = NULL,
   dist_metric = NULL,
   .dist_metric_name = NULL,
+  symmetric = TRUE,
   window = NULL
 )
 }
@@ -52,6 +53,9 @@ is created.}
 \item{.dist_metric_name}{Optional; not required, even when a distance
 matrix is passed. However, if you'd like to name the distance function
 you use something specific, you can pass this name as a string using}
+
+\item{window}{Optional; object of class \code{owin} from spatstat.geom
+representing window of point process}
 }
 \value{
 \code{MltplxObject} object

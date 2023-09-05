@@ -1,6 +1,9 @@
 exp <- build_mltplx_exp(200,seed=2025)
 exp <- update_intensity(exp,ps=2,bw=3)
-exp <- update_dist(exp,cor)
+# setting symmetric to FALSE produces the type of distance matrix that
+# this code uses to check for duplicates, i.e. a redundant/upper-lower
+# distance matrix
+exp <- update_dist(exp,cor, symmetric = FALSE)
 
 # Raw data to test constructor directly
 set.seed(1234567)
