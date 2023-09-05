@@ -51,7 +51,8 @@ mltplx_experiment = new_MltplxExperiment(x = cell_x_values,
 
 ```
 
-Next we can add information on how the JSD between cell types changes in different areas of higher and lower tumor density, by using the `update_qdist` function. This function takes in the `MltplxExperiment` object, the distance metric of choice, a cell type by which the image is partitioned on (by the density of that cell type), as well as the quantiles that the mask density should be partitioned into.
+Next we can add information on how the JSD between cell types changes in different areas of higher and lower tumor density, by using the `update_qdist` function. This function takes in the `MltplxExperiment` object, the distance metric of choice, a cell type by which the image is partitioned on (by the density of that cell type), as well as the quantiles that the mask density should be partitioned into. Briefly, partitioning occurs by taking the smoothed intensity of the cell type of choice and then identifying the regions of the image that correspond to each quantile of the smoothed intensity, with the desired quantiles being defined in  `q_probs`. Then for each quantile region in the image, one can estimate the distance matrices and perform similar analyses as those that are performed on the whole image. This allows for the accounting for possible heterogeneity in cell-type relationships in different regions of the tissue.
+
 
 ```{r}
 q_probs <- tibble(from=c(0,34,67),to=c(33,66,100))
