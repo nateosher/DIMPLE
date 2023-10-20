@@ -21,8 +21,8 @@ plot_dist_boxplots <- function(mltplx_experiment,
 
   mltplx_experiment %>%
     dist_to_df() %>%
-    filter(type1 == t1,
-           type2 == t2) %>%
+    filter((type1 == t1 & type2 == t2) |
+             (type1 == t2 & type2 == t1)) %>%
     mutate(across(!!sym(grouping_var),factor)) %>%
     {
       if(!is.null(agg_fun)) {

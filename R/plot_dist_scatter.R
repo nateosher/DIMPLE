@@ -15,8 +15,8 @@ plot_dist_scatter <- function(mltplx_experiment,t1,t2,cont_var="Age",agg_fun=NUL
 
   mltplx_experiment %>%
     dist_to_df() %>%
-    filter(type1 == t1,
-           type2 == t2) %>%
+    filter((type1 == t1 & type2 == t2) |
+             (type1 == t2 & type2 == t1)) %>%
     mutate(across(!!sym(cont_var),as.numeric)) %>%
     {
       if(!is.null(agg_fun)) {
