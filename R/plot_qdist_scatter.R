@@ -20,8 +20,8 @@ plot_qdist_scatter <- function(mltplx_experiment,t1,t2,cont_var="Age",agg_fun=NU
   
   mltplx_experiment %>%
     qdist_to_df(reduce_symmetric = F) %>%
-    filter(type1 == t1,
-           type2 == t2) %>%
+    filter((type1 == t1 & type2 == t2) |
+             (type1 == t2 & type2 == t1)) %>%
     mutate(across(!!sym(cont_var),as.numeric)) %>%
     {
       if(!is.null(agg_fun)) {

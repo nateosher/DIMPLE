@@ -15,9 +15,9 @@ patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",p_val_
   stopifnot("Patient metadata must exist"=!is.null(mltplx_experiment$metadata))
 
   df <- mltplx_experiment %>%
-    dist_to_df %>%
-    filter(type1 == t1,
-           type2 == t2)
+    dist_to_df() %>%
+    filter((type1 == t1 & type2 == t2) |
+             (type1 == t2 & type2 == t1)) 
   
   res <- df %>%
     group_by(patient_id) %>%
@@ -39,6 +39,7 @@ patient_boxplots <- function(mltplx_experiment,t1,t2,grouping_var="Group",p_val_
   } else {
     df$gp <- df %>% pull(!!sym(grouping_var))
   }
+  
   df %>%
     mutate(across(gp,factor) ) %>%
     mutate(gp_bin = as.numeric(gp)) %>%

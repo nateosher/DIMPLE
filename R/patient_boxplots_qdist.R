@@ -21,8 +21,8 @@ patient_boxplots_qdist <- function(mltplx_experiment,t1,t2,grouping_var="Group",
   
   df <- mltplx_experiment %>%
     qdist_to_df(reduce_symmetric = F) %>%
-    filter(type1 == t1,
-           type2 == t2)
+    filter((type1 == t1 & type2 == t2) |
+             (type1 == t2 & type2 == t1)) 
   
   res <- df %>%
     group_by(patient_id,interval) %>%
