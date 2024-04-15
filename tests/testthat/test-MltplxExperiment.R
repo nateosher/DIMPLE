@@ -1,5 +1,6 @@
 set.seed(1234567)
 library(purrr)
+library(magrittr)
 cell_x_values = runif(3000, 0, 600)
 cell_y_values = runif(3000, 0, 600)
 cell_marks = sample(c("Tumor", "Immune", "Other"), 3000, replace = TRUE)
