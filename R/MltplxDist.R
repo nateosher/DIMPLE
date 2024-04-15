@@ -10,7 +10,7 @@
 new_MltplxDist = function(mltplx_intensity, dist_metric, .dist_metric_name,
                           symmetric = TRUE){
   intensities <- mltplx_intensity$intensities
-  distance_matrix = MakeDistMat(intensities[,!(colnames(intensities) %in% c("X","Y"))],
+  distance_matrix = MakeDistMat(intensities[,!(colnames(intensities) %in% c("X","Y")), drop=FALSE],
                                 dist_metric, symmetric = symmetric)
 
   structure(

@@ -17,7 +17,7 @@ pat.density = function(pat,eps,sigma,...) {
       spatstat.explore::density.ppp(pp,diggle=T,eps=eps,...)
     })
   })
-  sp = dens.split[[2]]
+  sp = dens.split[[1]]
   Y = rep(sp$yrow,times=sp$dim[2])
   X = rep(sp$xcol,each=sp$dim[1])
   step = sp$xstep

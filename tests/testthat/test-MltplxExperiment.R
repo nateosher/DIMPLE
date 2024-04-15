@@ -543,3 +543,65 @@ test_that("`list.as_MltplxExperiment` works", {
 
 
 })
+
+test_that("single cell type slides don't break `new_MltplxExperiment`", {
+  tib_with_one_type_slide = tibble(
+    cell_x_values,
+    cell_y_values,
+    cell_marks,
+    slide_ids
+  ) %>%
+    filter(
+      slide_ids != "Slide 1" | cell_marks == "Tumor"
+    )
+
+  expect_no_error({
+    exp_with_one_type_slide = tib_with_one_type_slide %$%
+      new_MltplxExperiment(
+        x = cell_x_values,
+        y = cell_y_values,
+        marks = cell_marks,
+        slide_id = slide_ids,
+        ps=20, bw=30,
+        dist_metric=cor
+      )
+  })
+
+  # Checking MltplxDist
+  expect_equal(length(exp_with_one_type_slide[[1]]$mltplx_dist$cell_types),
+               1)
+  expect_equal(exp_with_one_type_slide[[1]]$mltplx_dist$cell_types[1],
+               "Tumor")
+  expect_equal(nrow(exp_with_one_type_slide[[1]]$mltplx_dist$dist),
+               1)
+  expect_equal(ncol(exp_with_one_type_slide[[1]]$mltplx_dist$dist),
+               1)
+  expect_true(is.na(exp_with_one_type_slide[[1]]$mltplx_dist$dist[1,1]))
+
+  # Checking MltplxImage
+  expect_equal(length(exp_with_one_type_slide[[1]]$mltplx_image$cell_types),
+               1)
+
+  # Checking MltplxIntensity
+  expect_equal(ncol(exp_with_one_type_slide[[1]]$mltplx_intensity$intensities),
+               3)
+  expect_equal(length(exp_with_one_type_slide[[1]]$mltplx_intensity$cell_types),
+               1)
+  expect_equal(exp_with_one_type_slide[[1]]$mltplx_intensity$cell_types[1],
+               "Tumor")
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
