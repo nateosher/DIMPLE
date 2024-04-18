@@ -10,8 +10,8 @@ MakeDistMat = function(intensity_mat, dist_metric, symmetric=T){
   if(ncol(intensity_mat) == 1){
     return(
       matrix(NA, nrow = 1, ncol = 1) %>%
-        set_rownames(colnames(intensity_mat)) %>%
-        set_colnames(colnames(intensity_mat))
+        magrittr::set_rownames(colnames(intensity_mat)) %>%
+        magrittr::set_colnames(colnames(intensity_mat))
     )
   }
 
