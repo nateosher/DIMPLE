@@ -4,7 +4,7 @@
 #' @param slide_ids Vector of slide ids for which you would like to plot
 #' the selected cell intensities.
 #' @param types Vector of cell types whose intensities you'd like to plot
-#' @return NULL
+#' @return list of ggplot2 objects
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
@@ -27,7 +27,7 @@ plot_intensity_surface.MltplxExperiment <- function(mltplx_experiment,slide_ids,
     stop("none of the cell types passed as arguments are present in subset of slides selected")
 
 
-  for(slide in filtered_exp$mltplx_objects){
-    print(plot_intensity_surface(slide, types = types))
-  }
+  lapply(filtered_exp$mltplx_objects,\(slide) {
+    plot_intensity_surface(slide, types = types)
+  })
 }

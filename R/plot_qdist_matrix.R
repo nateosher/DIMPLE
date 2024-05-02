@@ -5,7 +5,7 @@
 #' @param mode String indicating plot type, either "heatmap" or "network"
 #' @param net_threshold When mode is "network", edges below this absolute value are
 #' excluded from the plot
-#' @return NULL
+#' @return list of ggplot2 objects
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
@@ -14,8 +14,8 @@ plot_qdist_matrix.MltplxExperiment <- function(mltplx_experiment, slide_ids,
                                                net_threshold = 0) {
   stopifnot("Quantile distances must exist"=!is.null(mltplx_experiment$mltplx_objects[[1]]$quantile_dist))
   filtered_exp = filter_MltplxExp(mltplx_experiment, slide_ids)
-  for(i in 1:length(filtered_exp$mltplx_objects)){
-    print(plot_qdist_matrix(filtered_exp[[i]], mode = mode,
-                            net_threshold = net_threshold))
-  }
+  lapply(1:length(filtered_exp$mltplx_objects),\(i){
+    plot_qdist_matrix(filtered_exp[[i]], mode = mode,
+                            net_threshold = net_threshold)
+  })
 }

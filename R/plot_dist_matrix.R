@@ -5,7 +5,7 @@
 #' @param mode String indicating plot type, either "heatmap" or "network"
 #' @param net_threshold When mode is "network", edges below this absolute value are
 #' excluded from the plot
-#' @return NULL
+#' @return list of ggplot2 objects
 #' @importFrom magrittr `%>%`
 #' @import ggplot2
 #' @export
@@ -16,9 +16,9 @@ plot_dist_matrix.MltplxExperiment <- function(mltplx_experiment, slide_ids, mode
       stop("no slide ids passed as argument are present in `MlptlxExperiment` object")
 
     filtered_exp <- filter_mltplx_objects(mltplx_experiment,slide_ids)
-    for(mltplx_object in filtered_exp) {
+    lapply(filtered_exp,\(mltplx_object) {
       plot_dist_matrix(mltplx_object, mode = mode, net_threshold = net_threshold,
                 invert_dist = invert_dist)
-    }
+    })
 }
 
