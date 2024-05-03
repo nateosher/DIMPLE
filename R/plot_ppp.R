@@ -3,7 +3,7 @@
 #' @param mltplx_experiment `MltplxExperiment` object
 #' @param slide_ids Vector of slide ids whose point processes you would like
 #' to plot.
-#' @return NULL
+#' @return list of ggplot2 objects
 #' @import ggplot2
 #' @importFrom magrittr `%>%`
 #' @export
@@ -20,7 +20,7 @@ plot_ppp <- function(mltplx_experiment,slide_ids) {
     tibble::tibble(X=pat$x,Y=pat$y,type=pat$marks,slide_id=slide_id)
   })
 
-  for(id in slide_ids) {
+  lapply(slide_ids,\(id) {
     df %>%
       dplyr::filter(slide_id == id) %>%
       ggplot(aes(X,Y,color=type,shape=type)) +
@@ -32,6 +32,6 @@ plot_ppp <- function(mltplx_experiment,slide_ids) {
                          label = levels(df$type),
                          values=rep_len(cbfp, length(unique(df$type))+1),drop=FALSE) +
       ggtitle(paste0("Point pattern plot for slide id ", id))-> p
-    print(p)
-  }
+    p
+  })
 }

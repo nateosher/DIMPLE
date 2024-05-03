@@ -6,7 +6,7 @@
 #' as percentage points, i.e. 25 for first quartile, 50 for median, etc. Note
 #' that these ranges *can* overlap.
 #' @param slide_ids Vector of slide ids for which you would like to plot
-#' @return NULL
+#' @return list of ggplot plots, one for each slide in `slide_ids`
 #' @importFrom magrittr `%>%`
 #' @import RColorBrewer
 #' @importFrom fuzzyjoin fuzzy_join
@@ -37,7 +37,7 @@ plot_quantile_intensity_surface <- function(mltplx_experiment,mask_type,q_probs,
       q_fac_for_plot = map2_chr(p1, p2, ~ paste0(.x, "-", .y)) %>% as.factor()
     )
 
-  for(id in slide_ids) {
+  lapply(slide_ids,\(id) {
 
     ppp<-objs[[which(sapply(objs, "[[", 1)==id)]]$mltplx_image$ppp
     d<-df %>%dplyr::filter(slide_id == id)
@@ -52,7 +52,7 @@ plot_quantile_intensity_surface <- function(mltplx_experiment,mask_type,q_probs,
                          label = levels(ppp$marks),
                          values=rep_len(cbfp, length(unique(ppp$marks))+1),drop=FALSE) +
       ggtitle(paste0("Quantile intensity plot for slide id ", id)) -> p
-    print(p)
-  }
+    p
+  })
 }
 
