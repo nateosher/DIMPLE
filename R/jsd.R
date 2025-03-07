@@ -18,7 +18,7 @@ jsd = function(v1, v2, base = 2, normalize = TRUE){
   M = 0.5 * (v1 + v2)
 
   return(sqrt(
-    0.5 * (kld(v1, M, base = base) + kld(v2, M, base = base))
+    0.5 * (kld(v1, M, base = base, normalize = FALSE) + kld(v2, M, base = base, normalize = FALSE))
   ))
 }
 
